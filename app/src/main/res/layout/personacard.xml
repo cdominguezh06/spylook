@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent">
+
+            <TextView
+                android:id="@+id/mostknownalias"
+                android:layout_width="232dp"
+                android:layout_height="39dp"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="24dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:rotation="-2"
+                android:text="Nick de internet"
+                android:textAlignment="viewStart"
+                android:textColor="#100E0E"
+                android:textSize="30dp"
+                app:layout_constraintStart_toEndOf="@+id/careto"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/careto"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="28dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:rotation="-15"
+                android:rotationX="0"
+                android:rotationY="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="116dp"
+                android:layout_height="17dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="52dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:rotation="0"
+                android:text="Nombre real"
+                android:textAlignment="viewStart"
+                android:textSize="11sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/mostknownalias"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
