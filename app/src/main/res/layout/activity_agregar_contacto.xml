@@ -2,9 +2,38 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="100dp"
+            android:layout_height="90dp"
+            app:srcCompat="@drawable/ratona" />
+
+        <EditText
+            android:id="@+id/editTextNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:hint="Nombre"
+            android:inputType="text" />
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -17,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView3"
@@ -45,15 +74,14 @@
                     android:textAppearance="?attr/textAppearanceHeadline6"
                     android:textColor="@android:color/black" />
 
-                <TextView
-                    android:id="@+id/nickContent"
+                <EditText
+                    android:id="@+id/editTextNick"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="Contenido"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="20sp" />
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Nick mas conocido"
+                    android:inputType="text"
+                    android:textAlignment="center" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -83,15 +111,14 @@
                     android:textAppearance="?attr/textAppearanceHeadline6"
                     android:textColor="@android:color/black" />
 
-                <TextView
-                    android:id="@+id/edadContent"
+                <EditText
+                    android:id="@+id/editTextEdad"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="Contenido"
-                    android:textAppearance="?attr/textAppearanceBody1"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="20sp" />
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Edad"
+                    android:inputType="text"
+                    android:textAlignment="center" />
 
             </LinearLayout>
 
@@ -119,7 +146,7 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="260dp"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
@@ -136,20 +163,22 @@
                             android:gravity="center"
                             android:paddingHorizontal="10dp"
                             android:paddingBottom="8dp"
-                            android:text="Fecha nacimiento"
+                            android:text="Cumpleaños"
                             android:textAppearance="?attr/textAppearanceHeadline6"
                             android:textColor="@android:color/black"
                             android:textSize="16sp" />
 
-                        <TextView
-                            android:id="@+id/fechaContent"
+                        <EditText
+                            android:id="@+id/editTextCumpleanos"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:paddingHorizontal="10dp"
-                            android:text="Contenido"
-                            android:textAppearance="?attr/textAppearanceBody1"
-                            android:textColor="@android:color/darker_gray" />
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"
+                            android:ems="10"
+                            android:hint="Cumpleaños"
+                            android:inputType="text"
+                            android:textAlignment="center"
+                            android:textSize="13sp" />
+
                     </LinearLayout>
 
                     <LinearLayout
@@ -169,14 +198,16 @@
                             android:textAppearance="?attr/textAppearanceHeadline6"
                             android:textColor="@android:color/black" />
 
-                        <TextView
-                            android:id="@+id/ciudadContent"
+                        <EditText
+                            android:id="@+id/editTextCiudad"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:text="Contenido"
-                            android:textAppearance="?attr/textAppearanceBody1"
-                            android:textColor="@android:color/darker_gray" />
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="Ciudad"
+                            android:inputType="text"
+                            android:textAlignment="center"
+                            android:textSize="13sp" />
 
                     </LinearLayout>
 
@@ -197,14 +228,17 @@
                             android:textAppearance="?attr/textAppearanceHeadline6"
                             android:textColor="@android:color/black" />
 
-                        <TextView
-                            android:id="@+id/estadoContent"
+                        <EditText
+                            android:id="@+id/editTextEstado"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:text="Contenido"
-                            android:textAppearance="?attr/textAppearanceBody1"
-                            android:textColor="@android:color/darker_gray" />
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="Estado"
+                            android:inputType="text"
+                            android:textAlignment="center"
+                            android:textSize="13sp" />
+
                     </LinearLayout>
 
                 </LinearLayout>
@@ -225,11 +259,10 @@
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="@android:color/black" />
 
-                    <ImageView
-                        android:id="@+id/imagenPais"
+                    <Spinner
+                        android:id="@+id/spinnerPais"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:srcCompat="@tools:sample/avatars" />
+                        android:layout_height="match_parent" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -239,10 +272,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAnotaciones"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSiguiente"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -260,5 +293,18 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+
+    <Button
+        android:id="@+id/buttonSiguiente"
+        android:layout_width="137dp"
+        android:layout_height="63dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="#00FFFFFF"
+        android:text="Siguiente"
+        android:textColor="#2880C4"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
