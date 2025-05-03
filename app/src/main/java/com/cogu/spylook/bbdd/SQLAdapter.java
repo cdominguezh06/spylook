@@ -33,7 +33,7 @@ public class SQLAdapter {
         Cursor cursor = db.rawQuery("Select * from contacto", null);
         List<Contacto> contactos = new ArrayList<>();
         while (cursor.moveToNext()) {
-            Contacto contacto = new Contacto(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), cursor.getInt(4), LocalDate.parse(Optional.ofNullable(cursor.getString(5)).orElse(LocalDate.now().toString())), cursor.getString(6), cursor.getString(7), cursor.getString(8));
+            Contacto contacto = new Contacto(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), LocalDate.parse(Optional.ofNullable(cursor.getString(5)).orElse(LocalDate.now().toString())), cursor.getString(6), cursor.getString(7), cursor.getString(8));
             if(contacto.getFoto() == 0){
                 contacto.setFoto(R.drawable.notfound);
             }
@@ -58,7 +58,7 @@ public class SQLAdapter {
         this.db = sqlOpenHelper.getWritableDatabase();
         Cursor contacto = db.rawQuery("Select * from contacto where id = " + id, null);
         if (contacto.moveToNext()) {
-            Contacto retorno = new Contacto(contacto.getInt(0), contacto.getString(1), contacto.getString(2), contacto.getInt(3), contacto.getInt(4), LocalDate.parse(Optional.ofNullable(contacto.getString(5)).orElse(LocalDate.now().toString())), contacto.getString(6), contacto.getString(7), contacto.getString(8));
+            Contacto retorno = new Contacto(contacto.getInt(0), contacto.getString(1), contacto.getString(2), contacto.getInt(3), LocalDate.parse(Optional.ofNullable(contacto.getString(5)).orElse(LocalDate.now().toString())), contacto.getString(6), contacto.getString(7), contacto.getString(8));
             if(retorno.getFoto() == 0){
                 retorno.setFoto(R.drawable.notfound);
             }

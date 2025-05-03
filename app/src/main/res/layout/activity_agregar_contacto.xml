@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#000000">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -29,18 +29,21 @@
             android:layout_weight="1"
             android:ems="10"
             android:gravity="center"
-            android:textSize="30sp"
             android:hint="Nombre"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:textSize="30sp" />
 
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
-        android:layout_width="370dp"
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="40dp"
         android:outlineAmbientShadowColor="#00FFFFFF"
         android:outlineSpotShadowColor="#00FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,9 +53,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView3"
-            android:layout_width="177dp"
-            android:layout_height="99dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="154dp"
+            android:layout_height="100dp"
             android:outlineAmbientShadowColor="#00FFFFFF"
             android:outlineSpotShadowColor="#00FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -61,6 +63,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/rainbow_box"
                 android:orientation="vertical">
 
                 <TextView
@@ -72,24 +75,28 @@
                     android:paddingBottom="8dp"
                     android:text="Conocido como"
                     android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
 
                 <EditText
                     android:id="@+id/editTextNick"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autofillHints="Nick"
                     android:ems="10"
                     android:hint="Nick mas conocido"
                     android:inputType="text"
-                    android:textAlignment="center" />
-
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white"
+                    android:textSize="20sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
-            android:layout_width="177dp"
-            android:layout_height="99dp"
+            android:layout_width="144dp"
+            android:layout_height="100dp"
             android:outlineAmbientShadowColor="#00FFFFFF"
             android:outlineSpotShadowColor="#00FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -98,6 +105,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/rainbow_box"
                 android:orientation="vertical">
 
                 <TextView
@@ -109,16 +117,21 @@
                     android:paddingBottom="8dp"
                     android:text="Edad"
                     android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
 
                 <EditText
                     android:id="@+id/editTextEdad"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autofillHints="Nick"
                     android:ems="10"
                     android:hint="Edad"
                     android:inputType="text"
-                    android:textAlignment="center" />
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
@@ -259,11 +272,6 @@
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="@android:color/black" />
 
-                    <Spinner
-                        android:id="@+id/spinnerPais"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
                 </LinearLayout>
             </LinearLayout>
 
@@ -308,3 +316,224 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!--    <TextView-->
+<!--        android:id="@+id/nickContent"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Contenido"-->
+<!--        android:textAppearance="?attr/textAppearanceBody1"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="20sp" />-->
+
+<!--</LinearLayout>-->
+<!--</androidx.cardview.widget.CardView>-->
+
+<!--<androidx.cardview.widget.CardView-->
+<!--android:id="@+id/cardView"-->
+<!--android:layout_width="144dp"-->
+<!--android:layout_height="100dp"-->
+<!--android:outlineAmbientShadowColor="#00FFFFFF"-->
+<!--android:outlineSpotShadowColor="#00FFFFFF"-->
+<!--app:layout_constraintBottom_toBottomOf="parent"-->
+<!--app:layout_constraintStart_toStartOf="parent">-->
+
+<!--<LinearLayout-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:background="@drawable/rainbow_box"-->
+<!--    android:orientation="vertical">-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/edadContent"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:gravity="center"-->
+<!--        android:text="Contenido"-->
+<!--        android:textAppearance="?attr/textAppearanceBody1"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="20sp" />-->
+
+<!--</LinearLayout>-->
+
+<!--</androidx.cardview.widget.CardView>-->
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+<!--<androidx.cardview.widget.CardView-->
+<!--android:id="@+id/cardView2"-->
+<!--android:layout_width="333dp"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_marginStart="30dp"-->
+<!--android:layout_marginTop="30dp"-->
+<!--android:layout_marginEnd="30dp"-->
+<!--app:layout_constraintEnd_toEndOf="parent"-->
+<!--app:layout_constraintHorizontal_bias="0.5"-->
+<!--app:layout_constraintStart_toStartOf="parent"-->
+<!--app:layout_constraintTop_toBottomOf="@+id/constraintLayout">-->
+
+<!--<LinearLayout-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:background="@drawable/rainbow_box"-->
+<!--    android:orientation="vertical">-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:orientation="horizontal">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="52.6dp"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/fechaTitle"-->
+<!--                    android:layout_width="166dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:fontFamily="@font/adlam_display"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:paddingBottom="8dp"-->
+<!--                    android:text="Fecha nacimiento"-->
+<!--                    android:textAppearance="?attr/textAppearanceHeadline6"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="16sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/fechaContent"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:text="Contenido"-->
+<!--                    android:textAppearance="?attr/textAppearanceBody1"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="18sp" />-->
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="52.6dp"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/ciudadTitle"-->
+<!--                    android:layout_width="166dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:fontFamily="@font/adlam_display"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:paddingBottom="8dp"-->
+<!--                    android:text="Ciudad"-->
+<!--                    android:textAppearance="?attr/textAppearanceHeadline6"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="20sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/ciudadContent"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="Contenido"-->
+<!--                    android:textAppearance="?attr/textAppearanceBody1"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="18sp" />-->
+
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="52.6dp"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/estadoTitle"-->
+<!--                    android:layout_width="166dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:fontFamily="@font/adlam_display"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:paddingBottom="8dp"-->
+<!--                    android:text="Estado"-->
+<!--                    android:textAppearance="?attr/textAppearanceHeadline6"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="20sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/estadoContent"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="Contenido"-->
+<!--                    android:textAppearance="?attr/textAppearanceBody1"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="18sp" />-->
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="52.6dp"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/paisTitle"-->
+<!--                    android:layout_width="166dp"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:fontFamily="@font/adlam_display"-->
+<!--                    android:gravity="center"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:paddingBottom="8dp"-->
+<!--                    android:text="Pais"-->
+<!--                    android:textAppearance="?attr/textAppearanceHeadline6"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="20sp" />-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/textPais"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="Contenido"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="18sp" />-->
+
+<!--            </LinearLayout>-->
+<!--        </LinearLayout>-->
+<!--    </LinearLayout>-->
+
+<!--</LinearLayout>-->
+<!--</androidx.cardview.widget.CardView>-->
+
+<!--<androidx.recyclerview.widget.RecyclerView-->
+<!--android:id="@+id/recyclerAnotaciones"-->
+<!--android:layout_width="0dp"-->
+<!--android:layout_height="0dp"-->
+<!--android:layout_marginTop="1dp"-->
+<!--android:background="#00FFFFFF"-->
+<!--app:layout_constraintBottom_toBottomOf="parent"-->
+<!--app:layout_constraintEnd_toEndOf="parent"-->
+<!--app:layout_constraintStart_toStartOf="parent"-->
+<!--app:layout_constraintTop_toBottomOf="@+id/textView2" />-->
+
+<!--<TextView-->
+<!--android:id="@+id/textView2"-->
+<!--android:layout_width="0dp"-->
+<!--android:layout_height="40dp"-->
+<!--android:layout_marginTop="12dp"-->
+<!--android:fontFamily="@font/adlam_display"-->
+<!--android:gravity="center"-->
+<!--android:text="Anotaciones"-->
+<!--android:textColor="#FFFFFF"-->
+<!--android:textSize="20sp"-->
+<!--app:layout_constraintEnd_toEndOf="parent"-->
+<!--app:layout_constraintHorizontal_bias="0.0"-->
+<!--app:layout_constraintStart_toStartOf="parent"-->
+<!--app:layout_constraintTop_toBottomOf="@+id/cardView2" />-->

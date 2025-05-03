@@ -36,7 +36,6 @@ public class InformacionFragment extends Fragment {
         fechaContent = fragment.findViewById(R.id.fechaContent);
         ciudadContent = fragment.findViewById(R.id.ciudadContent);
         estadoContent = fragment.findViewById(R.id.estadoContent);
-        paisImg = fragment.findViewById(R.id.imagenPais);
 
         edadContent.setText(String.valueOf(contacto.getEdad()));
         nickContent.setText(contacto.getNickMasConocido());

@@ -19,13 +19,17 @@ public class Contacto {
     private String estado;
     private String pais;
 
-    public Contacto(int id, String nombre, String nickMasConocido, int foto, int edad, LocalDate fechaNacimiento, String ciudad, String estado, String pais) {
+    public Contacto(int id, String nombre, String nickMasConocido, int foto, LocalDate fechaNacimiento, String ciudad, String estado, String pais) {
         this.id = id;
         this.nombre = nombre;
         this.nickMasConocido = nickMasConocido;
         this.foto = foto;
-        this.edad = edad;
         this.fechaNacimiento = fechaNacimiento;
+        this.edad = LocalDate.now().isAfter(
+                fechaNacimiento.withYear(LocalDate.now().getYear())
+                        .withDayOfYear(LocalDate.now().getDayOfYear() - 1))
+                ? LocalDate.now().getYear() - fechaNacimiento.getYear()
+                : LocalDate.now().getYear() - (fechaNacimiento.getYear() - 1);
         this.ciudad = ciudad;
         this.estado = estado;
         this.pais = pais;

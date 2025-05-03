@@ -14,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.SpinnerAdapter;
 import com.cogu.spylook.model.Contacto;
-import com.cogu.spylook.model.enums.PaisEnum;
 import com.cogu.spylook.model.unimplemented.SpinnerableClass;
 
 import java.time.LocalDate;
@@ -47,11 +46,6 @@ public class NuevoContactoActivity extends AppCompatActivity {
         editTextEstado = findViewById(R.id.editTextEstado);
         spinnerPais = findViewById(R.id.spinnerPais);
         siguiente = findViewById(R.id.buttonSiguiente);
-        PaisEnum[] paisEnums = PaisEnum.values();
-        List<SpinnerableClass> collect = Arrays.stream(paisEnums).map(p -> new SpinnerableClass(p.getString(), p.getImage())).collect(Collectors.toList());
-        List<Integer> ids = new ArrayList<>(Arrays.asList(R.layout.spinner_pais_view,R.id.imagePais));
-        SpinnerAdapter<SpinnerableClass> adapter = new SpinnerAdapter<>(this, collect, ids);
-        spinnerPais.setAdapter(adapter);
 
         siguiente.setOnClickListener(v -> {
             Contacto contacto = new Contacto();
