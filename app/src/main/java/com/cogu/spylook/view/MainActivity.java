@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +19,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.mappers.ContactoToCardItem;
-import com.cogu.spylook.model.Contacto;
+import com.cogu.spylook.model.TextWatcherSearchBar;
+import com.cogu.spylook.model.decorators.RainbowTextViewDecorator;
 import com.cogu.spylook.model.cards.ContactoCardItem;
+import com.cogu.spylook.model.decorators.SpacingItemDecoration;
 import com.cogu.spylook.repositories.ContactoRepository;
 
 import org.mapstruct.factory.Mappers;
@@ -31,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ContactoToCardItem mapper;
     private ContactoRepository repository;
-    Button button;
+    private PersonaCardAdapter adapter;
+    private RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,48 +49,33 @@ public class MainActivity extends AppCompatActivity {
         });
         repository = ContactoRepository.getInstance(this);
         mapper = Mappers.getMapper(ContactoToCardItem.class);
-        button = findViewById(R.id.button);
+        prepareButton();
+        prepareRecyclerView();
+        EditText text = findViewById(R.id.searchEditText);
+        text.addTextChangedListener(new TextWatcherSearchBar(text, recyclerView, adapter, this));
+
+        TextView usuarios = findViewById(R.id.textUsuarios);
+        TextView grupos = findViewById(R.id.textGrupos);
+
+        RainbowTextViewDecorator decorator = new RainbowTextViewDecorator(this, usuarios);
+        decorator.apply();
+        decorator = new RainbowTextViewDecorator(this, grupos);
+        decorator.apply();
+    }
+
+    private void prepareButton() {
+        Button button = findViewById(R.id.button);
         button.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, NuevoContactoActivity.class);
             startActivity(intent);
         });
-        PersonaCardAdapter adapter = new PersonaCardAdapter(repository.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
-        RecyclerView recyclerView = findViewById(R.id.recycler);
+    }
+
+    private void prepareRecyclerView(){
+        adapter = new PersonaCardAdapter(repository.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
+        recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        EditText text = findViewById(R.id.searchEditText);
-
-        text.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (text.getText().toString().isEmpty()){
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-                    recyclerView.setAdapter(adapter);
-                }else{
-                    List<ContactoCardItem> collect = repository.getContactos().stream()
-                            .filter(i -> i.getNickMasConocido().toLowerCase().contains(text.getText().toString().toLowerCase()))
-                            .map(mapper::toCardItem)
-                            .collect(Collectors.toList());
-                    if (collect.isEmpty()){
-                        collect.add(new ContactoCardItem("", "Sin resultados", R.drawable.notfound, false));
-                    }
-                    PersonaCardAdapter newAdapter = new PersonaCardAdapter(collect, getBaseContext());
-                    recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-                    recyclerView.setAdapter(newAdapter);
-                }
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-
-        });
+        recyclerView.addItemDecoration(new SpacingItemDecoration(this));
     }
 }

@@ -2,5 +2,6 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/adlam_display</item>
+        <item>@font/alatsi</item>
     </array>
 </resources>

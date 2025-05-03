@@ -5,10 +5,10 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#000000"
     android:backgroundTintMode="src_atop"
-    tools:context=".view.MainActivity"
-    app:itemIconSize="40dp">
+    app:itemIconSize="40dp"
+    tools:context=".view.MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
@@ -44,7 +44,7 @@
                 app:srcCompat="@drawable/grupos" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/textGrupos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -68,7 +68,7 @@
                 app:srcCompat="@drawable/grupos" />
 
             <TextView
-                android:id="@+id/textusuarios"
+                android:id="@+id/textUsuarios"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -82,28 +82,37 @@
 
     <EditText
         android:id="@+id/searchEditText"
+        style="@style/RainbowBorderEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:layout_weight="1"
-        android:background="?android:attr/editTextBackground"
+        android:background="@drawable/rainbow_border"
         android:drawableLeft="@android:drawable/ic_menu_search"
         android:drawablePadding="8dp"
+        android:fontFamily="@font/alatsi"
         android:hint="Buscar"
         android:inputType="text"
         android:padding="8dp"
         android:textAlignment="viewStart"
+        android:textColorHighlight="#FFECEC"
+        android:textColorHint="#FFFFFF"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button"
+        style="@style/RainbowBorderButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00FFFFFF"
+        android:background="@drawable/rainbow_border"
+        android:fontFamily="@font/alatsi"
         android:text="Nuevo"
-        android:textColor="#008599"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchEditText" />
