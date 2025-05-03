@@ -2,6 +2,7 @@ package com.cogu.spylook.repositories;
 
 import android.content.Context;
 
+import com.cogu.spylook.R;
 import com.cogu.spylook.bbdd.SQLAdapter;
 import com.cogu.spylook.model.Contacto;
 
@@ -27,6 +28,7 @@ public class ContactoRepository {
     }
 
     public boolean addContacto(Contacto contacto) {
+        contacto.setFoto(R.drawable.ratona);
         if (adapter.addContacto(contacto)){
             contactos.add(contacto);
             return true;

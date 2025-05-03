@@ -21,11 +21,9 @@ import java.util.Optional;
 public class SQLAdapter {
     private SQLOpenHelper sqlOpenHelper;
     private SQLiteDatabase db;
-    private ContactoToCardItem mapper;
 
     public SQLAdapter(Context context) {
         this.sqlOpenHelper = SQLOpenHelper.getInstance(context);
-        this.mapper = Mappers.getMapper(ContactoToCardItem.class);
     }
 
     public List<Contacto> getContactos() {
@@ -33,9 +31,9 @@ public class SQLAdapter {
         Cursor cursor = db.rawQuery("Select * from contacto", null);
         List<Contacto> contactos = new ArrayList<>();
         while (cursor.moveToNext()) {
-            Contacto contacto = new Contacto(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3), LocalDate.parse(Optional.ofNullable(cursor.getString(5)).orElse(LocalDate.now().toString())), cursor.getString(6), cursor.getString(7), cursor.getString(8));
-            if(contacto.getFoto() == 0){
-                contacto.setFoto(R.drawable.notfound);
+            Contacto contacto = new Contacto(cursor.getInt(0), cursor.getString(1), cursor.getString(2), LocalDate.parse(Optional.ofNullable(cursor.getString(3)).orElse(LocalDate.now().toString())), cursor.getString(4), cursor.getString(5), cursor.getString(6));
+            if (contacto.getFoto() == 0){
+                contacto.setFoto(R.drawable.ratona);
             }
             contactos.add(contacto);
         }
@@ -46,7 +44,7 @@ public class SQLAdapter {
     public boolean addContacto(Contacto contacto) {
         this.db = sqlOpenHelper.getWritableDatabase();
         try {
-            db.execSQL("INSERT INTO contacto (nombre, nickMasConocido, foto, edad, fechaNacimiento, ciudad, estado, pais) VALUES ('" + contacto.getNombre() + "','" + contacto.getNickMasConocido() + "'," + contacto.getFoto() + "," + contacto.getEdad() + "," + contacto.getFechaNacimiento() + "," + contacto.getCiudad()+ "," + contacto.getEstado() + "," + contacto.getPais() +");");
+            db.execSQL("INSERT INTO contacto (nombre, nickMasConocido, fechaNacimiento, ciudad, estado, pais) VALUES ('" + contacto.getNombre() + "','" + contacto.getNickMasConocido() + "','" + contacto.getFechaNacimiento() + "','" + contacto.getCiudad()+ "','" + contacto.getEstado() + "','" + contacto.getPais() +"');");
             return true;
         } catch (Exception e) {
             db.close();
@@ -58,11 +56,7 @@ public class SQLAdapter {
         this.db = sqlOpenHelper.getWritableDatabase();
         Cursor contacto = db.rawQuery("Select * from contacto where id = " + id, null);
         if (contacto.moveToNext()) {
-            Contacto retorno = new Contacto(contacto.getInt(0), contacto.getString(1), contacto.getString(2), contacto.getInt(3), LocalDate.parse(Optional.ofNullable(contacto.getString(5)).orElse(LocalDate.now().toString())), contacto.getString(6), contacto.getString(7), contacto.getString(8));
-            if(retorno.getFoto() == 0){
-                retorno.setFoto(R.drawable.notfound);
-            }
-            return retorno;
+            return new Contacto(contacto.getInt(0), contacto.getString(1), contacto.getString(2), LocalDate.parse(Optional.ofNullable(contacto.getString(3)).orElse(LocalDate.now().toString())), contacto.getString(4), contacto.getString(5), contacto.getString(6));
         }
         return null;
     }

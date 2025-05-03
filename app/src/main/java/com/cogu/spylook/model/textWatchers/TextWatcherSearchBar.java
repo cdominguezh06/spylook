@@ -1,4 +1,4 @@
-package com.cogu.spylook.model;
+package com.cogu.spylook.model.textWatchers;
 
 import android.content.Context;
 import android.text.Editable;
@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.mappers.ContactoToCardItem;
-import com.cogu.spylook.mappers.ContactoToCardItemImpl;
 import com.cogu.spylook.model.cards.ContactoCardItem;
 import com.cogu.spylook.repositories.ContactoRepository;
 
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;

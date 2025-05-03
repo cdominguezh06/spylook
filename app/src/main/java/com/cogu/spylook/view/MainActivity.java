@@ -2,8 +2,6 @@ package com.cogu.spylook.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.mappers.ContactoToCardItem;
-import com.cogu.spylook.model.TextWatcherSearchBar;
+import com.cogu.spylook.model.textWatchers.TextWatcherSearchBar;
 import com.cogu.spylook.model.decorators.RainbowTextViewDecorator;
 import com.cogu.spylook.model.cards.ContactoCardItem;
 import com.cogu.spylook.model.decorators.SpacingItemDecoration;
@@ -72,7 +70,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareRecyclerView(){
-        adapter = new PersonaCardAdapter(repository.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
+        if (repository.getContactos().isEmpty()){
+            adapter = new PersonaCardAdapter(List.of(new ContactoCardItem("Vaya...", "Qué vacio...", R.drawable.notfound, false)), this);
+        }else{
+            adapter = new PersonaCardAdapter(repository.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
+        }
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);

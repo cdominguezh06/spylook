@@ -12,21 +12,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.cogu.spylook.R;
-import com.cogu.spylook.adapters.SpinnerAdapter;
 import com.cogu.spylook.model.Contacto;
+import com.cogu.spylook.model.unimplemented.DateTextWatcher;
 import com.cogu.spylook.model.unimplemented.SpinnerableClass;
+import com.cogu.spylook.repositories.ContactoRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.format.DateTimeFormatter;
 
 public class NuevoContactoActivity extends AppCompatActivity {
 
-    private EditText editTextNombre, editTextNick, editTextEdad, editTextCumpleanos, editTextCiudad, editTextEstado;
-    private Spinner spinnerPais;
+    private EditText editTextNombre, editTextNick, editTextCumpleanos, editTextCiudad, editTextEstado, editTextPais;
     private Button siguiente;
+    private ContactoRepository repository;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,25 +36,26 @@ public class NuevoContactoActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        repository = ContactoRepository.getInstance(this);
         editTextNombre = findViewById(R.id.editTextNombre);
         editTextNick = findViewById(R.id.editTextNick);
-        editTextEdad = findViewById(R.id.editTextEdad);
         editTextCumpleanos = findViewById(R.id.editTextCumpleanos);
+        editTextCumpleanos.addTextChangedListener(new DateTextWatcher(editTextCumpleanos));
         editTextCiudad = findViewById(R.id.editTextCiudad);
         editTextEstado = findViewById(R.id.editTextEstado);
-        spinnerPais = findViewById(R.id.spinnerPais);
+        editTextPais = findViewById(R.id.editTextPais);
         siguiente = findViewById(R.id.buttonSiguiente);
 
         siguiente.setOnClickListener(v -> {
-            Contacto contacto = new Contacto();
-            contacto.setNombre(editTextNombre.getText().toString());
-            contacto.setNickMasConocido(editTextNick.getText().toString());
-            contacto.setEdad(Integer.parseInt(editTextEdad.getText().toString()));
-            contacto.setFechaNacimiento(LocalDate.parse(editTextCumpleanos.getText().toString()));
-            contacto.setCiudad(editTextCiudad.getText().toString());
-            contacto.setEstado(editTextEstado.getText().toString());
-            contacto.setPais(((SpinnerableClass) spinnerPais.getSelectedItem()).getString());
-
+            String nombre = editTextNombre.getText().toString();
+            String nick = editTextNick.getText().toString();
+            String cumpleanos = LocalDate.parse(editTextCumpleanos.getText().toString(), DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString();
+            String ciudad = editTextCiudad.getText().toString();
+            String estado = editTextEstado.getText().toString();
+            String pais = editTextPais.getText().toString();
+            Contacto contacto = new Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais);
+            repository.addContacto(contacto);
+            finish();
         });
     }
 }
