@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
+import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.mappers.ContactoToCardItem;
 import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.cards.ContactoCardItem;
@@ -28,12 +29,14 @@ import java.util.stream.Collectors;
 public class AmigosFragment extends Fragment {
 
     private Contacto contacto;
-    private ContactoDAO repository;
     private ContactoToCardItem mapper;
     private Context context;
+    private AppDatabase db;
+    private ContactoDAO contactoDAO;
     public AmigosFragment(Contacto contacto, Context context) {
         this.contacto = contacto;
-        repository = ContactoDAO.getInstance(context);
+        db = AppDatabase.getInstance(context);
+        contactoDAO = db.contactoDAO();
         mapper = Mappers.getMapper(ContactoToCardItem.class);
         this.context = context;
     }
@@ -44,7 +47,7 @@ public class AmigosFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View fragment = inflater.inflate(R.layout.fragment_amigos, container, false);
         RecyclerView recyclerView = fragment.findViewById(R.id.recycleramigos);
-        List<ContactoCardItem> amigos = repository.getAmigos(contacto).stream().map(mapper::toCardItem).collect(Collectors.toList());
+        List<ContactoCardItem> amigos = contactoDAO.getAmigos(contacto).stream().map(mapper::toCardItem).collect(Collectors.toList());
         if (amigos.isEmpty()){
             amigos.add(new ContactoCardItem("Error", "No hay amigos", R.drawable.notfound, false));
         }

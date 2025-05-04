@@ -13,5 +13,4 @@ public class Suceso {
     private LocalDate fecha;
     private String descripcion;
     private Contacto causante;
-    private List<Contacto> participantes;
 }

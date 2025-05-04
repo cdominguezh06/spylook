@@ -15,5 +15,5 @@ public class Grupo {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String nombre;
-    public int id_creador;
+    public int idCreador;
 }

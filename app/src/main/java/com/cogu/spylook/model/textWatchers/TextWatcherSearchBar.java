@@ -13,7 +13,6 @@ import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.mappers.ContactoToCardItem;
 import com.cogu.spylook.model.cards.ContactoCardItem;
-import com.cogu.spylook.DAO.ContactoDAO;
 
 import org.mapstruct.factory.Mappers;
 
@@ -48,8 +47,8 @@ public class TextWatcherSearchBar implements TextWatcher {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(adapter);
         }else{
-            List<ContactoCardItem> collect = db.userDao().getContactos().stream()
-                    .filter(i -> i.getNickMasConocido().toLowerCase().contains(text.getText().toString().toLowerCase()))
+            List<ContactoCardItem> collect = db.contactoDAO().getContactos().stream()
+                    .filter(i -> i.getAlias().toLowerCase().contains(text.getText().toString().toLowerCase()))
                     .map(mapper::toCardItem)
                     .collect(Collectors.toList());
             if (collect.isEmpty()){

@@ -35,7 +35,7 @@ public class ContactoActivity extends AppCompatActivity {
             return insets;
         });
         db = AppDatabase.getInstance(this);
-        contactoDAO = db.userDao();
+        contactoDAO = db.contactoDAO();
         title = findViewById(R.id.contactoTitle);
         title.setText(contactoDAO.findContactoById(getIntent().getIntExtra("id", 0)).getNombre());
         viewPager = findViewById(R.id.pager);

@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.cogu.spylook.R;
+import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.unimplemented.DateTextWatcher;
 import com.cogu.spylook.DAO.ContactoDAO;
@@ -22,7 +23,8 @@ public class NuevoContactoActivity extends AppCompatActivity {
 
     private EditText editTextNombre, editTextNick, editTextCumpleanos, editTextCiudad, editTextEstado, editTextPais;
     private Button siguiente;
-    private ContactoDAO repository;
+    private AppDatabase db;
+    private ContactoDAO contactoDAO;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +36,8 @@ public class NuevoContactoActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        repository = ContactoDAO.getInstance(this);
+        db = AppDatabase.getInstance(this);
+        contactoDAO = db.contactoDAO();
         editTextNombre = findViewById(R.id.editTextNombre);
         editTextNick = findViewById(R.id.editTextNick);
         editTextCumpleanos = findViewById(R.id.editTextCumpleanos);
@@ -52,7 +55,7 @@ public class NuevoContactoActivity extends AppCompatActivity {
             String estado = editTextEstado.getText().toString();
             String pais = editTextPais.getText().toString();
             Contacto contacto = new Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais);
-            repository.addContacto(contacto);
+            contactoDAO.addContacto(contacto);
             finish();
         });
     }

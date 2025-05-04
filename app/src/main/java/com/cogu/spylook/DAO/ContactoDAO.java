@@ -1,9 +1,11 @@
 package com.cogu.spylook.DAO;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Transaction;
+import androidx.room.Update;
 
 import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.relationships.CreadorGrupo;
@@ -15,6 +17,12 @@ public interface ContactoDAO {
 
     @Insert
     public void addContacto(Contacto contacto);
+
+    @Update
+    public void updateContacto(Contacto contacto);
+
+    @Delete
+    public void deleteContacto(Contacto contacto);
 
     @Query("Select * from contactos where id = :id")
     public Contacto findContactoById(int id);

@@ -16,7 +16,7 @@ import com.cogu.spylook.model.entity.Suceso;
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 
-    public abstract ContactoDAO userDao();
+    public abstract ContactoDAO contactoDAO();
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {

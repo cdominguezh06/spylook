@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
+import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.mappers.ContactoToCardItem;
 import com.cogu.spylook.model.textWatchers.TextWatcherSearchBar;
 import com.cogu.spylook.model.decorators.RainbowTextViewDecorator;
@@ -31,9 +32,10 @@ import java.util.stream.Collectors;
 public class MainActivity extends AppCompatActivity {
 
     private ContactoToCardItem mapper;
-    private ContactoDAO repository;
     private PersonaCardAdapter adapter;
     private RecyclerView recyclerView;
+    private AppDatabase db;
+    private ContactoDAO dao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        repository = ContactoDAO.getInstance(this);
+        db = AppDatabase.getInstance(this);
+        dao = db.contactoDAO();
         mapper = Mappers.getMapper(ContactoToCardItem.class);
         prepareButton();
         prepareRecyclerView();
@@ -70,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareRecyclerView(){
-        if (repository.getContactos().isEmpty()){
+        if (dao.getContactos().isEmpty()){
             adapter = new PersonaCardAdapter(List.of(new ContactoCardItem("Vaya...", "Qué vacio...", R.drawable.notfound, false)), this);
         }else{
-            adapter = new PersonaCardAdapter(repository.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
+            adapter = new PersonaCardAdapter(dao.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
         }
         recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
