@@ -10,24 +10,8 @@ import java.util.List;
 
 public class CreadorGrupo {
     @Embedded
-    private Contacto contacto;
+    public Contacto contacto;
 
     @Relation(parentColumn = "id", entityColumn = "idCreador")
-    private List<Grupo> grupos;
-
-    public Contacto getContacto() {
-        return contacto;
-    }
-
-    public void setContacto(Contacto contacto) {
-        this.contacto = contacto;
-    }
-
-    public List<Grupo> getGrupos() {
-        return grupos;
-    }
-
-    public void setGrupos(List<Grupo> grupos) {
-        this.grupos = grupos;
-    }
+    public List<Grupo> grupos;
 }

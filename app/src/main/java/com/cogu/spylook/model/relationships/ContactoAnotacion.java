@@ -10,8 +10,8 @@ import java.util.List;
 
 public class ContactoAnotacion {
     @Embedded
-    private Contacto contacto;
+    public Contacto contacto;
 
     @Relation(parentColumn = "id", entityColumn = "idContacto")
-    private List<Anotacion> anotaciones;
+    public List<Anotacion> anotaciones;
 }

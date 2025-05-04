@@ -47,7 +47,8 @@ public class AmigosFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View fragment = inflater.inflate(R.layout.fragment_amigos, container, false);
         RecyclerView recyclerView = fragment.findViewById(R.id.recycleramigos);
-        List<ContactoCardItem> amigos = contactoDAO.getAmigos(contacto).stream().map(mapper::toCardItem).collect(Collectors.toList());
+        List<ContactoCardItem> amigos = contactoDAO.getAmigosDeContacto(contacto.getId()).
+                amigos.stream().map(mapper::toCardItem).collect(Collectors.toList());
         if (amigos.isEmpty()){
             amigos.add(new ContactoCardItem("Error", "No hay amigos", R.drawable.notfound, false));
         }

@@ -12,11 +12,13 @@ import java.util.List;
 
 public class ContactosSucesos {
     @Embedded
-    private Contacto contacto;
+    public Contacto contacto;
 
     @Relation(parentColumn = "id", entityColumn = "id",
             associateBy = @Junction(
                     value = ContactoSucesoCrossRef.class,
                     parentColumn = "idContacto", entityColumn = "idSuceso"))
-    private List<Suceso> sucesos;
+    public List<Suceso> sucesos;
+
+
 }

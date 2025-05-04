@@ -10,8 +10,8 @@ import java.util.List;
 
 public class CausanteSuceso {
     @Embedded
-    private Contacto contacto;
+    public Contacto contacto;
 
     @Relation(parentColumn = "id", entityColumn = "idCausante")
-    private List<Suceso> sucesos;
+    public List<Suceso> sucesos;
 }
