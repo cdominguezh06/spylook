@@ -5,6 +5,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,6 +15,7 @@ import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.mappers.ContactoToCardItem;
 import com.cogu.spylook.model.cards.ContactoCardItem;
+import com.cogu.spylook.model.entity.Contacto;
 
 import org.mapstruct.factory.Mappers;
 
@@ -27,6 +30,7 @@ public class TextWatcherSearchBar implements TextWatcher {
     private ContactoToCardItem mapper;
     private Context context;
     private AppDatabase db;
+
     public TextWatcherSearchBar(EditText text, RecyclerView recyclerView, PersonaCardAdapter adapter, Context context) {
         this.text = text;
         this.recyclerView = recyclerView;
@@ -43,20 +47,24 @@ public class TextWatcherSearchBar implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (text.getText().toString().isEmpty()){
+        if (text.getText().toString().isEmpty()) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(adapter);
-        }else{
-            List<ContactoCardItem> collect = db.contactoDAO().getContactos().stream()
-                    .filter(i -> i.getAlias().toLowerCase().contains(text.getText().toString().toLowerCase()))
-                    .map(mapper::toCardItem)
-                    .collect(Collectors.toList());
-            if (collect.isEmpty()){
-                collect.add(new ContactoCardItem("", "Sin resultados", R.drawable.notfound, false));
-            }
-            PersonaCardAdapter newAdapter = new PersonaCardAdapter(collect, context);
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(newAdapter);
+        } else {
+            LiveData<List<Contacto>> contactLiveData = db.contactoDAO().getContactos();
+            contactLiveData.observe((LifecycleOwner) context, contactos -> {
+                List<ContactoCardItem> collect = contactos.stream()
+                        .filter(i -> i.getAlias().toLowerCase().contains(text.getText().toString().toLowerCase()))
+                        .map(mapper::toCardItem)
+                        .collect(Collectors.toList());
+                if (collect.isEmpty()) {
+                    collect.add(new ContactoCardItem("", "Sin resultados", R.drawable.notfound, false));
+                }
+                PersonaCardAdapter newAdapter = new PersonaCardAdapter(collect, context);
+                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                recyclerView.setAdapter(newAdapter);
+            });
+
         }
 
     }

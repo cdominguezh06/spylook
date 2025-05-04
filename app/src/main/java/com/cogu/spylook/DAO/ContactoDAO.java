@@ -1,5 +1,6 @@
 package com.cogu.spylook.DAO;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -27,23 +28,23 @@ public interface ContactoDAO {
     public void deleteContacto(Contacto contacto);
 
     @Query("Select * from contactos where id = :id")
-    public Contacto findContactoById(int id);
+    LiveData<Contacto> findContactoById(int id);
 
     @Query("Select * from contactos")
-    public List<Contacto> getContactos();
+    LiveData<List<Contacto>> getContactos();
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    List<CreadorGrupo> getCreadoresDeGrupos();
+    LiveData<List<CreadorGrupo>> getCreadoresDeGrupos();
 
     @Insert
     void insertAmistad(ContactoAmistadCrossRef crossRef);
 
     @Transaction
     @Query("SELECT * FROM contactos WHERE id = :id")
-    AmigosDeContacto getAmigosDeContacto(int id);
+    LiveData<AmigosDeContacto> getAmigosDeContacto(int id);
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    List<AmigosDeContacto> getTodosLosContactosConAmigos();
+    LiveData<List<AmigosDeContacto>> getTodosLosContactosConAmigos();
 }

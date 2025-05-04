@@ -1,5 +1,6 @@
 package com.cogu.spylook.DAO;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -26,9 +27,9 @@ public interface SucesoDAO {
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    List<ContactosSucesos> getContactosWithSucesos();
+    LiveData<List<ContactosSucesos>> getContactosWithSucesos();
 
     @Transaction
     @Query("SELECT * FROM sucesos")
-    List<SucesosContactos> getSucesosWithContactos();
+    LiveData<List<SucesosContactos>> getSucesosWithContactos();
 }

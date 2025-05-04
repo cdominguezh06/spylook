@@ -18,13 +18,15 @@ import com.cogu.spylook.DAO.ContactoDAO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class NuevoContactoActivity extends AppCompatActivity {
 
     private EditText editTextNombre, editTextNick, editTextCumpleanos, editTextCiudad, editTextEstado, editTextPais;
     private Button siguiente;
     private AppDatabase db;
-    private ContactoDAO contactoDAO;
+    private final Executor executor = Executors.newSingleThreadExecutor();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,8 +38,6 @@ public class NuevoContactoActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        db = AppDatabase.getInstance(this);
-        contactoDAO = db.contactoDAO();
         editTextNombre = findViewById(R.id.editTextNombre);
         editTextNick = findViewById(R.id.editTextNick);
         editTextCumpleanos = findViewById(R.id.editTextCumpleanos);
@@ -55,8 +55,11 @@ public class NuevoContactoActivity extends AppCompatActivity {
             String estado = editTextEstado.getText().toString();
             String pais = editTextPais.getText().toString();
             Contacto contacto = new Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais);
-            contactoDAO.addContacto(contacto);
-            finish();
+            db = AppDatabase.getInstance(this);
+            executor.execute(() -> {
+                db.contactoDAO().addContacto(contacto);
+                finish();
+            });
         });
     }
 }

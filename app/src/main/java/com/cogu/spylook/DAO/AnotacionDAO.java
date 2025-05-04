@@ -1,5 +1,6 @@
 package com.cogu.spylook.DAO;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -24,10 +25,10 @@ public interface AnotacionDAO {
     public void deleteAnotacion(Anotacion anotacion);
 
     @Query("Select * from anotaciones where id = :id")
-    public Anotacion findAnotacionById(int id);
+    public LiveData<Anotacion> findAnotacionById(int id);
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    List<ContactoAnotacion> getContactosWithAnotaciones();
+    LiveData<List<ContactoAnotacion>> getContactosWithAnotaciones();
 
 }

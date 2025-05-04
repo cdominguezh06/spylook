@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +22,7 @@ import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.cards.ContactoCardItem;
 import com.cogu.spylook.model.decorators.SpacingItemDecoration;
 import com.cogu.spylook.DAO.ContactoDAO;
+import com.cogu.spylook.model.relationships.AmigosDeContacto;
 
 import org.mapstruct.factory.Mappers;
 
@@ -47,14 +50,19 @@ public class AmigosFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View fragment = inflater.inflate(R.layout.fragment_amigos, container, false);
         RecyclerView recyclerView = fragment.findViewById(R.id.recycleramigos);
-        List<ContactoCardItem> amigos = contactoDAO.getAmigosDeContacto(contacto.getId()).
-                amigos.stream().map(mapper::toCardItem).collect(Collectors.toList());
-        if (amigos.isEmpty()){
-            amigos.add(new ContactoCardItem("Error", "No hay amigos", R.drawable.notfound, false));
-        }
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter(new PersonaCardAdapter(amigos,context));
-        recyclerView.addItemDecoration(new SpacingItemDecoration(context));
+        LiveData<AmigosDeContacto> amigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.getId());
+        amigosDeContacto.observe((LifecycleOwner) context, amigosDeContacto1 -> {
+            List<ContactoCardItem> collect = amigosDeContacto1.amigos.stream()
+                    .map(mapper::toCardItem)
+                    .collect(Collectors.toList());
+            if (collect.isEmpty()){
+                collect.add(new ContactoCardItem("Error", "No hay amigos", R.drawable.notfound, false));
+            }
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(new PersonaCardAdapter(collect,context));
+            recyclerView.addItemDecoration(new SpacingItemDecoration(context));
+        });
+
         return fragment;
     }
 }

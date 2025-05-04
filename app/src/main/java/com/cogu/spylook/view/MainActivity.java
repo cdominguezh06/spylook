@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +19,7 @@ import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.mappers.ContactoToCardItem;
+import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.textWatchers.TextWatcherSearchBar;
 import com.cogu.spylook.model.decorators.RainbowTextViewDecorator;
 import com.cogu.spylook.model.cards.ContactoCardItem;
@@ -73,14 +75,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void prepareRecyclerView(){
-        if (dao.getContactos().isEmpty()){
-            adapter = new PersonaCardAdapter(List.of(new ContactoCardItem("Vaya...", "Qué vacio...", R.drawable.notfound, false)), this);
-        }else{
-            adapter = new PersonaCardAdapter(dao.getContactos().stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
-        }
-        recyclerView = findViewById(R.id.recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-        recyclerView.addItemDecoration(new SpacingItemDecoration(this));
+        LiveData<List<Contacto>> contactLiveData = dao.getContactos();
+        contactLiveData.observe(this, contactos -> {
+            if (contactos.isEmpty()){
+                adapter = new PersonaCardAdapter(List.of(new ContactoCardItem("Vaya...", "Qué vacio...", R.drawable.notfound, false)), this);
+            }else{
+                adapter = new PersonaCardAdapter(contactos.stream().map(mapper::toCardItem).collect(Collectors.toList()), this);
+            }
+            recyclerView = findViewById(R.id.recycler);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapter);
+            recyclerView.addItemDecoration(new SpacingItemDecoration(this));
+        });
     }
 }
