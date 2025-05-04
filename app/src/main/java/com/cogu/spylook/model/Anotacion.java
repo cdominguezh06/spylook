@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class Anotacion {
     private int id;
     private LocalDate fecha;
+    private String titulo;
     private String descripcion;
     private Contacto contacto;
 }

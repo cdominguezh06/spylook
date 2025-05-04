@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rainbow_border"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout

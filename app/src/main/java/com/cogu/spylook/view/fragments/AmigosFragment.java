@@ -17,6 +17,7 @@ import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.mappers.ContactoToCardItem;
 import com.cogu.spylook.model.Contacto;
 import com.cogu.spylook.model.cards.ContactoCardItem;
+import com.cogu.spylook.model.decorators.SpacingItemDecoration;
 import com.cogu.spylook.repositories.ContactoRepository;
 
 import org.mapstruct.factory.Mappers;
@@ -49,6 +50,7 @@ public class AmigosFragment extends Fragment {
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(new PersonaCardAdapter(amigos,context));
+        recyclerView.addItemDecoration(new SpacingItemDecoration(context));
         return fragment;
     }
 }
