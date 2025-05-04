@@ -12,9 +12,6 @@ public class CreadorGrupo {
     @Embedded
     private Contacto contacto;
 
-    @Relation(
-            parentColumn = "id",
-            entityColumn = "idCreador"
-    )
+    @Relation(parentColumn = "id", entityColumn = "idCreador")
     private List<Grupo> grupos;
 }

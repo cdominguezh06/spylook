@@ -5,9 +5,7 @@ import androidx.room.Junction;
 import androidx.room.Relation;
 
 import com.cogu.spylook.model.entity.Contacto;
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef;
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef;
-import com.cogu.spylook.model.entity.Grupo;
 import com.cogu.spylook.model.entity.Suceso;
 
 import java.util.List;
@@ -16,10 +14,6 @@ public class ContactosSucesos {
     @Embedded
     private Contacto contacto;
 
-    @Relation(
-            parentColumn = "id",
-            entityColumn = "id",
-            associateBy = @Junction(ContactoSucesoCrossRef.class)
-    )
+    @Relation(parentColumn = "id", entityColumn = "id", associateBy = @Junction(ContactoSucesoCrossRef.class))
     private List<Suceso> sucesos;
 }

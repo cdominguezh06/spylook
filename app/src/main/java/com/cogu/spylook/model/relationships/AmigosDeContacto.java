@@ -13,14 +13,7 @@ public class AmigosDeContacto {
     @Embedded
     public Contacto contacto;
 
-    @Relation(
-            parentColumn = "id",
-            entityColumn = "id",
-            associateBy = @Junction(
-                    value = ContactoAmistadCrossRef.class,
-                    parentColumn = "idContacto",
-                    entityColumn = "idAmigo"
-            )
-    )
+    @Relation(parentColumn = "id", entityColumn = "id",
+            associateBy = @Junction(value = ContactoAmistadCrossRef.class, parentColumn = "idContacto", entityColumn = "idAmigo"))
     public List<Contacto> amigos;
 }

@@ -12,9 +12,6 @@ public class CausanteSuceso {
     @Embedded
     private Contacto contacto;
 
-    @Relation(
-            parentColumn = "id",
-            entityColumn = "idCausante"
-    )
+    @Relation(parentColumn = "id", entityColumn = "idCausante")
     private List<Suceso> sucesos;
 }
