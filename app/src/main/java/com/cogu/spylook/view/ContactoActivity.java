@@ -45,19 +45,17 @@ public class ContactoActivity extends AppCompatActivity {
             viewPager = findViewById(R.id.pager);
             tabLayout = findViewById(R.id.tabLayout);
             viewPager.setAdapter(new SliderAdapter(this, contacto,this));
-
+            new TabLayoutMediator(tabLayout, viewPager,
+                    (tab, position) -> {
+                        switch (position) {
+                            case 0:
+                                tab.setText("Información");
+                                break;
+                            case 1:
+                                tab.setText("Amigos");
+                                break;
+                        }
+                    }).attach();
         });
-        new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> {
-                    switch (position) {
-                        case 0:
-                            tab.setText("Información");
-                            break;
-                        case 1:
-                            tab.setText("Amigos");
-                            break;
-                        // Puedes agregar más casos aquí para más pestañas
-                    }
-                }).attach();
     }
 }

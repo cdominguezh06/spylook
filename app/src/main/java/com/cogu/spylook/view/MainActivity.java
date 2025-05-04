@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
         mapper = Mappers.getMapper(ContactoToCardItem.class);
         prepareButton();
         prepareRecyclerView();
-        EditText text = findViewById(R.id.searchEditText);
-        text.addTextChangedListener(new TextWatcherSearchBar(text, recyclerView, adapter, this));
 
         TextView usuarios = findViewById(R.id.textUsuarios);
         TextView grupos = findViewById(R.id.textGrupos);
@@ -86,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setAdapter(adapter);
             recyclerView.addItemDecoration(new SpacingItemDecoration(this));
+            EditText text = findViewById(R.id.searchEditText);
+            text.addTextChangedListener(new TextWatcherSearchBar(text, recyclerView, adapter, this));
         });
     }
 }
