@@ -2,8 +2,8 @@ package com.cogu.spylook.model.entity;
 
 import androidx.room.Entity;
 
-@Entity(primaryKeys = {"contactoId", "amigoId"})
+@Entity(primaryKeys = {"idContacto", "idAmigo"})
 public class ContactoAmistadCrossRef {
-    public int contactoId;
-    public int amigoId;
+    public int idContacto;
+    public int idAmigo;
 }

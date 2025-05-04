@@ -19,6 +19,6 @@ public class Anotacion {
     private LocalDate fecha;
     private String titulo;
     private String descripcion;
-    private int contactoId;
+    private int idContacto;
 
 }

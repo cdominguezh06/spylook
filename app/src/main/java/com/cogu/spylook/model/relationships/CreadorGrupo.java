@@ -14,7 +14,7 @@ public class CreadorGrupo {
 
     @Relation(
             parentColumn = "id",
-            entityColumn = "id_creador"
+            entityColumn = "idCreador"
     )
     private List<Grupo> grupos;
 }

@@ -15,8 +15,8 @@ public class GruposContactos {
     public Grupo grupo;
 
     @Relation(
-            parentColumn = "grupoId",
-            entityColumn = "userId",
+            parentColumn = "id",
+            entityColumn = "id",
             associateBy = @Junction(ContactoGrupoCrossRef.class)
     )
     public List<Contacto> contactos;

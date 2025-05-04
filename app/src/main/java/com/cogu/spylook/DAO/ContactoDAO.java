@@ -8,6 +8,8 @@ import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.cogu.spylook.model.entity.Contacto;
+import com.cogu.spylook.model.entity.ContactoAmistadCrossRef;
+import com.cogu.spylook.model.relationships.AmigosDeContacto;
 import com.cogu.spylook.model.relationships.CreadorGrupo;
 
 import java.util.List;
@@ -33,4 +35,15 @@ public interface ContactoDAO {
     @Transaction
     @Query("SELECT * FROM contactos")
     List<CreadorGrupo> getCreadoresDeGrupos();
+
+    @Insert
+    void insertAmistad(ContactoAmistadCrossRef crossRef);
+
+    @Transaction
+    @Query("SELECT * FROM contactos WHERE id = :id")
+    AmigosDeContacto getAmigosDeContacto(int id);
+
+    @Transaction
+    @Query("SELECT * FROM contactos")
+    List<AmigosDeContacto> getTodosLosContactosConAmigos();
 }
