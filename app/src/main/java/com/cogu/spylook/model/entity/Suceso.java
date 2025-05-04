@@ -1,16 +1,17 @@
-package com.cogu.spylook.model;
+package com.cogu.spylook.model.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Anotacion {
+public class Suceso {
     private int id;
     private LocalDate fecha;
-    private String titulo;
     private String descripcion;
-    private Contacto contacto;
+    private Contacto causante;
+    private List<Contacto> participantes;
 }

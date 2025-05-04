@@ -5,13 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.cogu.spylook.R;
-import com.cogu.spylook.mappers.ContactoToCardItem;
-import com.cogu.spylook.model.Contacto;
-import com.cogu.spylook.model.Grupo;
-import com.cogu.spylook.model.cards.ContactoCardItem;
-import com.cogu.spylook.model.cards.GrupoCardItem;
-
-import org.mapstruct.factory.Mappers;
+import com.cogu.spylook.model.entity.Contacto;
+import com.cogu.spylook.model.entity.Grupo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,7 +39,7 @@ public class SQLAdapter {
     public boolean addContacto(Contacto contacto) {
         this.db = sqlOpenHelper.getWritableDatabase();
         try {
-            db.execSQL("INSERT INTO contacto (nombre, nickMasConocido, fechaNacimiento, ciudad, estado, pais) VALUES ('" + contacto.getNombre() + "','" + contacto.getNickMasConocido() + "','" + contacto.getFechaNacimiento() + "','" + contacto.getCiudad()+ "','" + contacto.getEstado() + "','" + contacto.getPais() +"');");
+            db.execSQL("INSERT INTO contacto (nombre, nickMasConocido, fechaNacimiento, ciudad, estado, pais) VALUES ('" + contacto.getNombre() + "','" + contacto.getAlias() + "','" + contacto.getFechaNacimiento() + "','" + contacto.getCiudad()+ "','" + contacto.getEstado() + "','" + contacto.getPais() +"');");
             return true;
         } catch (Exception e) {
             db.close();

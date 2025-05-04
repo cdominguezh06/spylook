@@ -1,7 +1,7 @@
 package com.cogu.spylook.mappers;
 
 import com.cogu.spylook.model.cards.ContactoCardItem;
-import com.cogu.spylook.model.Contacto;
+import com.cogu.spylook.model.entity.Contacto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;
@@ -12,6 +12,6 @@ public interface ContactoToCardItem {
 
     @ObjectFactory
     default ContactoCardItem createCardItem(Contacto contacto){
-        return new ContactoCardItem(contacto.getId(), contacto.getNombre(), contacto.getNickMasConocido(), contacto.getEdad());
+        return new ContactoCardItem(contacto.getId(), contacto.getNombre(), contacto.getAlias(), contacto.getEdad());
     }
 }

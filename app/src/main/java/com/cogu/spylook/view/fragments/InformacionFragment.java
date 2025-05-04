@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.cogu.spylook.R;
-import com.cogu.spylook.model.Contacto;
+import com.cogu.spylook.model.entity.Contacto;
 
 
 public class InformacionFragment extends Fragment {
@@ -38,7 +38,7 @@ public class InformacionFragment extends Fragment {
         estadoContent = fragment.findViewById(R.id.estadoContent);
 
         edadContent.setText(String.valueOf(contacto.getEdad()));
-        nickContent.setText(contacto.getNickMasConocido());
+        nickContent.setText(contacto.getAlias());
         fechaContent.setText(contacto.getFechaNacimiento().toString());
         ciudadContent.setText(contacto.getCiudad());
         estadoContent.setText(contacto.getEstado());

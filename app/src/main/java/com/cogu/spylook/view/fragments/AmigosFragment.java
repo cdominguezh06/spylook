@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
 import com.cogu.spylook.mappers.ContactoToCardItem;
-import com.cogu.spylook.model.Contacto;
+import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.cards.ContactoCardItem;
 import com.cogu.spylook.model.decorators.SpacingItemDecoration;
-import com.cogu.spylook.repositories.ContactoRepository;
+import com.cogu.spylook.DAO.ContactoDAO;
 
 import org.mapstruct.factory.Mappers;
 
@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 public class AmigosFragment extends Fragment {
 
     private Contacto contacto;
-    private ContactoRepository repository;
+    private ContactoDAO repository;
     private ContactoToCardItem mapper;
     private Context context;
     public AmigosFragment(Contacto contacto, Context context) {
         this.contacto = contacto;
-        repository = ContactoRepository.getInstance(context);
+        repository = ContactoDAO.getInstance(context);
         mapper = Mappers.getMapper(ContactoToCardItem.class);
         this.context = context;
     }

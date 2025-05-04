@@ -3,7 +3,6 @@ package com.cogu.spylook.view;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,10 +11,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.cogu.spylook.R;
-import com.cogu.spylook.model.Contacto;
+import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.unimplemented.DateTextWatcher;
-import com.cogu.spylook.model.unimplemented.SpinnerableClass;
-import com.cogu.spylook.repositories.ContactoRepository;
+import com.cogu.spylook.DAO.ContactoDAO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +22,7 @@ public class NuevoContactoActivity extends AppCompatActivity {
 
     private EditText editTextNombre, editTextNick, editTextCumpleanos, editTextCiudad, editTextEstado, editTextPais;
     private Button siguiente;
-    private ContactoRepository repository;
+    private ContactoDAO repository;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +34,7 @@ public class NuevoContactoActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        repository = ContactoRepository.getInstance(this);
+        repository = ContactoDAO.getInstance(this);
         editTextNombre = findViewById(R.id.editTextNombre);
         editTextNick = findViewById(R.id.editTextNick);
         editTextCumpleanos = findViewById(R.id.editTextCumpleanos);

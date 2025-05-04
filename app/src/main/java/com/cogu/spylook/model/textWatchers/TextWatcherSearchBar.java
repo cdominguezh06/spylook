@@ -10,9 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.PersonaCardAdapter;
+import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.mappers.ContactoToCardItem;
 import com.cogu.spylook.model.cards.ContactoCardItem;
-import com.cogu.spylook.repositories.ContactoRepository;
+import com.cogu.spylook.DAO.ContactoDAO;
 
 import org.mapstruct.factory.Mappers;
 
@@ -26,14 +27,14 @@ public class TextWatcherSearchBar implements TextWatcher {
     private PersonaCardAdapter adapter;
     private ContactoToCardItem mapper;
     private Context context;
-    private ContactoRepository repository;
+    private AppDatabase db;
     public TextWatcherSearchBar(EditText text, RecyclerView recyclerView, PersonaCardAdapter adapter, Context context) {
         this.text = text;
         this.recyclerView = recyclerView;
         this.adapter = adapter;
         this.context = context;
         this.mapper = Mappers.getMapper(ContactoToCardItem.class);
-        this.repository = ContactoRepository.getInstance(context);
+        this.db = AppDatabase.getInstance(context);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class TextWatcherSearchBar implements TextWatcher {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(adapter);
         }else{
-            List<ContactoCardItem> collect = repository.getContactos().stream()
+            List<ContactoCardItem> collect = db.userDao().getContactos().stream()
                     .filter(i -> i.getNickMasConocido().toLowerCase().contains(text.getText().toString().toLowerCase()))
                     .map(mapper::toCardItem)
                     .collect(Collectors.toList());

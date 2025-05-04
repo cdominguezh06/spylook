@@ -21,7 +21,7 @@ import com.cogu.spylook.model.textWatchers.TextWatcherSearchBar;
 import com.cogu.spylook.model.decorators.RainbowTextViewDecorator;
 import com.cogu.spylook.model.cards.ContactoCardItem;
 import com.cogu.spylook.model.decorators.SpacingItemDecoration;
-import com.cogu.spylook.repositories.ContactoRepository;
+import com.cogu.spylook.DAO.ContactoDAO;
 
 import org.mapstruct.factory.Mappers;
 
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class MainActivity extends AppCompatActivity {
 
     private ContactoToCardItem mapper;
-    private ContactoRepository repository;
+    private ContactoDAO repository;
     private PersonaCardAdapter adapter;
     private RecyclerView recyclerView;
     @Override
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        repository = ContactoRepository.getInstance(this);
+        repository = ContactoDAO.getInstance(this);
         mapper = Mappers.getMapper(ContactoToCardItem.class);
         prepareButton();
         prepareRecyclerView();

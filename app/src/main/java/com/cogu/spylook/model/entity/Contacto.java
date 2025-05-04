@@ -1,5 +1,8 @@
-package com.cogu.spylook.model;
+package com.cogu.spylook.model.entity;
 
+
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
 
@@ -8,10 +11,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Entity(tableName = "contactos")
 public class Contacto {
+    @PrimaryKey(autoGenerate = true)
     private int id;
     private String nombre;
-    private String nickMasConocido;
+    private String alias;
     private int edad;
     private int foto;
     private LocalDate fechaNacimiento;
@@ -22,7 +27,7 @@ public class Contacto {
     public Contacto(int id, String nombre, String nickMasConocido, LocalDate fechaNacimiento, String ciudad, String estado, String pais) {
         this.id = id;
         this.nombre = nombre;
-        this.nickMasConocido = nickMasConocido;
+        this.alias = nickMasConocido;
         this.fechaNacimiento = fechaNacimiento;
         this.edad = LocalDate.now().isAfter(
                 fechaNacimiento.withYear(LocalDate.now().getYear())
@@ -35,7 +40,7 @@ public class Contacto {
     }
     public Contacto(String nombre, String nickMasConocido, LocalDate fechaNacimiento, String ciudad, String estado, String pais) {
         this.nombre = nombre;
-        this.nickMasConocido = nickMasConocido;
+        this.alias = nickMasConocido;
         this.fechaNacimiento = fechaNacimiento;
         this.edad = LocalDate.now().isAfter(
                 fechaNacimiento.withYear(LocalDate.now().getYear())

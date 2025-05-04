@@ -10,6 +10,7 @@ constraintlayout = "2.2.0"
 lombok = "1.18.36"
 mapstruct = "1.5.3.Final"
 mapstructProcessor = "1.5.3.Final"
+roomRuntime = "2.7.1"
 
 [libraries]
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
@@ -23,6 +24,8 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
