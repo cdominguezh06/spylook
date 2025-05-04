@@ -10,13 +10,10 @@ import com.cogu.spylook.model.entity.Suceso;
 
 import java.util.List;
 
-public class ContactosSucesos {
+public class SucesosContactos {
     @Embedded
-    private Contacto contacto;
+    public Suceso suceso;
 
-    @Relation(parentColumn = "id", entityColumn = "id",
-            associateBy = @Junction(
-                    value = ContactoSucesoCrossRef.class,
-                    parentColumn = "idContacto", entityColumn = "idSuceso"))
-    private List<Suceso> sucesos;
+    @Relation(parentColumn = "sucesoId", entityColumn = "contactoId", associateBy = @Junction(ContactoSucesoCrossRef.class))
+    public List<Contacto> contactos;
 }
