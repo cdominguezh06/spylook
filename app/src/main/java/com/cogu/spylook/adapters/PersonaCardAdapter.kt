@@ -14,7 +14,7 @@ import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.view.ContactoActivity
 
 class PersonaCardAdapter(
-    private val cardItemList: MutableList<ContactoCardItem>,
+    private val cardItemList: List<ContactoCardItem>,
     private val context: Context
 ) : RecyclerView.Adapter<CardViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -25,13 +25,13 @@ class PersonaCardAdapter(
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList.get(position)
-        holder.name.setText(cardItem.getNombre())
-        holder.mostknownalias.setText(cardItem.getNickMasConocido())
-        holder.careto.setImageResource(cardItem.getFoto())
-        if (cardItem.isClickable()) {
+        holder.name.text = cardItem.nombre
+        holder.mostknownalias.text = cardItem.alias
+        holder.careto.setImageResource(R.drawable.ratona)
+        if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                 val intent = Intent(context, ContactoActivity::class.java)
-                intent.putExtra("id", cardItem.getId())
+                intent.putExtra("id", cardItem.id)
                 context.startActivity(intent)
             })
         }

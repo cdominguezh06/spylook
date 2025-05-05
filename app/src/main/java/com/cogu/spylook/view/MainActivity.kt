@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         var contactos = dao!!.getContactos()
         if (contactos.isEmpty()) {
             adapter = PersonaCardAdapter(
-                listOf<ContactoCardItem?>(
+                listOf<ContactoCardItem>(
                     ContactoCardItem(
                         "Vaya...",
                         "Qué vacio...",

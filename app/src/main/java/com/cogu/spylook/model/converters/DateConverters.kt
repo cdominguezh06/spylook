@@ -1,20 +1,21 @@
-package com.cogu.spylook.model.converters;
+package com.cogu.spylook.model.converters
 
-import androidx.room.TypeConverter;
+import androidx.room.TypeConverter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+object DateConverters {
+    private val formatter: DateTimeFormatter? = DateTimeFormatter.ISO_LOCAL_DATE
 
-public class DateConverters {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-
+    @JvmStatic
     @TypeConverter
-    public static LocalDate fromString(String value) {
-        return value == null ? null : LocalDate.parse(value, formatter);
+    fun fromString(value: String?): LocalDate? {
+        return if (value == null) null else LocalDate.parse(value, formatter)
     }
 
+    @JvmStatic
     @TypeConverter
-    public static String toString(LocalDate date) {
-        return date == null ? null : date.format(formatter);
+    fun toString(date: LocalDate?): String? {
+        return if (date == null) null else date.format(formatter)
     }
 }

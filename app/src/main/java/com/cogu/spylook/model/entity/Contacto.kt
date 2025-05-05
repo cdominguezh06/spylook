@@ -10,19 +10,17 @@ import java.time.LocalDate
 @NoArgsConstructor
 @Entity(tableName = "contactos")
 class Contacto {
-    @JvmField
     @PrimaryKey(autoGenerate = true)
+    @JvmField
     var id: Int = 0
     @JvmField
     var nombre: String?
     @JvmField
     var alias: String?
 
-    @JvmField
     @Ignore
-    var edad: Int
     @JvmField
-    var foto: Int = 0
+    var edad: Int
     @JvmField
     var fechaNacimiento: LocalDate?
     @JvmField
@@ -36,7 +34,7 @@ class Contacto {
         id: Int,
         nombre: String?,
         alias: String?,
-        fechaNacimiento: LocalDate,
+        fechaNacimiento: LocalDate?,
         ciudad: String?,
         estado: String?,
         pais: String?
@@ -46,13 +44,13 @@ class Contacto {
         this.alias = alias
         this.fechaNacimiento = fechaNacimiento
         this.edad = if (LocalDate.now().isAfter(
-                fechaNacimiento.withYear(LocalDate.now().getYear())
-                    .withDayOfYear(LocalDate.now().getDayOfYear() - 1)
+                fechaNacimiento!!.withYear(LocalDate.now().year)
+                    .withDayOfYear(LocalDate.now().dayOfYear - 1)
             )
         )
-            LocalDate.now().getYear() - fechaNacimiento.getYear()
+            LocalDate.now().year - fechaNacimiento.year
         else
-            LocalDate.now().getYear() - (fechaNacimiento.getYear() - 1)
+            LocalDate.now().year - (fechaNacimiento.year - 1)
         this.ciudad = ciudad
         this.estado = estado
         this.pais = pais
@@ -82,4 +80,6 @@ class Contacto {
         this.estado = estado
         this.pais = pais
     }
+
+
 }

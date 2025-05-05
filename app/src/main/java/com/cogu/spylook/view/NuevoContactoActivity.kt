@@ -43,7 +43,7 @@ class NuevoContactoActivity : AppCompatActivity() {
         editTextNombre = findViewById<EditText>(R.id.editTextNombre)
         editTextNick = findViewById<EditText>(R.id.editTextNick)
         editTextCumpleanos = findViewById<EditText>(R.id.editTextCumpleanos)
-        editTextCumpleanos!!.addTextChangedListener(DateTextWatcher(editTextCumpleanos))
+        editTextCumpleanos!!.addTextChangedListener(DateTextWatcher(editTextCumpleanos!!))
         editTextCiudad = findViewById<EditText>(R.id.editTextCiudad)
         editTextEstado = findViewById<EditText>(R.id.editTextEstado)
         editTextPais = findViewById<EditText>(R.id.editTextPais)
@@ -62,7 +62,7 @@ class NuevoContactoActivity : AppCompatActivity() {
             val contacto = Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais)
             db = AppDatabase.getInstance(this)
             runBlocking {
-                db!!.contactoDAO().addContacto(contacto)
+                db!!.contactoDAO()!!.addContacto(contacto)
             }
             finish()
 

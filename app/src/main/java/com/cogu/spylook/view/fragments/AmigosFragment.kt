@@ -23,8 +23,8 @@ import java.util.stream.Collectors
 class AmigosFragment(private val contacto: Contacto, private val context: Context?) :
     androidx.fragment.app.Fragment() {
     private val mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
-    private val db: AppDatabase = AppDatabase.getInstance(context)
-    private val contactoDAO: ContactoDAO = db.contactoDAO()
+    private val db: AppDatabase = AppDatabase.getInstance(requireContext())!!
+    private val contactoDAO: ContactoDAO = db.contactoDAO()!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +35,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
         runBlocking {
             val amigosDeContacto: AmigosDeContacto? =
                 contactoDAO.getAmigosDeContacto(contacto.id)
-            val collect = amigosDeContacto!!.amigos.stream()
+            val collect = amigosDeContacto!!.amigos!!.stream()
                 .map<ContactoCardItem?> { contacto: Contacto? -> mapper.toCardItem(contacto) }
                 .collect(Collectors.toList())
             if (collect.isEmpty()) {
@@ -48,9 +48,9 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
                     )
                 )
             }
-            recyclerView.setLayoutManager(LinearLayoutManager(context))
-            recyclerView.setAdapter(PersonaCardAdapter(collect, context))
-            recyclerView.addItemDecoration(SpacingItemDecoration(context))
+            recyclerView.setLayoutManager(LinearLayoutManager(requireContext()))
+            recyclerView.setAdapter(PersonaCardAdapter(collect, requireContext()))
+            recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
         }
 
         return fragment

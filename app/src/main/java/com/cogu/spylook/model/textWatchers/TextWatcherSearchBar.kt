@@ -28,7 +28,7 @@ class TextWatcherSearchBar(
 
     init {
         this.mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
-        this.db = AppDatabase.getInstance(context)
+        this.db = AppDatabase.getInstance(context!!)!!
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -40,7 +40,7 @@ class TextWatcherSearchBar(
             recyclerView.setAdapter(adapter)
         } else {
             runBlocking { val contactos: List<Contacto?>? =
-                db.contactoDAO().getContactos();
+                db.contactoDAO()!!.getContactos();
                 val collect = contactos!!.stream()
                     .filter { i: Contacto? ->
                         i!!.alias!!.lowercase(Locale.getDefault()).contains(
@@ -62,7 +62,7 @@ class TextWatcherSearchBar(
                     )
                 }
 
-            val newAdapter = PersonaCardAdapter(collect, context)
+            val newAdapter = PersonaCardAdapter(collect, context!!)
             recyclerView!!.setLayoutManager(LinearLayoutManager(context))
             recyclerView.setAdapter(newAdapter)
             }
