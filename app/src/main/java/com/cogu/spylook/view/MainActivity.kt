@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        getWindow().setDecorFitsSystemWindows(false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(
             findViewById<View?>(R.id.main),
             OnApplyWindowInsetsListener { v: View?, insets: WindowInsetsCompat? ->
@@ -49,7 +50,10 @@ class MainActivity : AppCompatActivity() {
         dao = db!!.contactoDAO()
         mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
         prepareButton()
-        runBlocking { prepareRecyclerView()}
+
+        runBlocking { loadData() }
+        prepareRecyclerView()
+
         val text = findViewById<EditText>(R.id.searchEditText)
         text.addTextChangedListener(TextWatcherSearchBar(text, recyclerView, adapter, this))
         val usuarios = findViewById<TextView?>(R.id.textUsuarios)
@@ -69,7 +73,16 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private suspend fun prepareRecyclerView() {
+    private fun prepareRecyclerView() {
+        recyclerView = findViewById<RecyclerView>(R.id.recycler)
+        recyclerView!!.setLayoutManager(LinearLayoutManager(this))
+        recyclerView!!.setAdapter(adapter)
+        if (recyclerView!!.itemDecorationCount <= 0) {
+            recyclerView!!.addItemDecoration(SpacingItemDecoration(this))
+        }
+    }
+
+    private suspend fun loadData(){
         var contactos = dao!!.getContactos()
         if (contactos.isEmpty()) {
             adapter = PersonaCardAdapter(
@@ -90,9 +103,11 @@ class MainActivity : AppCompatActivity() {
                     ), this
             )
         }
-        recyclerView = findViewById<RecyclerView>(R.id.recycler)
-        recyclerView!!.setLayoutManager(LinearLayoutManager(this))
-        recyclerView!!.setAdapter(adapter)
-        recyclerView!!.addItemDecoration(SpacingItemDecoration(this))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        runBlocking { loadData() }
+        prepareRecyclerView()
     }
 }

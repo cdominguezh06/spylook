@@ -4,9 +4,6 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -22,7 +19,7 @@ import java.util.stream.Collectors
 
 class TextWatcherSearchBar(
     private val text: EditText,
-    private val recyclerView: RecyclerView,
+    private val recyclerView: RecyclerView?,
     private val adapter: PersonaCardAdapter?,
     private val context: Context?
 ) : TextWatcher {
@@ -39,10 +36,10 @@ class TextWatcherSearchBar(
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         if (text.getText().toString().isEmpty()) {
-            recyclerView.setLayoutManager(LinearLayoutManager(context))
+            recyclerView!!.setLayoutManager(LinearLayoutManager(context))
             recyclerView.setAdapter(adapter)
         } else {
-            runBlocking { val contactos: MutableList<Contacto?>? =
+            runBlocking { val contactos: List<Contacto?>? =
                 db.contactoDAO().getContactos();
                 val collect = contactos!!.stream()
                     .filter { i: Contacto? ->
@@ -66,13 +63,13 @@ class TextWatcherSearchBar(
                 }
 
             val newAdapter = PersonaCardAdapter(collect, context)
-            recyclerView.setLayoutManager(LinearLayoutManager(context))
+            recyclerView!!.setLayoutManager(LinearLayoutManager(context))
             recyclerView.setAdapter(newAdapter)
             }
-        })
+        }
+    }
+
+    override fun afterTextChanged(s: Editable?) {
     }
 }
 
-override fun afterTextChanged(s: Editable?) {
-}
-}
