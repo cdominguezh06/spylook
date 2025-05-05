@@ -14,7 +14,6 @@ import com.cogu.spylook.R;
 import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.model.entity.Contacto;
 import com.cogu.spylook.model.unimplemented.DateTextWatcher;
-import com.cogu.spylook.DAO.ContactoDAO;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

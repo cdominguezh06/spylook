@@ -11,9 +11,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.LiveData;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.cogu.spylook.DAO.ContactoDAO;
 import com.cogu.spylook.R;
 import com.cogu.spylook.adapters.SliderAdapter;
-import com.cogu.spylook.DAO.ContactoDAO;
 import com.cogu.spylook.bbdd.AppDatabase;
 import com.cogu.spylook.model.entity.Contacto;
 import com.google.android.material.tabs.TabLayout;

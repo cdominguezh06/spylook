@@ -1,34 +1,30 @@
-package com.cogu.spylook.DAO;
+package com.cogu.spylook.DAO
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Transaction;
-import androidx.room.Update;
-
-import com.cogu.spylook.model.entity.Anotacion;
-import com.cogu.spylook.model.relationships.ContactoAnotacion;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import com.cogu.spylook.model.entity.Anotacion
+import com.cogu.spylook.model.relationships.ContactoAnotacion
 
 @Dao
-public interface AnotacionDAO {
+interface AnotacionDAO {
+
     @Insert
-    public void addAnotacion(Anotacion anotacion);
+    suspend fun addAnotacion(anotacion: Anotacion)
 
     @Update
-    public void updateAnotacion(Anotacion anotacion);
+    fun updateAnotacion(anotacion: Anotacion)
 
     @Delete
-    public void deleteAnotacion(Anotacion anotacion);
+    fun deleteAnotacion(anotacion: Anotacion)
 
-    @Query("Select * from anotaciones where id = :id")
-    public LiveData<Anotacion> findAnotacionById(int id);
+    @Query("SELECT * FROM anotaciones WHERE id = :id")
+    fun findAnotacionById(id: Int): Anotacion
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    LiveData<List<ContactoAnotacion>> getContactosWithAnotaciones();
-
+    fun getContactosWithAnotaciones():List<ContactoAnotacion>
 }

@@ -1,50 +1,41 @@
-package com.cogu.spylook.DAO;
+package com.cogu.spylook.DAO
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Transaction;
-import androidx.room.Update;
-
-import com.cogu.spylook.model.entity.Contacto;
-import com.cogu.spylook.model.entity.ContactoAmistadCrossRef;
-import com.cogu.spylook.model.relationships.AmigosDeContacto;
-import com.cogu.spylook.model.relationships.CreadorGrupo;
-
-import java.util.List;
+import androidx.room.*
+import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
+import com.cogu.spylook.model.relationships.AmigosDeContacto
+import com.cogu.spylook.model.relationships.CreadorGrupo
 
 @Dao
-public interface ContactoDAO {
+interface ContactoDAO {
 
     @Insert
-    public void addContacto(Contacto contacto);
+    suspend fun addContacto(contacto: Contacto)
 
     @Update
-    public void updateContacto(Contacto contacto);
+    suspend fun updateContacto(contacto: Contacto)
 
     @Delete
-    public void deleteContacto(Contacto contacto);
+    suspend fun deleteContacto(contacto: Contacto)
 
-    @Query("Select * from contactos where id = :id")
-    LiveData<Contacto> findContactoById(int id);
+    @Query("SELECT * FROM contactos WHERE id = :id")
+    suspend fun findContactoById(id: Int): Contacto
 
-    @Query("Select * from contactos")
-    LiveData<List<Contacto>> getContactos();
+    @Query("SELECT * FROM contactos")
+    suspend fun getContactos(): List<Contacto>
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    LiveData<List<CreadorGrupo>> getCreadoresDeGrupos();
+    suspend fun getCreadoresDeGrupos(): List<CreadorGrupo>
 
     @Insert
-    void insertAmistad(ContactoAmistadCrossRef crossRef);
+    suspend fun insertAmistad(crossRef: ContactoAmistadCrossRef)
 
     @Transaction
     @Query("SELECT * FROM contactos WHERE id = :id")
-    LiveData<AmigosDeContacto> getAmigosDeContacto(int id);
+    suspend fun getAmigosDeContacto(id: Int): AmigosDeContacto
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    LiveData<List<AmigosDeContacto>> getTodosLosContactosConAmigos();
+    suspend fun getTodosLosContactosConAmigos(): List<AmigosDeContacto>
 }

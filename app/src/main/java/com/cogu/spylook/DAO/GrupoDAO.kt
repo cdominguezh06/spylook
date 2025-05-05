@@ -1,49 +1,46 @@
-package com.cogu.spylook.DAO;
+package com.cogu.spylook.DAO
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Transaction;
-import androidx.room.Update;
-
-import com.cogu.spylook.model.entity.Grupo;
-import com.cogu.spylook.model.relationships.ContactosGrupos;
-import com.cogu.spylook.model.relationships.GruposContactos;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.relationships.ContactosGrupos
+import com.cogu.spylook.model.relationships.GruposContactos
 
 @Dao
-public interface GrupoDAO {
+interface GrupoDAO {
+
     @Insert
-    public void addGrupo(Grupo grupo);
+    suspend fun addGrupo(grupo: Grupo)
 
     @Update
-    public void updateGrupo(Grupo grupo);
+    suspend fun updateGrupo(grupo: Grupo)
 
     @Delete
-    public void deleteGrupo(Grupo grupo);
+    suspend fun deleteGrupo(grupo: Grupo)
 
-    @Query("Select * from grupos where id = :id")
-    public LiveData<Grupo> findGrupoById(int id);
+    @Query("SELECT * FROM grupos WHERE id = :id")
+    suspend fun findGrupoById(id: Int): Grupo?
 
-    @Query("Select * from grupos")
-    public LiveData<List<Grupo>> getGrupos();
+    @Query("SELECT * FROM grupos")
+    suspend fun getGrupos(): List<Grupo>
 
     /**
-     * Relacion entre grupos y contactos
+     * Relación entre grupos y contactos
      * @return Un objeto ContactoGrupos el cual cuenta con el contacto y la lista de grupos a la que pertenece
      */
     @Transaction
     @Query("SELECT * FROM contactos")
-    List<ContactosGrupos> getContactosWithGrupos();
+    suspend fun getContactosWithGrupos(): List<ContactosGrupos>
 
     /**
-     * Relacion entre grupos y contactos
+     * Relación entre grupos y contactos
      * @return Un objeto GruposContactos el cual cuenta con el grupo y la lista de contactos miembros
      */
     @Transaction
     @Query("SELECT * FROM grupos")
-    LiveData<List<GruposContactos>> getGruposWithContactos();
+    suspend fun getGruposWithContactos(): List<GruposContactos>
 }

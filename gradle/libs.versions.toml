@@ -4,6 +4,7 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
+kotlinxCoroutinesAndroid = "1.10.2"
 material = "1.12.0"
 activity = "1.10.0"
 constraintlayout = "2.2.0"
@@ -11,8 +12,11 @@ lombok = "1.18.36"
 mapstruct = "1.5.3.Final"
 mapstructProcessor = "1.5.3.Final"
 roomRuntime = "2.7.1"
+kotlin = "2.1.20"
+coreKtx = "1.16.0"
 
 [libraries]
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstructProcessor" }
 lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
@@ -26,7 +30,9 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
