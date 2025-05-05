@@ -16,15 +16,19 @@ interface AnotacionDAO {
     suspend fun addAnotacion(anotacion: Anotacion)
 
     @Update
-    fun updateAnotacion(anotacion: Anotacion)
+    suspend fun updateAnotacion(anotacion: Anotacion)
 
     @Delete
-    fun deleteAnotacion(anotacion: Anotacion)
+    suspend fun deleteAnotacion(anotacion: Anotacion)
 
     @Query("SELECT * FROM anotaciones WHERE id = :id")
-    fun findAnotacionById(id: Int): Anotacion
+    suspend fun findAnotacionById(id: Int): Anotacion
 
     @Transaction
     @Query("SELECT * FROM contactos")
-    fun getContactosWithAnotaciones():List<ContactoAnotacion>
+    suspend fun getContactosWithAnotaciones():List<ContactoAnotacion>
+
+    @Query("SELECT * FROM anotaciones WHERE idContacto = :idContacto")
+    suspend fun getAnotacionesContacto(idContacto: Int): MutableList<Anotacion>
+
 }

@@ -26,6 +26,7 @@ class ContactoActivity : AppCompatActivity() {
     private var title: TextView? = null
     private var db: AppDatabase? = null
     private var contactoDAO: ContactoDAO? = null
+
     private var fragmentActivity = this
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +56,8 @@ class ContactoActivity : AppCompatActivity() {
                         1 -> tab!!.setText("Amigos")
                     }
                 }).attach()
+
+
         }
     }
 }

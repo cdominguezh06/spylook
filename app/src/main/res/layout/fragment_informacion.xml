@@ -238,7 +238,7 @@
                             android:textSize="20sp" />
 
                         <TextView
-                            android:id="@+id/textPais"
+                            android:id="@+id/paisContent"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center"
