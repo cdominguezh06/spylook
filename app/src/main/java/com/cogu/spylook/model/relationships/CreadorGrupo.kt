@@ -1,17 +1,16 @@
-package com.cogu.spylook.model.relationships;
+package com.cogu.spylook.model.relationships
 
-import androidx.room.Embedded;
-import androidx.room.Relation;
+import androidx.room.Embedded
+import androidx.room.Relation
+import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.Grupo
 
-import com.cogu.spylook.model.entity.Contacto;
-import com.cogu.spylook.model.entity.Grupo;
-
-import java.util.List;
-
-public class CreadorGrupo {
+class CreadorGrupo {
+    @JvmField
     @Embedded
-    public Contacto contacto;
+    var contacto: Contacto? = null
 
+    @JvmField
     @Relation(parentColumn = "id", entityColumn = "idCreador")
-    public List<Grupo> grupos;
+    var grupos: MutableList<Grupo?>? = null
 }

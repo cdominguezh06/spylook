@@ -1,23 +1,27 @@
-package com.cogu.spylook.model.relationships;
+package com.cogu.spylook.model.relationships
+
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
+import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
+import com.cogu.spylook.model.entity.Grupo
 
 
-import androidx.room.Embedded;
-import androidx.room.Junction;
-import androidx.room.Relation;
-
-import com.cogu.spylook.model.entity.Contacto;
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef;
-import com.cogu.spylook.model.entity.Grupo;
-
-import java.util.List;
-
-public class ContactosGrupos {
+class ContactosGrupos {
+    @JvmField
     @Embedded
-    public Contacto contacto;
+    var contacto: Contacto? = null
 
-    @Relation(parentColumn = "id", entityColumn = "id",
-            associateBy = @Junction(
-                    value = ContactoGrupoCrossRef.class,
-                    parentColumn = "idContacto", entityColumn = "idGrupo"))
-    public List<Grupo> grupos;
+    @JvmField
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "id",
+        associateBy = Junction(
+            value = ContactoGrupoCrossRef::class,
+            parentColumn = "idContacto",
+            entityColumn = "idGrupo"
+        )
+    )
+    var grupos: MutableList<Grupo?>? = null
 }
