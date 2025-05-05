@@ -1,4 +1,3 @@
-package com.cogu.spylook.model.cards;
+package com.cogu.spylook.model.cards
 
-public class GrupoCardItem {
-}
+class GrupoCardItem 
