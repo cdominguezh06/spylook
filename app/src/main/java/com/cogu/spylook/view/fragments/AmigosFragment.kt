@@ -34,7 +34,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
         val recyclerView: RecyclerView = fragment.findViewById<RecyclerView>(R.id.recycleramigos)
         runBlocking {
             val amigosDeContacto: AmigosDeContacto? =
-                contactoDAO.getAmigosDeContacto(contacto.getId())
+                contactoDAO.getAmigosDeContacto(contacto.id)
             val collect = amigosDeContacto!!.amigos.stream()
                 .map<ContactoCardItem?> { contacto: Contacto? -> mapper.toCardItem(contacto) }
                 .collect(Collectors.toList())

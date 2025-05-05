@@ -1,9 +1,9 @@
-package com.cogu.spylook.model.entity;
+package com.cogu.spylook.model.entity
 
-import androidx.room.Entity;
+import androidx.room.Entity
 
-@Entity(primaryKeys = {"idContacto", "idGrupo"})
-public class ContactoGrupoCrossRef {
-    public int idContacto;
-    public int idGrupo;
+@Entity(primaryKeys = ["idContacto", "idGrupo"])
+class ContactoGrupoCrossRef {
+    var idContacto: Int = 0
+    var idGrupo: Int = 0
 }

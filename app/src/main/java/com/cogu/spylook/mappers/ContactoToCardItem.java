@@ -12,6 +12,6 @@ public interface ContactoToCardItem {
 
     @ObjectFactory
     default ContactoCardItem createCardItem(Contacto contacto){
-        return new ContactoCardItem(contacto.getId(), contacto.getNombre(), contacto.getAlias(), contacto.getEdad());
+        return new ContactoCardItem(contacto.id, contacto.nombre, contacto.alias, contacto.edad);
     }
 }

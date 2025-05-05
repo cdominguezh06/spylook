@@ -43,7 +43,7 @@ class ContactoActivity : AppCompatActivity() {
         title = findViewById<TextView>(R.id.contactoTitle)
         runBlocking {
             val byId: Contacto? = contactoDAO!!.findContactoById(getIntent().getIntExtra("id", 0))
-            title!!.setText(byId!!.getNombre())
+            title!!.setText(byId!!.nombre)
             viewPager = findViewById<ViewPager2>(R.id.pager)
             tabLayout = findViewById<TabLayout>(R.id.tabLayout)
             viewPager!!.setAdapter(SliderAdapter(fragmentActivity, byId, fragmentActivity))

@@ -43,7 +43,7 @@ class TextWatcherSearchBar(
                 db.contactoDAO().getContactos();
                 val collect = contactos!!.stream()
                     .filter { i: Contacto? ->
-                        i!!.getAlias().lowercase(Locale.getDefault()).contains(
+                        i!!.alias!!.lowercase(Locale.getDefault()).contains(
                             text.getText().toString().lowercase(
                                 Locale.getDefault()
                             )
