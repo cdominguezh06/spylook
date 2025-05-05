@@ -54,6 +54,7 @@ class TextWatcherSearchBar(
                 if (collect.isEmpty()) {
                     collect.add(
                         ContactoCardItem(
+                            0,
                             "",
                             "Sin resultados",
                             R.drawable.notfound,

@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
+    id("io.freefair.lombok") version "6.5.0-rc1"
+    kotlin("kapt") version "2.1.20"
 }
 
 android {
@@ -35,9 +37,7 @@ android {
         jvmTarget = "1.8"
     }
 }
-
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -51,9 +51,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok.annotation.processor)
+    kapt(libs.lombok.annotation.processor)
     implementation(libs.mapstruct)
-    annotationProcessor(libs.mapstruct.processor)
-
-
+    kapt(libs.mapstruct.processor)
 }

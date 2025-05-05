@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             })
         db = AppDatabase.getInstance(this)
         dao = db!!.contactoDAO()
-        mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
+        mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         prepareButton()
 
         runBlocking { loadData() }
@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             adapter = PersonaCardAdapter(
                 listOf<ContactoCardItem>(
                     ContactoCardItem(
+                        0,
                         "Vaya...",
                         "Qué vacio...",
                         R.drawable.notfound,
@@ -96,12 +97,13 @@ class MainActivity : AppCompatActivity() {
                 ), this
             )
         } else {
-            adapter = PersonaCardAdapter(
-                contactos.stream().map({ contacto: Contacto? -> mapper!!.toCardItem(contacto) })
-                    .collect(
-                        Collectors.toList()
-                    ), this
-            )
+adapter = PersonaCardAdapter(
+    contactos.stream()
+        .map { contacto: Contacto? -> mapper!!.toCardItem(contacto) }
+        .collect(Collectors.toList())
+        .filterNotNull(),
+    this
+)
         }
     }
 

@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#000000"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
@@ -28,10 +30,65 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
+            android:fontFamily="@font/alatsi"
             android:hint="Escribe un título"
             android:inputType="text"
             android:padding="10dp"
-            android:textColorHint="#B4B4B4"
+            android:textColorHint="@color/hintcolor"
             android:textSize="20sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/alatsi"
+            android:gravity="center"
+            android:paddingVertical="20dp"
+            android:paddingStart="25dp"
+            android:text="Descripcion"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/editTextText2"
+            style="@style/RainbowBorderEditText"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_weight="1"
+            android:height="100dp"
+            android:ems="10"
+            android:fontFamily="@font/alatsi"
+            android:gravity="start|top"
+            android:hint="Escribe aqui..."
+            android:inputType="text"
+            android:padding="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="10dp"
+            android:textAlignment="viewStart"
+            android:textColorHint="@color/hintcolor"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/rainbow_box"
+            android:fontFamily="@font/alatsi"
+            android:text="Guardar"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
     </LinearLayout>
 </LinearLayout>

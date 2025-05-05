@@ -3,6 +3,7 @@ package com.cogu.spylook.model.entity
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import lombok.Builder.Default
 import lombok.NoArgsConstructor
 import java.time.LocalDate
 
@@ -29,7 +30,6 @@ class Contacto {
     var estado: String?
     @JvmField
     var pais: String?
-
     constructor(
         id: Int,
         nombre: String?,

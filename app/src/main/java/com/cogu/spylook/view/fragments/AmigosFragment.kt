@@ -41,6 +41,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
             if (collect.isEmpty()) {
                 collect.add(
                     ContactoCardItem(
+                        0,
                         "Error",
                         "No hay amigos",
                         R.drawable.notfound,
