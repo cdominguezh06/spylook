@@ -1,69 +1,55 @@
-package com.cogu.spylook.adapters;
+package com.cogu.spylook.adapters
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.content.Context
+import android.content.Intent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.cogu.spylook.R
+import com.cogu.spylook.adapters.PersonaCardAdapter.CardViewHolder
+import com.cogu.spylook.model.cards.ContactoCardItem
+import com.cogu.spylook.view.ContactoActivity
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.cogu.spylook.model.cards.ContactoCardItem;
-import com.cogu.spylook.R;
-import com.cogu.spylook.view.ContactoActivity;
-
-import java.util.List;
-
-public class PersonaCardAdapter extends RecyclerView.Adapter<PersonaCardAdapter.CardViewHolder>{
-
-    private List<ContactoCardItem> cardItemList;
-    private Context context;
-
-    public PersonaCardAdapter(List<ContactoCardItem> cardItemList, Context context) {
-        this.cardItemList = cardItemList;
-        this.context = context;
+class PersonaCardAdapter(
+    private val cardItemList: MutableList<ContactoCardItem>,
+    private val context: Context
+) : RecyclerView.Adapter<CardViewHolder?>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
+        val view =
+            LayoutInflater.from(parent.getContext()).inflate(R.layout.personacard, parent, false)
+        return CardViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public PersonaCardAdapter.CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.personacard, parent, false);
-        return new CardViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull PersonaCardAdapter.CardViewHolder holder, int position) {
-        ContactoCardItem cardItem = cardItemList.get(position);
-        holder.name.setText(cardItem.getNombre());
-        holder.mostknownalias.setText(cardItem.getNickMasConocido());
-        holder.careto.setImageResource(cardItem.getFoto());
-        if (cardItem.isClickable()){
-            holder.itemView.setOnClickListener(l->{
-                Intent intent = new Intent(context, ContactoActivity.class);
-                intent.putExtra("id", cardItem.getId());
-                context.startActivity(intent);
-            });
+    override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+        val cardItem = cardItemList.get(position)
+        holder.name.setText(cardItem.getNombre())
+        holder.mostknownalias.setText(cardItem.getNickMasConocido())
+        holder.careto.setImageResource(cardItem.getFoto())
+        if (cardItem.isClickable()) {
+            holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
+                val intent = Intent(context, ContactoActivity::class.java)
+                intent.putExtra("id", cardItem.getId())
+                context.startActivity(intent)
+            })
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return cardItemList.size();
+    override fun getItemCount(): Int {
+        return cardItemList.size
     }
 
-    public static class CardViewHolder extends RecyclerView.ViewHolder {
+    class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var name: TextView
+        var mostknownalias: TextView
+        var careto: ImageView
 
-        TextView name;
-        TextView mostknownalias;
-        ImageView careto;
-        public CardViewHolder(@NonNull View itemView) {
-            super(itemView);
-            name = itemView.findViewById(R.id.name);
-            mostknownalias = itemView.findViewById(R.id.mostknownalias);
-            careto = itemView.findViewById(R.id.careto);
+        init {
+            name = itemView.findViewById<TextView>(R.id.name)
+            mostknownalias = itemView.findViewById<TextView>(R.id.mostknownalias)
+            careto = itemView.findViewById<ImageView>(R.id.careto)
         }
     }
 }

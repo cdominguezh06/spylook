@@ -1,13 +1,13 @@
-package com.cogu.spylook.model.unimplemented;
+package com.cogu.spylook.model.unimplemented
 
+import lombok.AllArgsConstructor
+import lombok.Data
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SpinnerableClass {
-    private String string;
-    private int image;
+class SpinnerableClass {
+     val string: String? = null
+     val image = 0
 
 }
