@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.core.ktx)
     testImplementation(libs.junit)
     implementation(libs.kotlinx.coroutines.android)
+    implementation (libs.recyclerview)
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
     androidTestImplementation(libs.ext.junit)
@@ -52,7 +53,6 @@ dependencies {
     annotationProcessor(libs.lombok.annotation.processor)
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
-
 
 
 }
