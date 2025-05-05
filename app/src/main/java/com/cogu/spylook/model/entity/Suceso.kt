@@ -7,7 +7,11 @@ import java.time.LocalDate
 
 @Entity(tableName = "sucesos")
 @NoArgsConstructor
-class Suceso(@JvmField var fecha: LocalDate?, @JvmField var descripcion: String?, @JvmField var idCausante: Int) {
+class Suceso(
+    @JvmField var fecha: LocalDate?,
+    @JvmField var descripcion: String?,
+    @JvmField var idCausante: Int
+) {
     @JvmField
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
