@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.AnotacionCardAdapte
+import com.cogu.spylook.adapters.AnotacionCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
@@ -53,13 +53,15 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
         runBlocking {
             val anotaciones = dao!!.getAnotacionesContacto(contacto.id)
             val nueva = Anotacion()
+            nueva.id = -1
             nueva.titulo = "Agregar nueva anotacion"
             nueva.fecha = LocalDate.now()
             nueva.idContacto = 0
             nueva.descripcion = ""
             anotaciones.add(nueva)
+            anotaciones.sortBy { a -> a.id }
             val cardItemList = anotaciones.mapNotNull { a -> mapper.toCardItem(a) }.toMutableList()
-            val adapter = AnotacionCardAdapte(cardItemList, requireContext())
+            val adapter = AnotacionCardAdapter(cardItemList, requireContext(), contacto.id)
             recyclerView!!.setLayoutManager(LinearLayoutManager(requireContext()))
             recyclerView!!.adapter = adapter
             if (recyclerView!!.itemDecorationCount <= 0) {

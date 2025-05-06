@@ -7,4 +7,5 @@ import org.mapstruct.Mapper
 @Mapper
 interface GrupoToCardItem {
     fun toCardItem(grupo: Grupo?): GrupoCardItem?
+    fun toGrupo(grupoCardItem: GrupoCardItem?): Grupo?
 }
