@@ -2,6 +2,7 @@ package com.cogu.spylook.view
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -42,8 +43,12 @@ class ContactoActivity : AppCompatActivity() {
         contactoDAO = db!!.contactoDAO()
         title = findViewById<TextView>(R.id.contactoTitle)
         runBlocking {
-            val byId: Contacto? = contactoDAO!!.findContactoById(getIntent().getIntExtra("id", 0))
+            val byId: Contacto? = contactoDAO!!.findContactoById(intent.getIntExtra("id", 0))
             title!!.setText(byId!!.nombre)
+            val image : ImageView = findViewById<View>(R.id.imageView3) as ImageView
+            image.setImageResource(R.drawable.user_icon)
+            image.setColorFilter(byId.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+
             viewPager = findViewById<ViewPager2>(R.id.pager)
             tabLayout = findViewById<TabLayout>(R.id.tabLayout)
             viewPager!!.setAdapter(SliderAdapter(fragmentActivity, byId, fragmentActivity))

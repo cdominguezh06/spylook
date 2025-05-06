@@ -21,8 +21,9 @@
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="100dp"
-            android:layout_height="90dp"
-            app:srcCompat="@drawable/ratona" />
+            android:layout_height="70dp"
+            android:layout_marginVertical="20dp"
+            app:srcCompat="@drawable/user_icon" />
 
         <TextView
             android:id="@+id/contactoTitle"

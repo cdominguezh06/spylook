@@ -20,7 +20,7 @@
             android:id="@+id/imageView3"
             android:layout_width="100dp"
             android:layout_height="90dp"
-            app:srcCompat="@drawable/ratona" />
+            app:srcCompat="@drawable/user_icon" />
 
         <EditText
             android:id="@+id/editTextNombre"
