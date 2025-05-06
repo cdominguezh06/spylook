@@ -15,7 +15,7 @@ class Anotacion {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
     @JvmField
-    var fecha: LocalDateTime? = null
+    var fecha: String? = null
     @JvmField
     var titulo: String? = null
     @JvmField
