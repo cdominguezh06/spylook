@@ -47,8 +47,16 @@ class TextWatcherSearchBar(
             Locale.getDefault()
         )
         if (busqueda.isEmpty()) {
-            recyclerView!!.setLayoutManager(LinearLayoutManager(context))
-            recyclerView.setAdapter(adapter)
+            runBlocking {
+                val contactos: List<Contacto?>? = db.contactoDAO()!!.getContactos()
+                val collect = contactos!!.stream()
+                    .map { contacto -> mapper.toCardItem(contacto) }
+                    .collect(Collectors.toList())
+                val mutableCollect = collect.toMutableList()
+
+                recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+                recyclerView.setAdapter(PersonaCardAdapter(mutableCollect.filterNotNull(), context!!))
+            }
         } else {
             runBlocking {
                 val contactos: List<Contacto?>? =
