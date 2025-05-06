@@ -1,4 +1,4 @@
-package com.cogu.spylook.model.decorators
+package com.cogu.spylook.model.utils.decorators
 
 import android.content.Context
 import android.graphics.Rect

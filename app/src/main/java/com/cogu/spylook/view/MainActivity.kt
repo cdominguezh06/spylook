@@ -20,10 +20,10 @@ import com.cogu.spylook.adapters.PersonaCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.decorators.RainbowTextViewDecorator
-import com.cogu.spylook.model.decorators.SpacingItemDecoration
+import com.cogu.spylook.model.utils.decorators.RainbowTextViewDecorator
+import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.textWatchers.TextWatcherSearchBar
+import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBar
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.stream.Collectors

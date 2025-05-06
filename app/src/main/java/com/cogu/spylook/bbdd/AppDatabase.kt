@@ -9,7 +9,7 @@ import com.cogu.spylook.DAO.AnotacionDAO
 import com.cogu.spylook.DAO.ContactoDAO
 import com.cogu.spylook.DAO.GrupoDAO
 import com.cogu.spylook.DAO.SucesoDAO
-import com.cogu.spylook.model.converters.DateConverters
+import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef

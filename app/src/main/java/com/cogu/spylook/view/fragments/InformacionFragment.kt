@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,8 +12,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.AnotacionCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
-import com.cogu.spylook.mappers.ContactoToCardItem
-import com.cogu.spylook.model.decorators.SpacingItemDecoration
+import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.entity.Contacto
 import kotlinx.coroutines.runBlocking

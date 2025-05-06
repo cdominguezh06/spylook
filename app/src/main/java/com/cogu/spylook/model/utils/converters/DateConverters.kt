@@ -1,4 +1,4 @@
-package com.cogu.spylook.model.converters
+package com.cogu.spylook.model.utils.converters
 
 import androidx.room.TypeConverter
 import java.time.LocalDate

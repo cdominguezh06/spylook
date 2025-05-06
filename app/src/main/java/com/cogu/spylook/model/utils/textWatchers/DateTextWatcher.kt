@@ -1,4 +1,4 @@
-package com.cogu.spylook.model.textWatchers
+package com.cogu.spylook.model.utils.textWatchers
 
 import android.text.Editable
 import android.text.TextWatcher

@@ -1,14 +1,14 @@
-package com.cogu.spylook.model.textWatchers
+package com.cogu.spylook.model.utils.textWatchers
 
 import android.content.Context
 import android.content.Intent
 import android.graphics.LinearGradient
+import android.graphics.PorterDuff
 import android.graphics.Shader
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextWatcher
-import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,8 +25,6 @@ import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
 import java.util.stream.Collectors
-import kotlin.compareTo
-import kotlin.toString
 
 class TextWatcherSearchBar(
     private val text: EditText,
@@ -106,7 +104,7 @@ class TextWatcherSearchBar(
                         }
                         if(cardItem.id !=-1){
                             holder.careto.setImageResource(R.drawable.user_icon)
-                            holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+                            holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
                         }else{
                             holder.careto.setImageResource(R.drawable.notfound)
                         }

@@ -13,7 +13,7 @@ import com.cogu.spylook.adapters.PersonaCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.decorators.SpacingItemDecoration
+import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.relationships.AmigosDeContacto
 import kotlinx.coroutines.runBlocking
