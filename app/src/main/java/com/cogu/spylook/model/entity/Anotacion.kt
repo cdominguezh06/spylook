@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import lombok.AllArgsConstructor
 import lombok.NoArgsConstructor
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +15,7 @@ class Anotacion {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
     @JvmField
-    var fecha: LocalDate? = null
+    var fecha: LocalDateTime? = null
     @JvmField
     var titulo: String? = null
     @JvmField

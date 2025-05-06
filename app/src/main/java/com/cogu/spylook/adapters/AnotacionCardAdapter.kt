@@ -12,9 +12,12 @@ import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
 import com.cogu.spylook.model.entity.Anotacion
+import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Date
 
 class AnotacionCardAdapter(
     private val cardItemList: MutableList<AnotacionCardItem>,
@@ -31,7 +34,12 @@ class AnotacionCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.titulo.text = cardItem.titulo
-        holder.fecha.text = cardItem.fecha
+        if(!cardItem.fecha.contains("|")){
+            val objectDate = DateConverters.fromDateTimeString(cardItem.fecha)
+            holder.fecha.text = DateConverters.toDateTimeString(objectDate)
+        }else{
+            holder.fecha.text = cardItem.fecha
+        }
         holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
             if (position == 0) {
                 writeNewAnotacion()
@@ -52,7 +60,8 @@ class AnotacionCardAdapter(
         val titulo = mostrarAnotacion.findViewById<TextView>(R.id.textViewTitulo)
         titulo.text = cardItemList[position].titulo
         val fecha = mostrarAnotacion.findViewById<TextView>(R.id.textViewFecha)
-        fecha.text = cardItemList[position].fecha
+        val objectDate = DateConverters.fromDateTimeString(cardItemList[position].fecha)
+        fecha.text = DateConverters.toDateTimeString(objectDate)
         val descripcion = mostrarAnotacion.findViewById<TextView>(R.id.textViewDescription)
         descripcion.text = cardItemList[position].descripcion
         val dialog = AlertDialog.Builder(context, R.style.CustomDialog)
@@ -74,10 +83,7 @@ class AnotacionCardAdapter(
                 anotacion.titulo
             anotacionView.findViewById<TextView>(R.id.editTextText2).text =
                 anotacion.descripcion
-            writeNewAnotacion(anotacionView, position)
-            titulo.text = cardItemList[position].titulo
-            fecha.text = cardItemList[position].fecha
-            descripcion.text = cardItemList[position].descripcion
+            writeNewAnotacion(anotacionView, position, dialog)
         }
         cerrar.setOnClickListener {
             dialog.dismiss()
@@ -101,46 +107,53 @@ class AnotacionCardAdapter(
     fun writeNewAnotacion(
         view: View = LayoutInflater.from(context)
             .inflate(R.layout.new_anotacion, null),
-        id: Int = 0,
-        position: Int = 0
+        position: Int = 0,
+        secondDialog: AlertDialog? = null
     ) {
         val db: AppDatabase = AppDatabase.getInstance(context)!!
         val dialog = AlertDialog.Builder(context, R.style.CustomDialog)
             .setView(view)
-            .create();
+            .create()
         val guardar =
             view.findViewById<TextView>(R.id.buttonEditarAnotacion)
         guardar.setOnClickListener {
-            val anotacion = Anotacion()
-            if (id != 0) {
-                anotacion.id = id
-            }
-            anotacion.fecha = LocalDate.now()
-            anotacion.titulo =
-                view.findViewById<TextView>(R.id.editTextText).text.toString()
-            anotacion.descripcion =
-                view.findViewById<TextView>(R.id.editTextText2).text.toString()
-            anotacion.idContacto = usuarioId
             runBlocking {
-                saveAnotacion(db, anotacion, position)
+                if (position == 0){
+                    createAnotacion(view, db)
+                } else {
+                    updateAnotacion(view, db, position)
+                }
+                dialog.dismiss()
+                if(secondDialog != null){
+                    secondDialog.dismiss()
+                    visualizeAnotacion(position)
+                }
             }
-            dialog.dismiss()
         }
         dialog.show()
     }
 
-    private suspend fun saveAnotacion(db: AppDatabase, anotacion: Anotacion, position: Int) {
+    private suspend fun createAnotacion(view : View,db: AppDatabase) {
+        val anotacion = Anotacion()
+        anotacion.fecha = LocalDateTime.now()
+        anotacion.titulo =
+            view.findViewById<TextView>(R.id.editTextText).text.toString()
+        anotacion.descripcion =
+            view.findViewById<TextView>(R.id.editTextText2).text.toString()
+        anotacion.idContacto = usuarioId
         var element = mapper.toCardItem(anotacion)!!
-        if (position == 0) {
-            db.anotacionDAO()!!.addAnotacion(anotacion)
-            cardItemList.add(element)
-            notifyItemInserted(cardItemList.size - 1)
-            return
-        }
+        db.anotacionDAO()!!.addAnotacion(anotacion)
+        cardItemList.add(element)
+        notifyItemInserted(cardItemList.size - 1)
+    }
+
+    private suspend fun updateAnotacion(view: View, db: AppDatabase, position: Int) {
         val editado = mapper.toAnotacion(cardItemList[position])
-        editado.titulo = anotacion.titulo
-        editado.descripcion = anotacion.descripcion
-        editado.fecha = anotacion.fecha
+        editado.fecha = LocalDateTime.now()
+        editado.titulo =
+            view.findViewById<TextView>(R.id.editTextText).text.toString()
+        editado.descripcion =
+            view.findViewById<TextView>(R.id.editTextText2).text.toString()
         db.anotacionDAO()!!.addAnotacion(editado)
         cardItemList[position] = mapper.toCardItem(editado)!!
         notifyItemChanged(position)

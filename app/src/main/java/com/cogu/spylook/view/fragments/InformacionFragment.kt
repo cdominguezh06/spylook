@@ -12,12 +12,15 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.AnotacionCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
+import com.cogu.spylook.model.cards.AnotacionCardItem
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class InformacionFragment(private val contacto: Contacto) : Fragment() {
     private var edadContent: TextView? = null
@@ -52,15 +55,10 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
 
         runBlocking {
             val anotaciones = dao!!.getAnotacionesContacto(contacto.id)
-            val nueva = Anotacion()
-            nueva.id = -1
-            nueva.titulo = "Agregar nueva anotacion"
-            nueva.fecha = LocalDate.now()
-            nueva.idContacto = 0
-            nueva.descripcion = ""
-            anotaciones.add(nueva)
-            anotaciones.sortBy { a -> a.id }
             val cardItemList = anotaciones.mapNotNull { a -> mapper.toCardItem(a) }.toMutableList()
+            cardItemList.add(AnotacionCardItem(-1, "Nueva Anotacion","", DateConverters.toDateTimeString(
+                LocalDateTime.now())!!, contacto.id))
+            cardItemList.sortBy { a -> a.id }
             val adapter = AnotacionCardAdapter(cardItemList, requireContext(), contacto.id)
             recyclerView!!.setLayoutManager(LinearLayoutManager(requireContext()))
             recyclerView!!.adapter = adapter
