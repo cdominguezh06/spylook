@@ -14,7 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cogu.spylook.DAO.ContactoDAO
+import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.PersonaCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase

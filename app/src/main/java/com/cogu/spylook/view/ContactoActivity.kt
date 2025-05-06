@@ -1,6 +1,5 @@
 package com.cogu.spylook.view
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -10,7 +9,7 @@ import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
-import com.cogu.spylook.DAO.ContactoDAO
+import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.SliderAdapter
 import com.cogu.spylook.bbdd.AppDatabase

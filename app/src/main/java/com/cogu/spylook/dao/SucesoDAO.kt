@@ -1,4 +1,4 @@
-package com.cogu.spylook.DAO
+package com.cogu.spylook.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -1,4 +1,4 @@
-package com.cogu.spylook.DAO
+package com.cogu.spylook.dao
 
 import androidx.room.*
 import com.cogu.spylook.model.entity.Contacto

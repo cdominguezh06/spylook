@@ -5,10 +5,10 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.cogu.spylook.DAO.AnotacionDAO
-import com.cogu.spylook.DAO.ContactoDAO
-import com.cogu.spylook.DAO.GrupoDAO
-import com.cogu.spylook.DAO.SucesoDAO
+import com.cogu.spylook.dao.AnotacionDAO
+import com.cogu.spylook.dao.ContactoDAO
+import com.cogu.spylook.dao.GrupoDAO
+import com.cogu.spylook.dao.SucesoDAO
 import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.entity.Contacto
