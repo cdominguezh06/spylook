@@ -18,10 +18,11 @@ class Contacto {
     var nombre: String?
     @JvmField
     var alias: String?
-
     @Ignore
     @JvmField
     var edad: Int
+    @JvmField
+    var colorFoto : Int
     @JvmField
     var fechaNacimiento: LocalDate?
     @JvmField
@@ -37,7 +38,8 @@ class Contacto {
         fechaNacimiento: LocalDate?,
         ciudad: String?,
         estado: String?,
-        pais: String?
+        pais: String?,
+        colorFoto: Int
     ) {
         this.id = id
         this.nombre = nombre
@@ -54,6 +56,7 @@ class Contacto {
         this.ciudad = ciudad
         this.estado = estado
         this.pais = pais
+        this.colorFoto = colorFoto
     }
 
     @Ignore
@@ -63,7 +66,8 @@ class Contacto {
         fechaNacimiento: LocalDate,
         ciudad: String?,
         estado: String?,
-        pais: String?
+        pais: String?,
+        colorFoto: Int
     ) {
         this.nombre = nombre
         this.alias = alias
@@ -79,6 +83,7 @@ class Contacto {
         this.ciudad = ciudad
         this.estado = estado
         this.pais = pais
+        this.colorFoto = colorFoto
     }
 
 

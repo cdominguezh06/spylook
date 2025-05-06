@@ -20,7 +20,7 @@ import com.cogu.spylook.model.entity.Suceso
 
 @Database(
     entities = [Contacto::class, ContactoSucesoCrossRef::class, ContactoGrupoCrossRef::class, ContactoAmistadCrossRef::class, Anotacion::class, Grupo::class, Suceso::class
-    ], version = 2, exportSchema = false
+    ], version = 3, exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -38,7 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
                 synchronized(AppDatabase::class.java) {
                     if (INSTANCE == null) {
                         INSTANCE = databaseBuilder(
-                            context.getApplicationContext(),
+                            context.applicationContext,
                             AppDatabase::class.java, "app_database.db"
                         )
                             .fallbackToDestructiveMigration(false)

@@ -4,7 +4,7 @@ data class ContactoCardItem(
     var id: Int,
     var nombre: String?,
     var alias: String?,
-    var foto: Int,
+    var colorFoto: Int,
     var clickable: Boolean = true
 ) {
 }

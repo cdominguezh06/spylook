@@ -59,7 +59,8 @@ class NuevoContactoActivity : AppCompatActivity() {
             val ciudad = editTextCiudad!!.getText().toString()
             val estado = editTextEstado!!.getText().toString()
             val pais = editTextPais!!.getText().toString()
-            val contacto = Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais)
+            val color = android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
+            val contacto = Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais, color)
             db = AppDatabase.getInstance(this)
             runBlocking {
                 db!!.contactoDAO()!!.addContacto(contacto)

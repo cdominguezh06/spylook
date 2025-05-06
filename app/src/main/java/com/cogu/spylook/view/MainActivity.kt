@@ -88,10 +88,10 @@ class MainActivity : AppCompatActivity() {
             adapter = PersonaCardAdapter(
                 listOf<ContactoCardItem>(
                     ContactoCardItem(
-                        0,
+                        -1,
                         "Vaya...",
                         "Qué vacio...",
-                        R.drawable.notfound,
+                        0,
                         false
                     )
                 ), this

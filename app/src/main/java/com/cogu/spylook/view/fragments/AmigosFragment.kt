@@ -23,13 +23,13 @@ import java.util.stream.Collectors
 class AmigosFragment(private val contacto: Contacto, private val context: Context?) :
     androidx.fragment.app.Fragment() {
     private val mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
-    private val db: AppDatabase = AppDatabase.getInstance(requireContext())!!
-    private val contactoDAO: ContactoDAO = db.contactoDAO()!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val db = AppDatabase.getInstance(requireContext())!!
+        val contactoDAO: ContactoDAO = db.contactoDAO()!!
         val fragment = inflater.inflate(R.layout.fragment_amigos, container, false)
         val recyclerView: RecyclerView = fragment.findViewById<RecyclerView>(R.id.recycleramigos)
         runBlocking {
@@ -41,7 +41,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
             if (collect.isEmpty()) {
                 collect.add(
                     ContactoCardItem(
-                        0,
+                        -1,
                         "Error",
                         "No hay amigos",
                         R.drawable.notfound,

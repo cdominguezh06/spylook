@@ -13,8 +13,8 @@ import com.cogu.spylook.adapters.PersonaCardAdapter.CardViewHolder
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.view.ContactoActivity
 
-class PersonaCardAdapter(
-    private val cardItemList: List<ContactoCardItem>,
+open class PersonaCardAdapter(
+    internal val cardItemList: List<ContactoCardItem>,
     private val context: Context
 ) : RecyclerView.Adapter<CardViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -27,7 +27,12 @@ class PersonaCardAdapter(
         val cardItem = cardItemList.get(position)
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
-        holder.careto.setImageResource(R.drawable.ratona)
+        if(cardItem.id !=-1){
+            holder.careto.setImageResource(R.drawable.user_icon)
+            holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+        }else{
+            holder.careto.setImageResource(R.drawable.notfound)
+        }
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                 val intent = Intent(context, ContactoActivity::class.java)
