@@ -13,10 +13,9 @@ android {
     defaultConfig {
         applicationId = "com.cogu.spylook"
         minSdk = 30
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -38,20 +37,20 @@ android {
     }
 }
 dependencies {
+    compileOnly(libs.lombok)
+    ksp(libs.room.compiler)
+    kapt(libs.lombok.annotation.processor)
+    kapt(libs.mapstruct.processor)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.core.ktx)
-    testImplementation(libs.junit)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.recyclerview)
     implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
+    implementation(libs.mapstruct)
+    testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    compileOnly(libs.lombok)
-    kapt(libs.lombok.annotation.processor)
-    implementation(libs.mapstruct)
-    kapt(libs.mapstruct.processor)
 }
