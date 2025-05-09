@@ -6,7 +6,7 @@ import com.cogu.spylook.model.entity.Suceso
 
 class SingleExportObject(
     val contacto: Contacto,
-    val anotaciones: MutableList<Anotacion>,
-    val sucesos: MutableList<Suceso?>,
+    val anotaciones: MutableList<Anotacion>?,
+    val sucesos: List<Suceso?>,
     val amistades: List<SingleExportObject?>
 )
