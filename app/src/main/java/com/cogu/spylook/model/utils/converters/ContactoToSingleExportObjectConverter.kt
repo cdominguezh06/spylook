@@ -4,8 +4,8 @@ import android.content.Context
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.model.SingleExportObject
 import com.cogu.spylook.model.entity.Contacto
-import kotlinx.coroutines.runBlocking
-import java.util.stream.Collectors
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 object ContactoToSingleExportObjectConverter {
 
@@ -13,30 +13,29 @@ object ContactoToSingleExportObjectConverter {
         contacto: Contacto,
         context: Context,
         deepLevel: Int = 1,
-        excluded: MutableList<Contacto> = mutableListOf()
-    ): SingleExportObject {
+        excluded: List<Contacto> = listOf()
+    ): SingleExportObject = coroutineScope {
         val db = AppDatabase.getInstance(context)
-        val anotaciones = db!!.anotacionDAO()!!.getAnotacionesContacto(contacto.id)
-        val sucesos = db.sucesoDAO()!!.getContactosWithSucesos()
-            .stream()
-            .filter { c -> c.contacto!! == contacto }
-            .map { c -> c.sucesos }
-            .findFirst()
-            .get()
+        val anotaciones = db?.anotacionDAO()?.getAnotacionesContacto(contacto.id)
+        val sucesos = db?.sucesoDAO()?.getContactosWithSucesos()
+            ?.filter { it.contacto == contacto }
+            ?.map { it.sucesos }
+            ?.firstOrNull() ?: emptyList()
+
         if (deepLevel > 0) {
-            excluded.add(contacto)
-            var amistades = db.contactoDAO()!!.getAmigosDeContacto(contacto.id)
-                .amigos
-                ?.stream()
-                ?.filter { c -> !excluded.contains(c) }
+            val newExcluded = excluded + contacto
+            val amistades = db?.contactoDAO()?.getAmigosDeContacto(contacto.id)
+                ?.amigos
+                ?.filter { it !in newExcluded }
                 ?.map { amigo ->
-                    runBlocking {
-                        toSingleExportObject(amigo!!, context, deepLevel - 1, excluded)
-                    }
+                    async { toSingleExportObject(amigo!!, context, deepLevel - 1, newExcluded) }
                 }
-                ?.collect(Collectors.toList())
-            return SingleExportObject(contacto, anotaciones, sucesos, amistades!!)
+                ?.map { it.await() }
+                ?: emptyList()
+
+            return@coroutineScope SingleExportObject(contacto, anotaciones, sucesos, amistades)
         }
-        return SingleExportObject(contacto, anotaciones, sucesos, mutableListOf())
+
+        return@coroutineScope SingleExportObject(contacto, anotaciones, sucesos, emptyList())
     }
 }
