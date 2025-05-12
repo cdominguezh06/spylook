@@ -84,8 +84,8 @@ open class PersonaCardAdapter(
     }
 
     class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var name: TextView = itemView.findViewById<TextView>(R.id.name)
-        var mostknownalias: TextView = itemView.findViewById<TextView>(R.id.mostknownalias)
-        var careto: ImageView = itemView.findViewById<ImageView>(R.id.careto)
+        var name: TextView = itemView.findViewById(R.id.name)
+        var mostknownalias: TextView = itemView.findViewById(R.id.mostknownalias)
+        var careto: ImageView = itemView.findViewById(R.id.careto)
     }
 }

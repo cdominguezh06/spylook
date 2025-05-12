@@ -1,74 +1,105 @@
 package com.cogu.spylook.view
 
+import android.graphics.Color
 import android.os.Bundle
+import android.transition.Explode
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.cogu.spylook.R
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class NuevoContactoActivity : AppCompatActivity() {
-    private var editTextNombre: EditText? = null
-    private var editTextNick: EditText? = null
-    private var editTextCumpleanos: EditText? = null
-    private var editTextCiudad: EditText? = null
-    private var editTextEstado: EditText? = null
-    private var editTextPais: EditText? = null
-    private var siguiente: Button? = null
-    private var db: AppDatabase? = null
+
+    private lateinit var nameEditText: EditText
+    private lateinit var nickEditText: EditText
+    private lateinit var birthdayEditText: EditText
+    private lateinit var cityEditText: EditText
+    private lateinit var stateEditText: EditText
+    private lateinit var countryEditText: EditText
+    private lateinit var nextButton: Button
+    private lateinit var database: AppDatabase
+
+    companion object {
+        private val DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.enableEdgeToEdge()
+        initWindowTransitions()
+        enableEdgeToEdge()
         setContentView(R.layout.activity_agregar_contacto)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        ViewCompat.setOnApplyWindowInsetsListener(
-            findViewById<View?>(R.id.main),
-            OnApplyWindowInsetsListener { v: View?, insets: WindowInsetsCompat? ->
-                val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-                v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-                insets
-            })
-        editTextNombre = findViewById<EditText>(R.id.editTextNombre)
-        editTextNick = findViewById<EditText>(R.id.editTextNick)
-        editTextCumpleanos = findViewById<EditText>(R.id.editTextCumpleanos)
-        editTextCumpleanos!!.addTextChangedListener(DateTextWatcher(editTextCumpleanos!!))
-        editTextCiudad = findViewById<EditText>(R.id.editTextCiudad)
-        editTextEstado = findViewById<EditText>(R.id.editTextEstado)
-        editTextPais = findViewById<EditText>(R.id.editTextPais)
-        siguiente = findViewById<Button>(R.id.buttonSiguiente)
 
-        siguiente!!.setOnClickListener(View.OnClickListener { v: View? ->
-            val nombre = editTextNombre!!.getText().toString()
-            val nick = editTextNick!!.getText().toString()
-            val cumpleanos = LocalDate.parse(
-                editTextCumpleanos!!.getText().toString(),
-                DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            ).toString()
-            val ciudad = editTextCiudad!!.getText().toString()
-            val estado = editTextEstado!!.getText().toString()
-            val pais = editTextPais!!.getText().toString()
-            val color =
-                android.graphics.Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
-            val contacto =
-                Contacto(nombre, nick, LocalDate.parse(cumpleanos), ciudad, estado, pais, color)
-            db = AppDatabase.getInstance(this)
-            runBlocking {
-                db!!.contactoDAO()!!.addContacto(contacto)
+        initViews()
+        setupNextButtonClickListener()
+    }
+
+    private fun initWindowTransitions() {
+        window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = Explode()
+        window.exitTransition = Explode()
+    }
+
+    private fun initViews() {
+        nameEditText = findViewById(R.id.editTextNombre)
+        nickEditText = findViewById(R.id.editTextNick)
+        birthdayEditText = findViewById<EditText>(R.id.editTextCumpleanos).apply {
+            addTextChangedListener(DateTextWatcher(this))
+        }
+        cityEditText = findViewById(R.id.editTextCiudad)
+        stateEditText = findViewById(R.id.editTextEstado)
+        countryEditText = findViewById(R.id.editTextPais)
+        nextButton = findViewById(R.id.buttonSiguiente)
+
+        val mainView: View = findViewById(R.id.main)
+        ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+    }
+
+    private fun setupNextButtonClickListener() {
+        nextButton.setOnClickListener {
+            val contact = createContactFromInput()
+            lifecycleScope.launch {
+                database = AppDatabase.getInstance(this@NuevoContactoActivity)!!
+                database.contactoDAO()!!.addContacto(contact)
+                finish()
             }
-            finish()
+        }
+    }
 
-        })
+    private fun createContactFromInput(): Contacto {
+        val name = nameEditText.text.toString()
+        val nick = nickEditText.text.toString()
+        val birthday = LocalDate.parse(birthdayEditText.text.toString(), DATE_FORMATTER)
+        val city = cityEditText.text.toString()
+        val state = stateEditText.text.toString()
+        val country = countryEditText.text.toString()
+        val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
+
+        return Contacto(
+            nombre = name,
+            alias = nick,
+            fechaNacimiento = birthday,
+            ciudad = city,
+            estado = state,
+            pais = country,
+            colorFoto = color
+        )
     }
 }

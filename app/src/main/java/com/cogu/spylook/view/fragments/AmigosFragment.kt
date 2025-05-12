@@ -5,55 +5,70 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.PersonaCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.relationships.AmigosDeContacto
+import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
-import java.util.stream.Collectors
 
-class AmigosFragment(private val contacto: Contacto, private val context: Context?) :
-    androidx.fragment.app.Fragment() {
-    private val mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
+class AmigosFragment(private val contacto: Contacto, private val context: Context?) : Fragment() {
+
+    private val mapper: ContactoToCardItem = Mappers.getMapper(ContactoToCardItem::class.java)
+
+    private companion object {
+        val ERROR_CARD_ITEM = ContactoCardItem(
+            id = -1,
+            nombre = "Error",
+            alias = "No hay amigos",
+            colorFoto = R.drawable.notfound,
+            clickable = false
+        )
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val db = AppDatabase.getInstance(requireContext())!!
-        val contactoDAO: ContactoDAO = db.contactoDAO()!!
-        val fragment = inflater.inflate(R.layout.fragment_amigos, container, false)
-        val recyclerView: RecyclerView = fragment.findViewById<RecyclerView>(R.id.recycleramigos)
-        runBlocking {
-            val amigosDeContacto: AmigosDeContacto? =
-                contactoDAO.getAmigosDeContacto(contacto.id)
-            val collect = amigosDeContacto!!.amigos!!.stream()
-                .map<ContactoCardItem?> { contacto: Contacto? -> mapper.toCardItem(contacto) }
-                .collect(Collectors.toList())
-            if (collect.isEmpty()) {
-                collect.add(
-                    ContactoCardItem(
-                        -1,
-                        "Error",
-                        "No hay amigos",
-                        R.drawable.notfound,
-                        false
-                    )
-                )
-            }
-            recyclerView.setLayoutManager(LinearLayoutManager(requireContext()))
-            recyclerView.setAdapter(PersonaCardAdapter(collect, requireContext()))
-            recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
-        }
+        val rootView = inflater.inflate(R.layout.fragment_amigos, container, false)
 
-        return fragment
+        setupRecyclerView(rootView.findViewById(R.id.recycleramigos))
+
+        return rootView
+    }
+
+    private fun setupRecyclerView(recyclerView: RecyclerView) = runBlocking {
+        val contactoDAO = getContactoDAO()
+        val amigos = fetchAmigos(contactoDAO)
+        initializeRecyclerView(recyclerView, amigos)
+    }
+
+    private fun getContactoDAO(): ContactoDAO {
+        val db = AppDatabase.getInstance(requireContext())
+        return db!!.contactoDAO()!!
+    }
+
+    private suspend fun fetchAmigos(contactoDAO: ContactoDAO): List<ContactoCardItem> {
+        val amigosDeContacto: AmigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.id)
+        val amigos = amigosDeContacto.amigos?.mapNotNull { amigo ->
+            mapper.toCardItem(amigo)
+        } ?: emptyList()
+
+        return amigos.ifEmpty { listOf(ERROR_CARD_ITEM) }
+    }
+
+    private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = PersonaCardAdapter(amigos, requireContext())
+        recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
 }

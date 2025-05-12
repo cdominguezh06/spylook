@@ -13,61 +13,87 @@ import com.cogu.spylook.adapters.AnotacionCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
-import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class InformacionFragment(private val contacto: Contacto) : Fragment() {
-    private var edadContent: TextView? = null
-    private var nickContent: TextView? = null
-    private var fechaContent: TextView? = null
-    private var ciudadContent: TextView? = null
-    private var estadoContent: TextView? = null
-    private var paisContent: TextView? = null
-    private var recyclerView : RecyclerView? = null
+
+    private val ID_RECYCLER_VIEW = R.id.recyclerAnotaciones
+    private val camposTextViewIds = mapOf(
+        "edad" to R.id.edadContent,
+        "nick" to R.id.nickContent,
+        "fecha" to R.id.fechaContent,
+        "ciudad" to R.id.ciudadContent,
+        "estado" to R.id.estadoContent,
+        "pais" to R.id.paisContent
+    )
+
+    private lateinit var recyclerView: RecyclerView
     private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val fragment = inflater.inflate(R.layout.fragment_informacion, container, false)
-        edadContent = fragment.findViewById<TextView>(R.id.edadContent)
-        nickContent = fragment.findViewById<TextView>(R.id.nickContent)
-        fechaContent = fragment.findViewById<TextView>(R.id.fechaContent)
-        ciudadContent = fragment.findViewById<TextView>(R.id.ciudadContent)
-        estadoContent = fragment.findViewById<TextView>(R.id.estadoContent)
-        paisContent = fragment.findViewById<TextView>(R.id.paisContent)
-        val db = AppDatabase.getInstance(requireContext())!!
-        val dao = db.anotacionDAO()
-        edadContent!!.text = contacto.edad.toString()
-        nickContent!!.text = contacto.alias
-        fechaContent!!.text = contacto.fechaNacimiento.toString()
-        ciudadContent!!.text = contacto.ciudad
-        estadoContent!!.text = contacto.estado
-        paisContent!!.text = contacto.pais
 
-        recyclerView = fragment.findViewById<RecyclerView>(R.id.recyclerAnotaciones)
-
-        runBlocking {
-            val anotaciones = dao!!.getAnotacionesContacto(contacto.id)
-            val cardItemList = anotaciones.mapNotNull { a -> mapper.toCardItem(a) }.toMutableList()
-            cardItemList.add(AnotacionCardItem(-1, "Nueva Anotacion","", DateConverters.toDateTimeString(
-                LocalDateTime.now())!!, contacto.id))
-            cardItemList.sortBy { a -> a.id }
-            val adapter = AnotacionCardAdapter(cardItemList, requireContext(), contacto.id)
-            recyclerView!!.setLayoutManager(LinearLayoutManager(requireContext()))
-            recyclerView!!.adapter = adapter
-            if (recyclerView!!.itemDecorationCount <= 0) {
-                recyclerView!!.addItemDecoration(SpacingItemDecoration(requireContext()))
-            }
-
-        }
+        bindStaticFields(fragment)
+        initializeRecyclerView(fragment)
 
         return fragment
+    }
+
+    private fun bindStaticFields(fragment: View) {
+        camposTextViewIds.entries.forEach { (field, id) ->
+            val textView = fragment.findViewById<TextView>(id)
+            textView.text = when (field) {
+                "edad" -> contacto.edad.toString()
+                "nick" -> contacto.alias
+                "fecha" -> contacto.fechaNacimiento.toString()
+                "ciudad" -> contacto.ciudad
+                "estado" -> contacto.estado
+                "pais" -> contacto.pais
+                else -> ""
+            }
+        }
+    }
+
+    private fun initializeRecyclerView(fragment: View) {
+        recyclerView = fragment.findViewById(ID_RECYCLER_VIEW)
+        val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
+        runBlocking {
+            val anotaciones = db!!.getAnotacionesContacto(contacto.id)
+            val cardItems = buildCardItemList(anotaciones)
+            setupRecyclerView(cardItems)
+        }
+    }
+
+    private fun buildCardItemList(anotaciones: List<Anotacion>): MutableList<AnotacionCardItem> {
+        val cardItems = anotaciones.mapNotNull { mapper.toCardItem(it) }.toMutableList()
+        cardItems.add(
+            AnotacionCardItem(
+                id = -1,
+                titulo = "Nueva Anotacion",
+                descripcion = "",
+                fecha = DateConverters.toDateTimeString(LocalDateTime.now())!!,
+                idContacto = contacto.id
+            )
+        )
+        cardItems.sortBy { it.id }
+        return cardItems
+    }
+
+    private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
+        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.id)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
+        if (recyclerView.itemDecorationCount == 0) {
+            recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
+        }
     }
 }

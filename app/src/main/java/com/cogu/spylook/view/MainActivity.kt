@@ -1,115 +1,135 @@
 package com.cogu.spylook.view
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.transition.Explode
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.PersonaCardAdapter
 import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.utils.decorators.RainbowTextViewDecorator
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
-import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBar
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
-import java.util.stream.Collectors
 
 class MainActivity : AppCompatActivity() {
-    private var mapper: ContactoToCardItem? = null
-    private var adapter: PersonaCardAdapter? = null
-    private var recyclerView: RecyclerView? = null
-    private var db: AppDatabase? = null
-    private var dao: ContactoDAO? = null
+
+    private val transitionEffect = Explode()
+    private lateinit var adapter: PersonaCardAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var mapper: ContactoToCardItem
+    private lateinit var dao: ContactoDAO
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupWindowTransitions()
         this.enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        ViewCompat.setOnApplyWindowInsetsListener(
-            findViewById<View?>(R.id.main),
-            OnApplyWindowInsetsListener { v: View?, insets: WindowInsetsCompat? ->
-                val systemBars = insets!!.getInsets(WindowInsetsCompat.Type.systemBars())
-                v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-                insets
-            })
-        db = AppDatabase.getInstance(this)
-        dao = db!!.contactoDAO()
+        applyWindowInsets()
+
+        val database = AppDatabase.getInstance(this)
+        dao = database!!.contactoDAO()!!
         mapper = Mappers.getMapper(ContactoToCardItem::class.java)
-        prepareButton()
 
-        runBlocking { loadData() }
-        prepareRecyclerView()
-
-        val text = findViewById<EditText>(R.id.searchEditText)
-        text.addTextChangedListener(TextWatcherSearchBar(text, recyclerView, adapter, this))
-        val usuarios = findViewById<TextView?>(R.id.textUsuarios)
-        val grupos = findViewById<TextView?>(R.id.textGrupos)
-
-        var decorator = RainbowTextViewDecorator(this, usuarios)
-        decorator.apply()
-        decorator = RainbowTextViewDecorator(this, grupos)
-        decorator.apply()
+        setupButton()
+        adapter = PersonaCardAdapter(emptyList(), this)
+        setupRecyclerView()
+        lifecycleScope.launch {
+            loadContactData()
+            adapter.notifyDataSetChanged()
+        }
+        setupSearchBar()
+        applyRainbowDecorators()
     }
 
-    private fun prepareButton() {
-        val button = findViewById<Button>(R.id.button)
-        button.setOnClickListener(View.OnClickListener { v: View? ->
-            val intent = Intent(this@MainActivity, NuevoContactoActivity::class.java)
-            startActivity(intent)
-        })
+    private fun setupWindowTransitions() {
+        window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = transitionEffect
+        window.exitTransition = transitionEffect
     }
 
-    private fun prepareRecyclerView() {
-        recyclerView = findViewById<RecyclerView>(R.id.recycler)
-        recyclerView!!.setLayoutManager(LinearLayoutManager(this))
-        recyclerView!!.setAdapter(adapter)
-        if (recyclerView!!.itemDecorationCount <= 0) {
-            recyclerView!!.addItemDecoration(SpacingItemDecoration(this))
+    private fun applyWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.main)
+        ) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
         }
     }
 
-    private suspend fun loadData(){
-        var contactos = dao!!.getContactos()
-        if (contactos.isEmpty()) {
-            adapter = PersonaCardAdapter(
-                listOf<ContactoCardItem>(
-                    ContactoCardItem(
-                        -1,
-                        "Vaya...",
-                        "Qué vacio...",
-                        0,
-                        false
-                    )
-                ), this
+    private fun setupButton() {
+        findViewById<Button>(R.id.button).setOnClickListener {
+            val intent = Intent(this, NuevoContactoActivity::class.java)
+            val options = ActivityOptions.makeSceneTransitionAnimation(this)
+            startActivity(intent, options.toBundle())
+        }
+    }
+
+    private fun setupRecyclerView() {
+        recyclerView = findViewById(R.id.recycler)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+        if (recyclerView.itemDecorationCount == 0) {
+            recyclerView.addItemDecoration(SpacingItemDecoration(this))
+        }
+    }
+
+    private fun setupSearchBar() {
+        val searchEditText = findViewById<EditText>(R.id.searchEditText)
+        searchEditText.addTextChangedListener(
+            TextWatcherSearchBar(searchEditText, recyclerView, adapter, this)
+        )
+    }
+
+    private fun applyRainbowDecorators() {
+        listOf(
+            findViewById<TextView>(R.id.textUsuarios),
+            findViewById<TextView>(R.id.textGrupos)
+        ).forEach { textView ->
+            RainbowTextViewDecorator(this, textView).apply()
+        }
+    }
+
+    private suspend fun loadContactData() {
+        val contactos = dao.getContactos()
+        val cardItems = if (contactos.isEmpty()) {
+            listOf(
+                ContactoCardItem(
+                    id = -1,
+                    nombre = "Vaya...",
+                    alias = "Qué vacio...",
+                    colorFoto = 0,
+                    clickable = false
+                )
             )
         } else {
-adapter = PersonaCardAdapter(
-    contactos.stream()
-        .map { contacto: Contacto? -> mapper!!.toCardItem(contacto) }
-        .collect(Collectors.toList())
-        .filterNotNull(),
-    this
-)
+            contactos.mapNotNull { mapper.toCardItem(it) }
         }
+        adapter = PersonaCardAdapter(cardItems, this)
     }
 
     override fun onResume() {
         super.onResume()
-        runBlocking { loadData() }
-        prepareRecyclerView()
+        runBlocking { loadContactData() }
+        setupRecyclerView()
     }
 }
