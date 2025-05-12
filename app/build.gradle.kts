@@ -28,6 +28,9 @@ android {
             )
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -50,6 +53,9 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.room.runtime)
     implementation(libs.mapstruct)
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
