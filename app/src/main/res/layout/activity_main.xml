@@ -8,7 +8,9 @@
     android:background="#000000"
     android:backgroundTintMode="src_atop"
     app:itemIconSize="40dp"
-    tools:context=".view.MainActivity">
+    tools:context=".view.MainActivity"
+    android:animateLayoutChanges="true"
+    >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
