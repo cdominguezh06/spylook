@@ -1,5 +1,6 @@
 [versions]
 agp = "8.10.0"
+core = "4.6.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -12,11 +13,14 @@ lombok = "1.18.36"
 mapstruct = "1.5.3.Final"
 mapstructProcessor = "1.5.3.Final"
 recyclerview = "1.4.0"
+retrofit = "2.9.0"
 roomRuntime = "2.7.1"
 kotlin = "2.1.20"
 coreKtx = "1.16.0"
 
 [libraries]
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+core = { module = "io.noties.markwon:core", version.ref = "core" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstructProcessor" }
@@ -30,6 +34,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
