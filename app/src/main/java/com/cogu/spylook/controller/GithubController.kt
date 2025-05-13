@@ -51,11 +51,18 @@ class GithubController {
                 if (response.isSuccessful) {
                     val release = response.body()
                     println(response.body())
+                    println(release?.tag_name)
                     release?.let {
-                        val latestVersion = it.tag_name.substring(2)
-                        println("aaaaa" +latestVersion)
-                        val currentVersion = BuildConfig.VERSION_NAME
-                        if (latestVersion > currentVersion) {
+                        val latestVersion = it.tag_name.substring(2).split(".")
+                        val currentVersion = BuildConfig.VERSION_NAME.split(".")
+                        var isSuperior = false
+                        for (i in 0 until latestVersion.size) {
+                            if (latestVersion[i].toInt() > currentVersion[i].toInt()) {
+                                isSuperior = true
+                                break
+                            }
+                        }
+                        if (isSuperior) {
                             showUpdateDialog(context, it)
                         }
                     }
@@ -93,7 +100,7 @@ class GithubController {
         val downloadUrl =
             release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
         downloadUrl?.let {
-            builder.setPositiveButton("Descargar") { _, _ ->
+            builder.setPositiveButton("Descargar") { dialog, _ ->
                 Log.d("DownloadTest", "URL de descarga: $downloadUrl")
                 downloadFile(context, downloadUrl, "spylook-${release.tag_name}.apk")
             }
