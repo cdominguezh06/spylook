@@ -1,12 +1,9 @@
 package com.cogu.spylook.controller
 
-import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.TextView
@@ -19,16 +16,11 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import androidx.appcompat.app.AlertDialog
-import io.noties.markwon.Markwon
-import androidx.core.net.toUri
-import com.cogu.spylook.BuildConfig
 import com.cogu.spylook.model.utils.ApplicationUpdater
-import io.noties.markwon.AbstractMarkwonPlugin
-import io.noties.markwon.SpanFactory
-import io.noties.markwon.core.MarkwonTheme
 
 class GithubController {
 
+    private val VERSION_NAME = "0.1.2"
     companion object {
         private lateinit var INSTANCE: GithubController
         fun getInstance(): GithubController {
@@ -50,11 +42,11 @@ class GithubController {
             override fun onResponse(call: Call<GitHubRelease>, response: Response<GitHubRelease>) {
                 if (response.isSuccessful) {
                     val release = response.body()
-                    println(response.body())
+                    println("${response.body()}")
                     println(release?.tag_name)
                     release?.let {
                         val latestVersion = it.tag_name.substring(2).split(".")
-                        val currentVersion = BuildConfig.VERSION_NAME.split(".")
+                        val currentVersion = VERSION_NAME.split(".")
                         var isSuperior = false
                         for (i in 0 until latestVersion.size) {
                             if (latestVersion[i].toInt() > currentVersion[i].toInt()) {
