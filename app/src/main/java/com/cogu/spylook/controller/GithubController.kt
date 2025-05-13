@@ -8,20 +8,21 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.cogu.spylook.model.github.GitHubAPI
 import com.cogu.spylook.model.github.GitHubRelease
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import androidx.appcompat.app.AlertDialog
 import com.cogu.spylook.model.utils.ApplicationUpdater
+import retrofit2.*
+import retrofit2.converter.gson.GsonConverterFactory
 
 class GithubController {
 
-    private val VERSION_NAME = "0.1.2"
     companion object {
+        private const val BASE_URL = "https://api.github.com/"
+        private const val REPO_OWNER = "cdominguezh06"
+        private const val REPO_NAME = "spylook"
+        private const val CURRENT_VERSION = "0.1.2"
+
         private lateinit var INSTANCE: GithubController
         fun getInstance(): GithubController {
             if (!::INSTANCE.isInitialized) {
@@ -33,29 +34,17 @@ class GithubController {
 
     fun checkForUpdates(context: Context) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.github.com/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
         val gitHubApi = retrofit.create(GitHubAPI::class.java)
-        val call = gitHubApi.getLatestRelease("cdominguezh06", "spylook")
-        call.enqueue(object : Callback<GitHubRelease> {
+        gitHubApi.getLatestRelease(REPO_OWNER, REPO_NAME).enqueue(object : Callback<GitHubRelease> {
             override fun onResponse(call: Call<GitHubRelease>, response: Response<GitHubRelease>) {
                 if (response.isSuccessful) {
-                    val release = response.body()
-                    println("${response.body()}")
-                    println(release?.tag_name)
-                    release?.let {
-                        val latestVersion = it.tag_name.substring(2).split(".")
-                        val currentVersion = VERSION_NAME.split(".")
-                        var isSuperior = false
-                        for (i in 0 until latestVersion.size) {
-                            if (latestVersion[i].toInt() > currentVersion[i].toInt()) {
-                                isSuperior = true
-                                break
-                            }
-                        }
-                        if (isSuperior) {
-                            showUpdateDialog(context, it)
+                    response.body()?.let { release ->
+                        if (isUpdateAvailable(release.tag_name, CURRENT_VERSION)) {
+                            displayUpdateDialog(context, release)
                         }
                     }
                 } else {
@@ -67,34 +56,39 @@ class GithubController {
                 }
             }
 
-
             override fun onFailure(call: Call<GitHubRelease>, t: Throwable) {
-                TODO("Not yet implemented")
+                Log.e("GithubController", "Error fetching updates: ${t.message}")
             }
         })
     }
 
-    fun showUpdateDialog(context: Context, release: GitHubRelease) {
+    private fun isUpdateAvailable(latestVersion: String, currentVersion: String): Boolean {
+        val latestVersionParts = latestVersion.substring(2).split(".").map { it.toInt() }
+        val currentVersionParts = currentVersion.split(".").map { it.toInt() }
 
+        return latestVersionParts.zip(currentVersionParts)
+            .any { (latest, current) -> latest > current }
+    }
+
+    private fun displayUpdateDialog(context: Context, release: GitHubRelease) {
         val markdownBody = release.body
-        val styledMarkdown = processCustomTags(markdownBody)
+        val styledMarkdown = formatMarkdownWithCustomTags(markdownBody)
 
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Nueva actualización disponible (${release.tag_name})")
-
-        val textView = TextView(context)
-        textView.textSize = 16f
-        textView.setPadding(32, 32, 32, 32)
-
-        textView.setText(styledMarkdown, TextView.BufferType.SPANNABLE)
-        builder.setView(textView)
+        val builder = AlertDialog.Builder(context).apply {
+            setTitle("Nueva actualización disponible (${release.tag_name})")
+            setView(TextView(context).apply {
+                textSize = 16f
+                setPadding(32, 32, 32, 32)
+                setText(styledMarkdown, TextView.BufferType.SPANNABLE)
+            })
+        }
 
         val downloadUrl =
             release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
         downloadUrl?.let {
-            builder.setPositiveButton("Descargar") { dialog, _ ->
-                Log.d("DownloadTest", "URL de descarga: $downloadUrl")
-                downloadFile(context, downloadUrl, "spylook-${release.tag_name}.apk")
+            builder.setPositiveButton("Descargar") { _, _ ->
+                Log.d("GithubController", "Descargando desde URL: $downloadUrl")
+                downloadFile(context, it, "spylook-${release.tag_name}.apk")
             }
         }
 
@@ -106,36 +100,22 @@ class GithubController {
         ApplicationUpdater.downloadAndInstallAPK(context, url, fileName)
     }
 
-
-    private fun processCustomTags(markdown: String): Spannable {
+    private fun formatMarkdownWithCustomTags(markdown: String): Spannable {
         val cleanMarkdown = markdown
-            .replace(
-                Regex("^>\\s*", RegexOption.MULTILINE),
-                ""
-            ) // Elimina caracteres "> " al inicio de línea
-            .replace(
-                Regex("\\[!Warning\\]", RegexOption.IGNORE_CASE),
-                "⚠️ Precaución"
-            ) // Reemplaza [!Warning] por emoji o texto
-            .replace(
-                Regex("\\[!Note\\]", RegexOption.IGNORE_CASE),
-                "💡 Notas"
-            ) // Reemplaza [!Note] por emoji o texto
+            .replace(Regex("^>\\s*", RegexOption.MULTILINE), "") // Elimina "> " al inicio de líneas
+            .replace(Regex("\\[!Warning\\]", RegexOption.IGNORE_CASE), "⚠️ Precaución")
+            .replace(Regex("\\[!Note\\]", RegexOption.IGNORE_CASE), "💡 Notas")
 
-        val spannable = SpannableStringBuilder(cleanMarkdown)
-
-        if (cleanMarkdown.contains("⚠️")) {
-            val start = cleanMarkdown.indexOf("⚠️")
-            val end = start + "⚠️".length
-            spannable.setSpan(
-                ForegroundColorSpan(Color.RED),
-                start,
-                end,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+        return SpannableStringBuilder(cleanMarkdown).apply {
+            val warningIndex = cleanMarkdown.indexOf("⚠️")
+            if (warningIndex != -1) {
+                setSpan(
+                    ForegroundColorSpan(Color.RED),
+                    warningIndex,
+                    warningIndex + 2,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
         }
-        return spannable
     }
-
-
 }
