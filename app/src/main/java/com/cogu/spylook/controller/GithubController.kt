@@ -52,7 +52,8 @@ class GithubController {
                     val release = response.body()
                     println(response.body())
                     release?.let {
-                        val latestVersion = it.tag_name
+                        val latestVersion = it.tag_name.substring(2)
+                        println("aaaaa" +latestVersion)
                         val currentVersion = BuildConfig.VERSION_NAME
                         if (latestVersion > currentVersion) {
                             showUpdateDialog(context, it)
