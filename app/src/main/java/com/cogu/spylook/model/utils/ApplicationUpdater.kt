@@ -36,7 +36,7 @@ object ApplicationUpdater {
         val request = DownloadManager.Request(url.toUri())
             .setTitle("Descargando actualización...")
             .setDescription("Espere mientras se descarga la actualización.")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION)
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
             .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, fileName)
             .setAllowedOverMetered(true) // Permitir en datos móviles
             .setAllowedOverRoaming(true) // Bloquear en roaming
@@ -58,7 +58,7 @@ object ApplicationUpdater {
                         // Obtén el URI del archivo con FileProvider
                         val apkUri: Uri = FileProvider.getUriForFile(
                             context,
-                            "${context.packageName}.fileprovider",
+                            "${context.packageName}.provider",
                             apkFile
                         )
                         installAPK(context, apkUri)
@@ -71,29 +71,32 @@ object ApplicationUpdater {
             }
         }
         downloadId = downloadManager.enqueue(request)
+        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
         ContextCompat.registerReceiver(
             context,
             onCompleteReceiver,
-            IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
-            ContextCompat.RECEIVER_NOT_EXPORTED
+            intentFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED // Configuración para evitar transmisiones externas
         )
+        val intent = Intent()
+        intent.putExtra(DownloadManager.EXTRA_DOWNLOAD_ID, downloadId)
+        onCompleteReceiver.onReceive(context, intent)
     }
 
 }
 
 private fun installAPK(context: Context, uri: Uri) {
 
-    val intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
-        setData(uri)
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(uri, "application/vnd.android.package-archive")
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Asegurarse de abrir la vista en una nueva tarea
     }
     try {
         context.startActivity(intent)
-        deleteAPKAfter(context, uri)
     } catch (e: Exception) {
         Log.e("installAPK", "Error al iniciar la instalación del APK", e)
-        Toast.makeText(context, "No se pudo iniciar la instalacion", Toast.LENGTH_SHORT).show()
-
+        Toast.makeText(context, "No se pudo iniciar la instalación", Toast.LENGTH_SHORT).show()
     }
 }
 
