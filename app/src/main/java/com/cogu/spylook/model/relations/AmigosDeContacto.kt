@@ -1,4 +1,4 @@
-package com.cogu.spylook.model.relationships
+package com.cogu.spylook.model.relations
 
 import androidx.room.Embedded
 import androidx.room.Junction

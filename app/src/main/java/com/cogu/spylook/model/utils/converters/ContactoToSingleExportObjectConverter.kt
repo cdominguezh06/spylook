@@ -1,7 +1,7 @@
 package com.cogu.spylook.model.utils.converters
 
 import android.content.Context
-import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.SingleExportObject
 import com.cogu.spylook.model.entity.Contacto
 import kotlinx.coroutines.async

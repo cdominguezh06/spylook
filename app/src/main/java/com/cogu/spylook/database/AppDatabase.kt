@@ -1,4 +1,4 @@
-package com.cogu.spylook.bbdd
+package com.cogu.spylook.database
 
 import android.content.Context
 import androidx.room.Database
@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.cogu.spylook.dao.AnotacionDAO
 import com.cogu.spylook.dao.ContactoDAO
+import com.cogu.spylook.dao.CuentaDao
 import com.cogu.spylook.dao.GrupoDAO
 import com.cogu.spylook.dao.SucesoDAO
 import com.cogu.spylook.model.utils.converters.DateConverters
@@ -28,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun sucesoDAO(): SucesoDAO?
     abstract fun grupoDAO(): GrupoDAO?
     abstract fun anotacionDAO(): AnotacionDAO?
+    abstract fun cuentaDAO(): CuentaDao?
 
     companion object {
         @Volatile

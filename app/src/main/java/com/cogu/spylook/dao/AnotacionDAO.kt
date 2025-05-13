@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.cogu.spylook.model.entity.Anotacion
-import com.cogu.spylook.model.relationships.ContactoAnotacion
+import com.cogu.spylook.model.relations.ContactoAnotacion
 
 @Dao
 interface AnotacionDAO {

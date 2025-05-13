@@ -3,61 +3,25 @@ package com.cogu.spylook.model.entity
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import lombok.Builder.Default
-import lombok.NoArgsConstructor
 import java.time.LocalDate
 
-
-@NoArgsConstructor
-@Entity(tableName = "contactos")
-class Contacto {
+@Entity(
+    tableName = "contactos",
+    indices = [androidx.room.Index(value = ["nombre", "alias"], unique = true)]
+)
+data class Contacto(
     @PrimaryKey(autoGenerate = true)
-    @JvmField
-    var id: Int = 0
-    @JvmField
-    var nombre: String?
-    @JvmField
-    var alias: String?
+    val id: Int = 0,
+    var nombre: String?,
+    var alias: String?,
+    var fechaNacimiento: LocalDate?,
+    var ciudad: String?,
+    var estado: String?,
+    var pais: String?,
+    var colorFoto: Int
+) {
     @Ignore
-    @JvmField
-    var edad: Int
-    @JvmField
-    var colorFoto : Int
-    @JvmField
-    var fechaNacimiento: LocalDate?
-    @JvmField
-    var ciudad: String?
-    @JvmField
-    var estado: String?
-    @JvmField
-    var pais: String?
-    constructor(
-        id: Int,
-        nombre: String?,
-        alias: String?,
-        fechaNacimiento: LocalDate?,
-        ciudad: String?,
-        estado: String?,
-        pais: String?,
-        colorFoto: Int
-    ) {
-        this.id = id
-        this.nombre = nombre
-        this.alias = alias
-        this.fechaNacimiento = fechaNacimiento
-        this.edad = if (LocalDate.now().isAfter(
-                fechaNacimiento!!.withYear(LocalDate.now().year)
-                    .withDayOfYear(LocalDate.now().dayOfYear - 1)
-            )
-        )
-            LocalDate.now().year - fechaNacimiento.year
-        else
-            LocalDate.now().year - (fechaNacimiento.year - 1)
-        this.ciudad = ciudad
-        this.estado = estado
-        this.pais = pais
-        this.colorFoto = colorFoto
-    }
+    var edad: Int = calcularEdad(fechaNacimiento)
 
     @Ignore
     constructor(
@@ -68,23 +32,30 @@ class Contacto {
         estado: String?,
         pais: String?,
         colorFoto: Int
-    ) {
-        this.nombre = nombre
-        this.alias = alias
-        this.fechaNacimiento = fechaNacimiento
-        this.edad = if (LocalDate.now().isAfter(
-                fechaNacimiento.withYear(LocalDate.now().getYear())
-                    .withDayOfYear(LocalDate.now().getDayOfYear() - 1)
-            )
-        )
-            LocalDate.now().getYear() - fechaNacimiento.getYear()
-        else
-            LocalDate.now().getYear() - (fechaNacimiento.getYear() - 1)
-        this.ciudad = ciudad
-        this.estado = estado
-        this.pais = pais
-        this.colorFoto = colorFoto
+    ) : this(
+        id = 0,
+        nombre = nombre,
+        alias = alias,
+        fechaNacimiento = fechaNacimiento,
+        ciudad = ciudad,
+        estado = estado,
+        pais = pais,
+        colorFoto = colorFoto
+    )
+
+    companion object {
+        private fun calcularEdad(fechaNacimiento: LocalDate?): Int {
+            return if (fechaNacimiento != null) {
+                if (LocalDate.now().isAfter(
+                        fechaNacimiento.withYear(LocalDate.now().year)
+                            .withDayOfYear(LocalDate.now().dayOfYear - 1)
+                    )
+                ) {
+                    LocalDate.now().year - fechaNacimiento.year
+                } else {
+                    LocalDate.now().year - (fechaNacimiento.year - 1)
+                }
+            } else 0
+        }
     }
-
-
 }

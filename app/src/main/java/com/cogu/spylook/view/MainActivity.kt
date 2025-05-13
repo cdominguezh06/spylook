@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.PersonaCardAdapter
-import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.controller.GithubController
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem

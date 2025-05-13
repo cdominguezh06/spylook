@@ -2,7 +2,6 @@ package com.cogu.spylook.view
 
 import android.os.Bundle
 import android.transition.Explode
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -12,7 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.SliderAdapter
-import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.model.entity.Contacto
 import com.google.android.material.tabs.TabLayout

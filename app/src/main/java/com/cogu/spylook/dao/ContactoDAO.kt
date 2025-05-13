@@ -3,8 +3,9 @@ package com.cogu.spylook.dao
 import androidx.room.*
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
-import com.cogu.spylook.model.relationships.AmigosDeContacto
-import com.cogu.spylook.model.relationships.CreadorGrupo
+import com.cogu.spylook.model.relations.AmigosDeContacto
+import com.cogu.spylook.model.relations.ContactoConCuentas
+import com.cogu.spylook.model.relations.CreadorGrupo
 
 @Dao
 interface ContactoDAO {
@@ -38,4 +39,9 @@ interface ContactoDAO {
     @Transaction
     @Query("SELECT * FROM contactos")
     suspend fun getTodosLosContactosConAmigos(): List<AmigosDeContacto>
+
+    @Transaction
+    @Query("SELECT * FROM contactos WHERE id = :idContacto")
+    fun obtenerContactoConCuentas(idContacto: Int): List<ContactoConCuentas>
+
 }

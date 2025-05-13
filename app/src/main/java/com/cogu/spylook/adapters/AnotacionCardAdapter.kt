@@ -8,16 +8,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
 import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Date
 
 class AnotacionCardAdapter(
     private val cardItemList: MutableList<AnotacionCardItem>,

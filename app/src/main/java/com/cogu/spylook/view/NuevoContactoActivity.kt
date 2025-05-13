@@ -13,11 +13,10 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.cogu.spylook.R
-import com.cogu.spylook.bbdd.AppDatabase
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

@@ -7,8 +7,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.cogu.spylook.model.entity.Grupo
-import com.cogu.spylook.model.relationships.ContactosGrupos
-import com.cogu.spylook.model.relationships.GruposContactos
+import com.cogu.spylook.model.relations.ContactosGrupos
+import com.cogu.spylook.model.relations.GruposContactos
 
 @Dao
 interface GrupoDAO {

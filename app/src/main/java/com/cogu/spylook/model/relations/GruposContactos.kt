@@ -1,4 +1,4 @@
-package com.cogu.spylook.model.relationships
+package com.cogu.spylook.model.relations
 
 import androidx.room.Embedded
 import androidx.room.Junction
@@ -7,11 +7,10 @@ import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.Grupo
 
-
-class ContactosGrupos {
+class GruposContactos {
     @JvmField
     @Embedded
-    var contacto: Contacto? = null
+    var grupo: Grupo? = null
 
     @JvmField
     @Relation(
@@ -19,9 +18,9 @@ class ContactosGrupos {
         entityColumn = "id",
         associateBy = Junction(
             value = ContactoGrupoCrossRef::class,
-            parentColumn = "idContacto",
-            entityColumn = "idGrupo"
+            parentColumn = "idGrupo",
+            entityColumn = "idContacto"
         )
     )
-    var grupos: MutableList<Grupo?>? = null
+    var contactos: MutableList<Contacto?>? = null
 }
