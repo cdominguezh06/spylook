@@ -14,5 +14,5 @@ class Suceso(
 ) {
     @JvmField
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var idSuceso: Int = 0
 }

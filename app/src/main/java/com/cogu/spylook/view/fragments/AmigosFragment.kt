@@ -58,7 +58,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
     }
 
     private suspend fun fetchAmigos(contactoDAO: ContactoDAO): List<ContactoCardItem> {
-        val amigosDeContacto: AmigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.id)
+        val amigosDeContacto: AmigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.idContacto)
         val amigos = amigosDeContacto.amigos?.mapNotNull { amigo ->
             mapper.toCardItem(amigo)
         } ?: emptyList()

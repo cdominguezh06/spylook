@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor
 class Grupo {
     @JvmField
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var idGrupo: Int = 0
     @JvmField
     var nombre: String? = null
     @JvmField

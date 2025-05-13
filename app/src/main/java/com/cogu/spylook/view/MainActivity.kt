@@ -4,6 +4,8 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.transition.Explode
+import android.transition.Fade
+import android.transition.Slide
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -31,12 +33,12 @@ import org.mapstruct.factory.Mappers
 
 class MainActivity : AppCompatActivity() {
 
-    private val transitionEffect = Explode()
+    private val transitionEffect = Slide()
     private lateinit var adapter: PersonaCardAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var mapper: ContactoToCardItem
     private lateinit var dao: ContactoDAO
-    private lateinit var githubController : GithubController
+    private lateinit var githubController: GithubController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -63,8 +65,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupWindowTransitions() {
         window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
-        window.enterTransition = transitionEffect
-        window.exitTransition = transitionEffect
+        window.enterTransition = transitionEffect.apply {
+            slideEdge = android.view.Gravity.BOTTOM
+        }
+        window.exitTransition = null
+
     }
 
     private fun applyWindowInsets() {

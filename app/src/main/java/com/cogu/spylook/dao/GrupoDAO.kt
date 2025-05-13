@@ -22,7 +22,7 @@ interface GrupoDAO {
     @Delete
     suspend fun deleteGrupo(grupo: Grupo)
 
-    @Query("SELECT * FROM grupos WHERE id = :id")
+    @Query("SELECT * FROM grupos WHERE idGrupo = :id")
     suspend fun findGrupoById(id: Int): Grupo?
 
     @Query("SELECT * FROM grupos")

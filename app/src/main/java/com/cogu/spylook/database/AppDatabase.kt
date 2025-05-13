@@ -16,12 +16,23 @@ import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
+import com.cogu.spylook.model.entity.Cuenta
+import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.entity.Grupo
 import com.cogu.spylook.model.entity.Suceso
 
 @Database(
-    entities = [Contacto::class, ContactoSucesoCrossRef::class, ContactoGrupoCrossRef::class, ContactoAmistadCrossRef::class, Anotacion::class, Grupo::class, Suceso::class
-    ], version = 3, exportSchema = false
+    entities = [
+        Contacto::class,
+        Anotacion::class,
+        Grupo::class,
+        Suceso::class,
+        Cuenta::class,
+        ContactoSucesoCrossRef::class,
+        ContactoGrupoCrossRef::class,
+        ContactoAmistadCrossRef::class,
+        CuentaContactoCrossRef::class
+    ], version = 1, exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -43,7 +54,7 @@ abstract class AppDatabase : RoomDatabase() {
                             context.applicationContext,
                             AppDatabase::class.java, "app_database.db"
                         )
-                            .fallbackToDestructiveMigration(false)
+                            .fallbackToDestructiveMigration(true)
                             .build()
                     }
                 }

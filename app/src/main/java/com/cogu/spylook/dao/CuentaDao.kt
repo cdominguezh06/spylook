@@ -9,7 +9,7 @@ import com.cogu.spylook.model.relations.CuentaConContactos
 interface CuentaDao {
 
     @Transaction
-    @Query("SELECT * FROM cuentas WHERE id = :idCuenta")
+    @Query("SELECT * FROM cuentas WHERE idCuenta = :idCuenta")
     fun obtenerCuentaConContactos(idCuenta: Int): List<CuentaConContactos>
 
     @Transaction

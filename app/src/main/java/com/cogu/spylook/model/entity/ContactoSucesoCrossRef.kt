@@ -2,18 +2,32 @@ package com.cogu.spylook.model.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
-    primaryKeys = ["idContacto", "idSuceso"
+    tableName = "contacto_suceso_cross_ref",
+    primaryKeys = ["idContacto", "idSuceso"],
+    foreignKeys = [
+        ForeignKey(
+            entity = Contacto::class,
+            parentColumns = ["idContacto"],
+            childColumns = ["idContacto"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Suceso::class,
+            parentColumns = ["idSuceso"],
+            childColumns = ["idSuceso"],
+            onDelete = ForeignKey.CASCADE
+        )
     ],
-    foreignKeys = [ForeignKey(
-        entity = Contacto::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("idContacto"),
-        onDelete = ForeignKey.Companion.CASCADE
-    ), ForeignKey(entity = Suceso::class, parentColumns = arrayOf("id"), childColumns = arrayOf("idSuceso"))]
+    indices = [
+        Index(value = ["idContacto"]), // Índice para idContacto
+        Index(value = ["idSuceso"]) // Índice para idSuceso
+    ]
+
 )
-class ContactoSucesoCrossRef {
-    var idContacto: Int = 0
-    var idSuceso: Int = 0
-}
+data class ContactoSucesoCrossRef(
+    var idContacto: Int,
+    var idSuceso: Int
+)

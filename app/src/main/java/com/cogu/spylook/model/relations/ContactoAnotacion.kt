@@ -11,6 +11,6 @@ class ContactoAnotacion {
     var contacto: Contacto? = null
 
     @JvmField
-    @Relation(parentColumn = "id", entityColumn = "idContacto")
+    @Relation(parentColumn = "idContacto", entityColumn = "idContacto")
     var anotaciones: MutableList<Anotacion?>? = null
 }

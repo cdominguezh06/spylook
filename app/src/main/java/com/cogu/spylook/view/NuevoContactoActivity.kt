@@ -3,6 +3,8 @@ package com.cogu.spylook.view
 import android.graphics.Color
 import android.os.Bundle
 import android.transition.Explode
+import android.transition.Fade
+import android.transition.Slide
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -48,8 +50,8 @@ class NuevoContactoActivity : AppCompatActivity() {
 
     private fun initWindowTransitions() {
         window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
-        window.enterTransition = Explode()
-        window.exitTransition = Explode()
+        window.enterTransition = Slide()
+        window.exitTransition = Slide()
     }
 
     private fun initViews() {

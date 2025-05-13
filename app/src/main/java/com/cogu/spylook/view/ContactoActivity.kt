@@ -2,6 +2,8 @@ package com.cogu.spylook.view
 
 import android.os.Bundle
 import android.transition.Explode
+import android.transition.Fade
+import android.transition.Slide
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -42,8 +44,8 @@ class ContactoActivity : AppCompatActivity() {
 
     private fun setupWindowTransitions() {
         window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
-        window.enterTransition = Explode()
-        window.exitTransition = Explode()
+        window.enterTransition = Slide()
+        window.exitTransition = Slide()
     }
 
     private fun setupWindowInsets() {

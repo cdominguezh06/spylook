@@ -1,4 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <style name="Tema.Arcoiris" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:windowBackground">#000000</item>
         <item name="android:colorBackground">#000000</item>
@@ -9,6 +10,7 @@
         <item name="android:buttonStyle">@style/RainbowBorderButton</item>
         <item name="android:editTextStyle">@style/RainbowBorderEditText</item>
     </style>
+
     <style name="RainbowBorderButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/rainbow_border</item>
         <item name="android:textColor">#FFFFFF</item>
@@ -18,6 +20,7 @@
         <item name="android:background">@drawable/rainbow_border</item>
         <item name="android:textColor">#FFFFFF</item>
     </style>
+
     <style name="CustomDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>

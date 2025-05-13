@@ -7,9 +7,11 @@ import androidx.room.PrimaryKey
 data class Cuenta(
     @PrimaryKey(autoGenerate = true)
     @JvmField
-    val id: Int,
+    val idCuenta: Int,
     @JvmField
     val link: String,
     @JvmField
     var nickname: String,
+    @JvmField
+    var redSocial : String
 )

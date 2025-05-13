@@ -67,7 +67,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
         recyclerView = fragment.findViewById(ID_RECYCLER_VIEW)
         val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
         runBlocking {
-            val anotaciones = db!!.getAnotacionesContacto(contacto.id)
+            val anotaciones = db!!.getAnotacionesContacto(contacto.idContacto)
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)
         }
@@ -81,7 +81,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
                 titulo = "Nueva Anotacion",
                 descripcion = "",
                 fecha = DateConverters.toDateTimeString(LocalDateTime.now())!!,
-                idContacto = contacto.id
+                idContacto = contacto.idContacto
             )
         )
         cardItems.sortBy { it.id }
@@ -89,7 +89,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
     }
 
     private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
-        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.id)
+        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.idContacto)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {

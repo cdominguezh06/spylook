@@ -11,7 +11,7 @@ import java.time.LocalDate
 )
 data class Contacto(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val idContacto: Int = 0,
     var nombre: String?,
     var alias: String?,
     var fechaNacimiento: LocalDate?,
@@ -33,7 +33,7 @@ data class Contacto(
         pais: String?,
         colorFoto: Int
     ) : this(
-        id = 0,
+        idContacto = 0,
         nombre = nombre,
         alias = alias,
         fechaNacimiento = fechaNacimiento,
