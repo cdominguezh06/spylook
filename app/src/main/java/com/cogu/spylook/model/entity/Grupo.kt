@@ -2,18 +2,16 @@ package com.cogu.spylook.model.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import lombok.AllArgsConstructor
-import lombok.NoArgsConstructor
 
 @Entity(tableName = "grupos")
-@NoArgsConstructor
-@AllArgsConstructor
-class Grupo {
+class Grupo(
     @JvmField
     @PrimaryKey(autoGenerate = true)
-    var idGrupo: Int = 0
+    var idGrupo: Int = 0,
     @JvmField
-    var nombre: String? = null
+    var nombre: String,
     @JvmField
-    var idCreador: Int = 0
+    var idCreador: Int = 0,
+) {
+    constructor() : this(0, "", 0)
 }

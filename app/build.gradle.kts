@@ -1,9 +1,8 @@
 plugins {
+    id("com.google.devtools.ksp")
+    kotlin("kapt") version "2.1.20"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp")
-    id("io.freefair.lombok") version "6.5.0-rc1"
-    kotlin("kapt") version "2.1.20"
 }
 
 android {
@@ -40,9 +39,7 @@ android {
     }
 }
 dependencies {
-    compileOnly(libs.lombok)
     ksp(libs.room.compiler)
-    kapt(libs.lombok.annotation.processor)
     kapt(libs.mapstruct.processor)
     implementation(libs.appcompat)
     implementation(libs.material)

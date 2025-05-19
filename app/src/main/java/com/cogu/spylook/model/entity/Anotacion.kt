@@ -2,24 +2,23 @@ package com.cogu.spylook.model.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import lombok.AllArgsConstructor
-import lombok.NoArgsConstructor
-import java.time.LocalDate
-import java.time.LocalDateTime
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity(tableName = "anotaciones")
-class Anotacion {
+data class Anotacion(
     @JvmField
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Int = 0,
     @JvmField
-    var fecha: String? = null
+    var fecha: String,
+
     @JvmField
-    var titulo: String? = null
+    var titulo: String,
+
     @JvmField
-    var descripcion: String? = null
+    var descripcion: String,
+
     @JvmField
     var idContacto: Int = 0
+) {
+    constructor(): this(0, "", "", "", 0)
 }

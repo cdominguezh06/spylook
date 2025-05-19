@@ -22,15 +22,15 @@ open class PersonaCardAdapter(
 ) : RecyclerView.Adapter<CardViewHolder?>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
-            LayoutInflater.from(parent.getContext()).inflate(R.layout.personacard, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
         return CardViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        val cardItem = cardItemList.get(position)
+        val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
-        if(cardItem.id !=-1){
+        if(cardItem.idContacto !=-1){
             holder.careto.setImageResource(R.drawable.user_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
@@ -73,7 +73,7 @@ open class PersonaCardAdapter(
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener {
                 val intent = Intent(context, ContactoActivity::class.java)
-                intent.putExtra("id", cardItem.id)
+                intent.putExtra("id", cardItem.idContacto)
                 context.startActivity(intent)
             })
         }

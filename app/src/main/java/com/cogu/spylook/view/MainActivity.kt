@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         val cardItems = if (contactos.isEmpty()) {
             listOf(
                 ContactoCardItem(
-                    id = -1,
+                    idContacto = -1,
                     nombre = "Vaya...",
                     alias = "Qué vacio...",
                     colorFoto = 0,

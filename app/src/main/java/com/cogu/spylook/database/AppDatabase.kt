@@ -32,7 +32,7 @@ import com.cogu.spylook.model.entity.Suceso
         ContactoGrupoCrossRef::class,
         ContactoAmistadCrossRef::class,
         CuentaContactoCrossRef::class
-    ], version = 1, exportSchema = false
+    ], version = 2, exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {

@@ -9,7 +9,6 @@ kotlinxCoroutinesAndroid = "1.10.2"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
-lombok = "1.18.36"
 mapstruct = "1.5.3.Final"
 mapstructProcessor = "1.5.3.Final"
 recyclerview = "1.4.0"
@@ -24,8 +23,6 @@ core = { module = "io.noties.markwon:core", version.ref = "core" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstructProcessor" }
-lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
-lombok-annotation-processor = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

@@ -110,7 +110,7 @@ class TextWatcherSearchBar(
                                 spannable.toString()
                             }
                         }
-                        if(cardItem.id !=-1){
+                        if(cardItem.idContacto !=-1){
                             holder.careto.setImageResource(R.drawable.user_icon)
                             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
                         }else{
@@ -119,7 +119,7 @@ class TextWatcherSearchBar(
                         if (cardItem.clickable) {
                             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                                 val intent = Intent(context, ContactoActivity::class.java)
-                                intent.putExtra("id", cardItem.id)
+                                intent.putExtra("id", cardItem.idContacto)
                                 context!!.startActivity(intent)
                             })
                         }

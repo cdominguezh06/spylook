@@ -15,6 +15,7 @@ interface AnotacionDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAnotacion(anotacion: Anotacion)
 
+    @Transaction
     @Delete
     suspend fun deleteAnotacion(anotacion: Anotacion)
 

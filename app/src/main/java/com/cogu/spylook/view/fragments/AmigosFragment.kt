@@ -26,7 +26,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private companion object {
         val ERROR_CARD_ITEM = ContactoCardItem(
-            id = -1,
+            idContacto = -1,
             nombre = "Error",
             alias = "No hay amigos",
             colorFoto = R.drawable.notfound,

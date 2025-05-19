@@ -9,11 +9,10 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import com.cogu.spylook.R
 import com.cogu.spylook.model.unimplemented.TextViewDecorator
-import lombok.Getter
 
 class RainbowTextViewDecorator(
     private val context: Context,
-    @field:Getter private val textView: TextView
+    private val textView: TextView
 ) : TextViewDecorator {
     private val drawableResourceId: Int = R.drawable.rainbow_gradient
 
