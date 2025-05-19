@@ -8,5 +8,5 @@ import org.mapstruct.Mapping
 @Mapper
 interface ContactoToCardItem {
     @Mapping(target = "clickable", constant = "true")
-    fun toCardItem(contacto: Contacto?): ContactoCardItem?
+    fun toCardItem(contacto: Contacto): ContactoCardItem
 }

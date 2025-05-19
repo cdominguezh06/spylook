@@ -6,6 +6,6 @@ import org.mapstruct.Mapper
 
 @Mapper
 interface AnotacionToCardItem {
-    fun toCardItem(anotacion: Anotacion): AnotacionCardItem?
+    fun toCardItem(anotacion: Anotacion): AnotacionCardItem
     fun toAnotacion(anotacionCardItem: AnotacionCardItem): Anotacion
 }

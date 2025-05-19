@@ -14,29 +14,34 @@ import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.PersonaCardAdapter
+import com.cogu.spylook.adapters.GrupoCardAdapter
 import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
-import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.mappers.GrupoToCardItem
+import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.view.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
-import java.util.stream.Collectors
 
-class TextWatcherSearchBar(
+class TextWatcherSearchBarGroups(
     private val text: EditText,
     private val recyclerView: RecyclerView?,
-    private val adapter: PersonaCardAdapter?,
     private val context: Context?
 ) : TextWatcher {
-    private val mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
+    private val mapper: GrupoToCardItem =
+        Mappers.getMapper<GrupoToCardItem>(GrupoToCardItem::class.java)
     private val db: AppDatabase
+    private lateinit var collect: MutableList<GrupoCardItem>
 
     init {
         this.db = AppDatabase.getInstance(context!!)!!
+        runBlocking {
+            collect = db.grupoDAO()!!
+                    .getGrupos()
+                    .map { c -> mapper.toCardItem(c) }
+                    .toMutableList()
+        }
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -48,31 +53,14 @@ class TextWatcherSearchBar(
         )
         if (busqueda.isEmpty()) {
             runBlocking {
-                val contactos: List<Contacto?>? = db.contactoDAO()!!.getContactos()
-                val collect = contactos!!.stream()
-                    .map { contacto -> mapper.toCardItem(contacto) }
-                    .collect(Collectors.toList())
-                val mutableCollect = collect.toMutableList()
-
-                recyclerView!!.setLayoutManager(LinearLayoutManager(context))
-                recyclerView.setAdapter(PersonaCardAdapter(mutableCollect.filterNotNull(), context!!))
+                recyclerView?.setAdapter(GrupoCardAdapter(collect, context!!))
             }
         } else {
             runBlocking {
-                val contactos: List<Contacto?>? =
-                    db.contactoDAO()!!.getContactos();
-                val collect = contactos!!.stream()
-                    .filter { i: Contacto? ->
-                        i!!.alias!!.lowercase(Locale.getDefault()).contains(busqueda)
-                    }
-                    .map { contacto -> mapper.toCardItem(contacto) }
-                    .collect(Collectors.toList())
-                val mutableCollect = collect.toMutableList()
-                if (mutableCollect.isEmpty()) {
-                    mutableCollect.add(
-                        ContactoCardItem(
+                if (collect.isEmpty()) {
+                    collect.add(
+                        GrupoCardItem(
                             -1,
-                            "",
                             "Sin resultados",
                             0,
                             false
@@ -80,23 +68,22 @@ class TextWatcherSearchBar(
                     )
                 }
 
-                val newAdapter = object : PersonaCardAdapter(mutableCollect.filterNotNull(), context!!) {
+                val newAdapter = object : GrupoCardAdapter(collect, context!!) {
                     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
                         val cardItem = cardItemList[position]
-                        holder.name.text = cardItem.nombre
-                        holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
-                            cardItem.alias = cardItem.alias?.let {
+                        holder.name.text = SpannableString(cardItem.nombre).apply {
+                            cardItem.nombre = cardItem.nombre.let {
                                 val spannable = SpannableString(it)
                                 val startIndex = it.lowercase(Locale.getDefault()).indexOf(busqueda)
                                 if (startIndex >= 0) {
                                     val shader = LinearGradient(
-                                        0f, 0f, holder.mostknownalias.textSize* 2,0f,
+                                        0f, 0f, holder.name.textSize * 2, 0f,
                                         intArrayOf(
                                             context!!.getColor(R.color.red),
                                             context.getColor(R.color.yellow),
                                             context.getColor(R.color.green),
 
-                                        ),
+                                            ),
                                         floatArrayOf(0f, 0.5f, 1f),
                                         Shader.TileMode.MIRROR
                                     )
@@ -110,16 +97,19 @@ class TextWatcherSearchBar(
                                 spannable.toString()
                             }
                         }
-                        if(cardItem.idContacto !=-1){
+                        if (cardItem.idGrupo != -1) {
                             holder.careto.setImageResource(R.drawable.user_icon)
-                            holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
-                        }else{
+                            holder.careto.setColorFilter(
+                                cardItem.colorFoto,
+                                PorterDuff.Mode.MULTIPLY
+                            )
+                        } else {
                             holder.careto.setImageResource(R.drawable.notfound)
                         }
                         if (cardItem.clickable) {
                             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                                 val intent = Intent(context, ContactoActivity::class.java)
-                                intent.putExtra("id", cardItem.idContacto)
+                                intent.putExtra("id", cardItem.idGrupo)
                                 context!!.startActivity(intent)
                             })
                         }
@@ -134,4 +124,3 @@ class TextWatcherSearchBar(
     override fun afterTextChanged(s: Editable?) {
     }
 }
-

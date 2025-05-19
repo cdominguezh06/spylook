@@ -21,7 +21,7 @@ class AnotacionCardAdapter(
     private val cardItemList: MutableList<AnotacionCardItem>,
     private val context: Context,
     private val usuarioId: Int
-) : RecyclerView.Adapter<CardViewHolder?>() {
+) : RecyclerView.Adapter<AnotacionCardAdapter.CardViewHolder>() {
     private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
@@ -146,12 +146,11 @@ class AnotacionCardAdapter(
         editado.descripcion =
             view.findViewById<TextView>(R.id.editTextText2).text.toString()
         db.anotacionDAO()!!.addAnotacion(editado)
-        cardItemList[position] = mapper.toCardItem(editado)!!
+        cardItemList[position] = mapper.toCardItem(editado)
         notifyItemChanged(position)
     }
-}
-
-class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    var titulo: TextView = itemView.findViewById<TextView>(R.id.textTitulo)
-    var fecha: TextView = itemView.findViewById<TextView>(R.id.textFecha)
+    class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var titulo: TextView = itemView.findViewById<TextView>(R.id.textTitulo)
+        var fecha: TextView = itemView.findViewById<TextView>(R.id.textFecha)
+    }
 }
