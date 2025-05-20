@@ -18,13 +18,13 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".view.GrupoActivity"
+            android:name=".view.groups.GrupoActivity"
             android:exported="false" />
         <activity
-            android:name=".view.NuevoContactoActivity"
+            android:name=".view.contacts.NuevoContactoActivity"
             android:exported="false" />
         <activity
-            android:name=".view.ContactoActivity"
+            android:name=".view.contacts.ContactoActivity"
             android:exported="false" />
         <activity
             android:name=".view.MainActivity"

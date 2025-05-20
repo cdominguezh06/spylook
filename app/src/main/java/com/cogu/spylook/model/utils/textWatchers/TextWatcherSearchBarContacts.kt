@@ -20,7 +20,7 @@ import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
-import com.cogu.spylook.view.ContactoActivity
+import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
@@ -59,7 +59,7 @@ class TextWatcherSearchBarContacts(
                     db.contactoDAO()!!.getContactos();
                 val collect = contactos!!
                     .filter { i: Contacto? ->
-                        i!!.alias!!.lowercase(Locale.getDefault()).contains(busqueda)
+                        i!!.alias.lowercase(Locale.getDefault()).contains(busqueda)
                     }
                     .map { contacto -> mapper.toCardItem(contacto!!) }
                     .toMutableList()
@@ -105,7 +105,7 @@ class TextWatcherSearchBarContacts(
                                 spannable.toString()
                             }
                         }
-                        if (cardItem.idContacto != -1) {
+                        if (cardItem.idAnotable != -1) {
                             holder.careto.setImageResource(R.drawable.user_icon)
                             holder.careto.setColorFilter(
                                 cardItem.colorFoto,
@@ -117,7 +117,7 @@ class TextWatcherSearchBarContacts(
                         if (cardItem.clickable) {
                             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                                 val intent = Intent(context, ContactoActivity::class.java)
-                                intent.putExtra("id", cardItem.idContacto)
+                                intent.putExtra("id", cardItem.idAnotable)
                                 context!!.startActivity(intent)
                             })
                         }

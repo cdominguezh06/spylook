@@ -74,7 +74,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
     }
 
     private fun buildCardItemList(anotaciones: List<Anotacion>): MutableList<AnotacionCardItem> {
-        val cardItems = anotaciones.mapNotNull { mapper.toCardItem(it) }.toMutableList()
+        val cardItems = anotaciones.map { mapper.toCardItem(it) }.toMutableList()
         cardItems.add(
             AnotacionCardItem(
                 id = -1,

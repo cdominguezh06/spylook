@@ -1,6 +1,7 @@
 package com.cogu.spylook.dao
 
 import androidx.room.*
+import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.relations.AmigosDeContacto
@@ -11,7 +12,22 @@ import com.cogu.spylook.model.relations.CreadorGrupo
 interface ContactoDAO {
 
     @Insert
+    suspend fun addAnotable(anotable: Anotable): Long
+
+    @Insert
     suspend fun addContacto(contacto: Contacto)
+
+    @Transaction
+    suspend fun addContactoWithAnotable(contacto: Contacto) {
+        val idAnotable = addAnotable(
+            Anotable(
+                idAnotable = contacto.idAnotable,
+                nombre = contacto.nombre
+            )
+        )
+        contacto.idAnotable = idAnotable.toInt()
+        addContacto(contacto)
+    }
 
     @Update
     suspend fun updateContacto(contacto: Contacto)

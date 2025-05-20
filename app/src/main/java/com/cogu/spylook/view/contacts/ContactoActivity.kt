@@ -1,7 +1,9 @@
-package com.cogu.spylook.view
+package com.cogu.spylook.view.contacts
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Slide
+import android.view.Window
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -36,7 +38,7 @@ class ContactoActivity : AppCompatActivity() {
     }
 
     private fun setupWindowTransitions() {
-        window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
         window.enterTransition = Slide()
         window.exitTransition = Slide()
     }
@@ -69,7 +71,7 @@ class ContactoActivity : AppCompatActivity() {
         title.text = contact.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.user_icon)
-        image.setColorFilter(contact.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+        image.setColorFilter(contact.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
     private fun setupViewPager(contact: Contacto) {

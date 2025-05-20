@@ -19,7 +19,7 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
-import com.cogu.spylook.view.ContactoActivity
+import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale

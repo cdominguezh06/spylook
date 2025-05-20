@@ -148,7 +148,7 @@
                             android:layout_weight="0"
                             android:autofillHints="Cumpleaños"
                             android:ems="10"
-                            android:hint="Cumpleaños"
+                            android:hint="DD/MM/YYYY"
                             android:inputType="date"
                             android:textColor="@color/white"
                             android:textColorHint="@color/white"

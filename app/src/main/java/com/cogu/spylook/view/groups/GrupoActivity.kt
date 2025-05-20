@@ -1,4 +1,4 @@
-package com.cogu.spylook.view
+package com.cogu.spylook.view.groups
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

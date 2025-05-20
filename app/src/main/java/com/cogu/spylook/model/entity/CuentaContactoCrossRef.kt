@@ -16,7 +16,7 @@ import androidx.room.Index
         ),
         ForeignKey(
             entity = Contacto::class,
-            parentColumns = ["idContacto"],
+            parentColumns = ["idAnotable"],
             childColumns = ["idContacto"],
             onDelete = ForeignKey.CASCADE
         )

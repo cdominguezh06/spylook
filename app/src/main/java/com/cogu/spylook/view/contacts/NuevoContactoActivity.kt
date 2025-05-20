@@ -1,11 +1,10 @@
-package com.cogu.spylook.view
+package com.cogu.spylook.view.contacts
 
 import android.graphics.Color
 import android.os.Bundle
-import android.transition.Explode
-import android.transition.Fade
 import android.transition.Slide
 import android.view.View
+import android.view.Window
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -49,7 +48,7 @@ class NuevoContactoActivity : AppCompatActivity() {
     }
 
     private fun initWindowTransitions() {
-        window.requestFeature(android.view.Window.FEATURE_CONTENT_TRANSITIONS)
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
         window.enterTransition = Slide()
         window.exitTransition = Slide()
     }
@@ -78,7 +77,7 @@ class NuevoContactoActivity : AppCompatActivity() {
             val contact = createContactFromInput()
             lifecycleScope.launch {
                 database = AppDatabase.getInstance(this@NuevoContactoActivity)!!
-                database.contactoDAO()!!.addContacto(contact)
+                database.contactoDAO()!!.addContactoWithAnotable(contact)
                 finish()
             }
         }

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.PersonaCardAdapter.CardViewHolder
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.view.ContactoActivity
+import com.cogu.spylook.view.contacts.ContactoActivity
 
 open class PersonaCardAdapter(
     internal val cardItemList: List<ContactoCardItem>,
@@ -30,7 +30,7 @@ open class PersonaCardAdapter(
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
-        if(cardItem.idContacto !=-1){
+        if(cardItem.idAnotable !=-1){
             holder.careto.setImageResource(R.drawable.user_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
@@ -72,7 +72,7 @@ open class PersonaCardAdapter(
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener {
                 val intent = Intent(context, ContactoActivity::class.java)
-                intent.putExtra("id", cardItem.idContacto)
+                intent.putExtra("id", cardItem.idAnotable)
                 context.startActivity(intent)
             })
         }

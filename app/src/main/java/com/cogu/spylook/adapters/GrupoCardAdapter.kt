@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.view.ContactoActivity
+import com.cogu.spylook.view.contacts.ContactoActivity
 
 open class GrupoCardAdapter(
     internal val cardItemList: List<GrupoCardItem>,

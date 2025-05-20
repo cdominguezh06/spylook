@@ -31,6 +31,7 @@ import com.cogu.spylook.model.utils.decorators.RainbowTextViewDecorator
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarContacts
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarGroups
+import com.cogu.spylook.view.contacts.NuevoContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var database: AppDatabase
     private var contactos = mutableListOf<Contacto>()
+    private lateinit var intent : Intent
     private var grupos = mutableListOf<Grupo>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,15 +60,16 @@ class MainActivity : AppCompatActivity() {
         database = AppDatabase.getInstance(this)!!
         searchEditText = findViewById<EditText>(R.id.searchEditText)
         setupButtons()
+        intent = Intent(this, NuevoContactoActivity::class.java)
         adapter = PersonaCardAdapter(listOf(), this)
         runBlocking {
             loadDatas()
             val cardItems = if (contactos.isEmpty()) {
                 listOf(
                     ContactoCardItem(
-                        idContacto = -1,
+                        idAnotable = -1,
                         nombre = "Vaya...",
-                        alias = "Qué vacio...",
+                        alias = "Qué vacío...",
                         colorFoto = 0,
                         clickable = false
                     )
@@ -103,7 +106,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupButtons() {
         findViewById<Button>(R.id.button).setOnClickListener {
-            val intent = Intent(this, NuevoContactoActivity::class.java)
             val options = ActivityOptions.makeSceneTransitionAnimation(this)
             startActivity(intent, options.toBundle())
         }
@@ -123,6 +125,7 @@ class MainActivity : AppCompatActivity() {
                 grupos.map { grupoMapper.toCardItem(it) }
             }
             adapter = GrupoCardAdapter(cardItems, this)
+            intent = Intent(this, NuevoContactoActivity::class.java)
             setupRecyclerView()
         }
 
@@ -131,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             val cardItems = if (contactos.isEmpty()) {
                 listOf(
                     ContactoCardItem(
-                        idContacto = -1,
+                        idAnotable = -1,
                         nombre = "Vaya...",
                         alias = "Que vacio todo",
                         colorFoto = 0,
@@ -178,6 +181,20 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         runBlocking { loadDatas() }
+        val cardItems = if (contactos.isEmpty()) {
+            listOf(
+                ContactoCardItem(
+                    idAnotable = -1,
+                    nombre = "Vaya...",
+                    alias = "Que vacio todo",
+                    colorFoto = 0,
+                    clickable = false
+                )
+            )
+        } else {
+            contactos.map { contactoMapper.toCardItem(it) }
+        }
+        adapter = PersonaCardAdapter(cardItems, this)
         setupRecyclerView()
     }
 }
