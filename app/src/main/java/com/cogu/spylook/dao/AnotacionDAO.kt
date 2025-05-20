@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.cogu.spylook.model.entity.Anotacion
-import com.cogu.spylook.model.relations.ContactoAnotacion
+import com.cogu.spylook.model.relations.AnotableConAnotaciones
 
 @Dao
 interface AnotacionDAO {
@@ -22,11 +22,7 @@ interface AnotacionDAO {
     @Query("SELECT * FROM anotaciones WHERE id = :id")
     suspend fun findAnotacionById(id: Int): Anotacion
 
-    @Transaction
-    @Query("SELECT * FROM contactos")
-    suspend fun getContactosWithAnotaciones():List<ContactoAnotacion>
-
-    @Query("SELECT * FROM anotaciones WHERE idContacto = :idContacto")
-    suspend fun getAnotacionesContacto(idContacto: Int): MutableList<Anotacion>
+    @Query("SELECT * FROM anotaciones WHERE idAnotable = :idAnotable")
+    suspend fun getAnotacionesDeAnotable(idAnotable: Int): MutableList<Anotacion>
 
 }

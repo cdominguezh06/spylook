@@ -16,7 +16,7 @@ object ContactoToSingleExportObjectConverter {
         excluded: List<Contacto> = listOf()
     ): SingleExportObject = coroutineScope {
         val db = AppDatabase.getInstance(context)
-        val anotaciones = db?.anotacionDAO()?.getAnotacionesContacto(contacto.idContacto)
+        val anotaciones = db?.anotacionDAO()?.getAnotacionesDeAnotable(contacto.idAnotable)
         val sucesos = db?.sucesoDAO()?.getContactosWithSucesos()
             ?.filter { it.contacto == contacto }
             ?.map { it.sucesos }
@@ -24,7 +24,7 @@ object ContactoToSingleExportObjectConverter {
 
         if (deepLevel > 0) {
             val newExcluded = excluded + contacto
-            val amistades = db?.contactoDAO()?.getAmigosDeContacto(contacto.idContacto)
+            val amistades = db?.contactoDAO()?.getAmigosDeContacto(contacto.idAnotable)
                 ?.amigos
                 ?.filter { it !in newExcluded }
                 ?.map { amigo ->

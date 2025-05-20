@@ -12,7 +12,7 @@ data class CuentaConContactos(
     val cuenta: Cuenta,
     @Relation(
         parentColumn = "idCuenta",
-        entityColumn = "idContacto",
+        entityColumn = "idAnotable",
         associateBy = Junction(
             value = CuentaContactoCrossRef::class,
             parentColumn = "idCuenta",

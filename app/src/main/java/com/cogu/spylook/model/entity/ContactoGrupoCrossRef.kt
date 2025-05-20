@@ -10,13 +10,13 @@ import androidx.room.Index
     foreignKeys = [
         ForeignKey(
             entity = Contacto::class,
-            parentColumns = ["idContacto"],
+            parentColumns = ["idAnotable"],
             childColumns = ["idContacto"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = Grupo::class,
-            parentColumns = ["idGrupo"],
+            parentColumns = ["idAnotable"],
             childColumns = ["idGrupo"],
             onDelete = ForeignKey.CASCADE
         )
@@ -30,3 +30,4 @@ data class ContactoGrupoCrossRef(
     var idContacto: Int,
     var idGrupo: Int
 )
+

@@ -9,6 +9,6 @@ class CausanteSuceso {
     @Embedded
     var contacto: Contacto? = null
 
-    @Relation(parentColumn = "idContacto", entityColumn = "idCausante")
+    @Relation(parentColumn = "idAnotable", entityColumn = "idCausante")
     var sucesos: MutableList<Suceso?>? = null
 }

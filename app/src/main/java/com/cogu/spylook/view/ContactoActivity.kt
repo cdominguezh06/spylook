@@ -1,8 +1,6 @@
 package com.cogu.spylook.view
 
 import android.os.Bundle
-import android.transition.Explode
-import android.transition.Fade
 import android.transition.Slide
 import android.widget.ImageView
 import android.widget.TextView
@@ -26,11 +24,6 @@ class ContactoActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var title: TextView
     private lateinit var contactoDAO: ContactoDAO
-
-    companion object {
-        private const val TAB_INFO_TITLE = "Información"
-        private const val TAB_FRIENDS_TITLE = "Amigos"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,8 +76,8 @@ class ContactoActivity : AppCompatActivity() {
         viewPager.adapter = SliderAdapter(this, contact, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> TAB_INFO_TITLE
-                1 -> TAB_FRIENDS_TITLE
+                0 -> getString(R.string.TAB_FRIENDS_TITLE)
+                1 -> getString(R.string.TAB_INFO_TITLE)
                 else -> ""
             }
         }.attach()

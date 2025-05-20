@@ -19,7 +19,7 @@ interface ContactoDAO {
     @Delete
     suspend fun deleteContacto(contacto: Contacto)
 
-    @Query("SELECT * FROM contactos WHERE idContacto = :id")
+    @Query("SELECT * FROM contactos WHERE idAnotable = :id")
     suspend fun findContactoById(id: Int): Contacto
 
     @Query("SELECT * FROM contactos")
@@ -33,7 +33,7 @@ interface ContactoDAO {
     suspend fun insertAmistad(crossRef: ContactoAmistadCrossRef)
 
     @Transaction
-    @Query("SELECT * FROM contactos WHERE idContacto = :id")
+    @Query("SELECT * FROM contactos WHERE idAnotable = :id")
     suspend fun getAmigosDeContacto(id: Int): AmigosDeContacto
 
     @Transaction
@@ -41,7 +41,7 @@ interface ContactoDAO {
     suspend fun getTodosLosContactosConAmigos(): List<AmigosDeContacto>
 
     @Transaction
-    @Query("SELECT * FROM contactos WHERE idContacto = :idContacto")
+    @Query("SELECT * FROM contactos WHERE idAnotable = :idContacto")
     fun obtenerContactoConCuentas(idContacto: Int): List<ContactoConCuentas>
 
 }

@@ -131,7 +131,7 @@ class AnotacionCardAdapter(
             view.findViewById<TextView>(R.id.editTextText).text.toString()
         anotacion.descripcion =
             view.findViewById<TextView>(R.id.editTextText2).text.toString()
-        anotacion.idContacto = usuarioId
+        anotacion.idAnotable = usuarioId
         var element = mapper.toCardItem(anotacion)!!
         db.anotacionDAO()!!.addAnotacion(anotacion)
         cardItemList.add(element)

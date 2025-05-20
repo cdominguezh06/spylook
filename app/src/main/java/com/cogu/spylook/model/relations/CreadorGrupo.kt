@@ -11,6 +11,6 @@ class CreadorGrupo {
     var contacto: Contacto? = null
 
     @JvmField
-    @Relation(parentColumn = "idContacto", entityColumn = "idCreador")
+    @Relation(parentColumn = "idAnotable", entityColumn = "idCreador")
     var grupos: MutableList<Grupo?>? = null
 }

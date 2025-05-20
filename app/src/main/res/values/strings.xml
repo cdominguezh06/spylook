@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SpyLook</string>
+    <string name="TAB_INFO_TITLE">Información</string>
+    <string name="TAB_FRIENDS_TITLE">Amigos</string>
 </resources>

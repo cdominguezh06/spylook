@@ -5,8 +5,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.view.fragments.AmigosFragment
-import com.cogu.spylook.view.fragments.InformacionFragment
+import com.cogu.spylook.view.fragments.contacts.AmigosFragment
+import com.cogu.spylook.view.fragments.contacts.InformacionFragment
 
 class SliderAdapter(
     fragment: FragmentActivity,

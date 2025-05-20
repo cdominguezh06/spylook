@@ -5,6 +5,6 @@ data class AnotacionCardItem(
     val titulo : String,
     val descripcion : String,
     val fecha : String,
-    val idContacto : Int
+    val idAnotable : Int
 ) {
 }

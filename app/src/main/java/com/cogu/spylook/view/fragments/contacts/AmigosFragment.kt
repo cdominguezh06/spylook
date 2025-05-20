@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.fragments
+package com.cogu.spylook.view.fragments.contacts
 
 import android.content.Context
 import android.os.Bundle
@@ -58,7 +58,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
     }
 
     private suspend fun fetchAmigos(contactoDAO: ContactoDAO): List<ContactoCardItem> {
-        val amigosDeContacto: AmigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.idContacto)
+        val amigosDeContacto: AmigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.idAnotable)
         val amigos = amigosDeContacto.amigos?.mapNotNull { amigo ->
             mapper.toCardItem(amigo!!)
         } ?: emptyList()

@@ -7,33 +7,38 @@ import java.time.LocalDate
 
 @Entity(
     tableName = "contactos",
-    indices = [androidx.room.Index(value = ["nombre", "alias"], unique = true)]
+    indices = [androidx.room.Index(value = ["alias"], unique = true)]
 )
-data class Contacto(
-    @PrimaryKey(autoGenerate = true)
-    val idContacto: Int = 0,
-    var nombre: String?,
-    var alias: String?,
-    var fechaNacimiento: LocalDate?,
-    var ciudad: String?,
-    var estado: String?,
-    var pais: String?,
-    var colorFoto: Int
-) {
+class Contacto(
+    idAnotable: Int = 0,
+    nombre: String,
+    @JvmField
+    var alias: String,
+    @JvmField
+    var fechaNacimiento: LocalDate,
+    @JvmField
+    var ciudad: String,
+    @JvmField
+    var estado: String,
+    @JvmField
+    var pais: String,
+    @JvmField
+    var colorFoto: Int,
+): Anotable(idAnotable, nombre) {
     @Ignore
     var edad: Int = calcularEdad(fechaNacimiento)
 
     @Ignore
     constructor(
-        nombre: String?,
-        alias: String?,
+        nombre: String,
+        alias: String,
         fechaNacimiento: LocalDate,
-        ciudad: String?,
-        estado: String?,
-        pais: String?,
+        ciudad: String,
+        estado: String,
+        pais: String,
         colorFoto: Int
     ) : this(
-        idContacto = 0,
+        idAnotable = 0,
         nombre = nombre,
         alias = alias,
         fechaNacimiento = fechaNacimiento,

@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.fragments
+package com.cogu.spylook.view.fragments.contacts
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -67,7 +67,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
         recyclerView = fragment.findViewById(ID_RECYCLER_VIEW)
         val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
         runBlocking {
-            val anotaciones = db!!.getAnotacionesContacto(contacto.idContacto)
+            val anotaciones = db!!.getAnotacionesDeAnotable(contacto.idAnotable)
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)
         }
@@ -81,7 +81,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
                 titulo = "Nueva Anotacion",
                 descripcion = "",
                 fecha = DateConverters.toDateTimeString(LocalDateTime.now())!!,
-                idContacto = contacto.idContacto
+                idAnotable = contacto.idAnotable
             )
         )
         cardItems.sortBy { it.id }
@@ -89,7 +89,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
     }
 
     private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
-        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.idContacto)
+        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.idAnotable)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {
