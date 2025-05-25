@@ -32,6 +32,7 @@ import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarContacts
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarGroups
 import com.cogu.spylook.view.contacts.NuevoContactoActivity
+import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -125,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                 grupos.map { grupoMapper.toCardItem(it) }
             }
             adapter = GrupoCardAdapter(cardItems, this)
-            intent = Intent(this, NuevoContactoActivity::class.java)
+            intent = Intent(this, NuevoGrupoActivity::class.java)
             setupRecyclerView()
         }
 

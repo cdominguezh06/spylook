@@ -14,7 +14,8 @@
         android:id="@+id/recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +25,8 @@
         android:id="@+id/linearLayout2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="24dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                app:srcCompat="@drawable/grupos" />
+                app:srcCompat="@drawable/contact_icon" />
 
             <TextView
                 android:id="@+id/textUsuarios"
@@ -65,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_weight="1"
-                app:srcCompat="@drawable/grupos" />
+                app:srcCompat="@drawable/group_icon" />
 
             <TextView
                 android:id="@+id/textGrupos"
@@ -85,7 +87,8 @@
         style="@style/RainbowBorderEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:background="@drawable/rainbow_border"
         android:drawableLeft="@android:drawable/ic_menu_search"
@@ -107,6 +110,8 @@
         style="@style/RainbowBorderButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/rainbow_border"
         android:fontFamily="@font/alatsi"
         android:text="Nuevo"

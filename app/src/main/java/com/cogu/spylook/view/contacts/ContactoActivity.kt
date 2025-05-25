@@ -70,7 +70,7 @@ class ContactoActivity : AppCompatActivity() {
     private fun setupContactDetails(contact: Contacto) {
         title.text = contact.nombre
         val image: ImageView = findViewById(R.id.imageView3)
-        image.setImageResource(R.drawable.user_icon)
+        image.setImageResource(R.drawable.contact_icon)
         image.setColorFilter(contact.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 

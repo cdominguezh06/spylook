@@ -106,7 +106,7 @@ class TextWatcherSearchBarContacts(
                             }
                         }
                         if (cardItem.idAnotable != -1) {
-                            holder.careto.setImageResource(R.drawable.user_icon)
+                            holder.careto.setImageResource(R.drawable.contact_icon)
                             holder.careto.setColorFilter(
                                 cardItem.colorFoto,
                                 PorterDuff.Mode.MULTIPLY

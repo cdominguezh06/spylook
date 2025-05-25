@@ -31,7 +31,7 @@ open class PersonaCardAdapter(
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
         if(cardItem.idAnotable !=-1){
-            holder.careto.setImageResource(R.drawable.user_icon)
+            holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {

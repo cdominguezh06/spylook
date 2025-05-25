@@ -20,7 +20,7 @@
             android:id="@+id/imageView3"
             android:layout_width="100dp"
             android:layout_height="90dp"
-            app:srcCompat="@drawable/user_icon" />
+            app:srcCompat="@drawable/contact_icon" />
 
         <EditText
             android:id="@+id/editTextNombre"
@@ -297,32 +297,3 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-    <!--<androidx.recyclerview.widget.RecyclerView-->
-    <!--android:id="@+id/recyclerAnotaciones"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:layout_marginTop="1dp"-->
-    <!--android:background="#00FFFFFF"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/textView2" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textView2"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="40dp"-->
-    <!--android:layout_marginTop="12dp"-->
-    <!--android:fontFamily="@font/adlam_display"-->
-    <!--android:gravity="center"-->
-    <!--android:text="Anotaciones"-->
-    <!--android:textColor="#FFFFFF"-->
-    <!--android:textSize="20sp"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintHorizontal_bias="0.0"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/cardView2" />-->

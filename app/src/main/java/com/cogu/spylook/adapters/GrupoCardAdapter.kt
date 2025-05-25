@@ -28,7 +28,7 @@ open class GrupoCardAdapter(
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         if (cardItem.idGrupo != -1) {
-            holder.careto.setImageResource(R.drawable.user_icon)
+            holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(
                 cardItem.colorFoto,
                 android.graphics.PorterDuff.Mode.MULTIPLY
