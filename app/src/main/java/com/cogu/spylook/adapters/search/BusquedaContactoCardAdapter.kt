@@ -14,10 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.model.cards.ContactoCardItem
 
-open class BusquedaContactoCardAdapter (
+abstract class BusquedaContactoCardAdapter (
     internal val cardItemList: List<ContactoCardItem>,
     private val context: Context,
-    private val addLimit : Int
 ) : RecyclerView.Adapter<BusquedaContactoCardAdapter.CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
@@ -27,6 +26,7 @@ open class BusquedaContactoCardAdapter (
 
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
@@ -38,18 +38,12 @@ open class BusquedaContactoCardAdapter (
         }
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener {
-                val inflated = LayoutInflater.from(context).inflate(R.layout.buscar_contacto_inflate, null)
-                val searchBar = inflated.findViewById<EditText>(R.id.searchInflateEditText)
-                val popupWindow = PopupWindow(
-                    inflated,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    true
-                )
-                popupWindow.showAtLocation(it, Gravity.NO_GRAVITY, 0, 0)
+                onClick(cardItem)
             })
         }
     }
+
+    abstract fun onClick(cardItem: ContactoCardItem)
 
     override fun getItemCount(): Int {
         return cardItemList.size
