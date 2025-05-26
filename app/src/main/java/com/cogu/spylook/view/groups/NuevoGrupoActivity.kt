@@ -13,6 +13,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.adapters.search.CrearGrupoCardAdapter
 import com.cogu.spylook.model.cards.ContactoCardItem
+import kotlin.properties.Delegates
 
 class NuevoGrupoActivity : AppCompatActivity() {
 
@@ -45,7 +46,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
         )
         creador.add(card)
         miembros.add(card)
-        var adapter = CrearGrupoCardAdapter(creador, this, 1)
+        var adapter = CrearGrupoCardAdapter(creador, this)
         recyclerCreadorGrupo.layoutManager = LinearLayoutManager(this)
         recyclerCreadorGrupo.adapter = adapter
 

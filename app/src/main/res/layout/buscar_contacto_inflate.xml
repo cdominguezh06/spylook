@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rainbow_box">
+    android:background="@drawable/rainbow_box"
+    android:paddingBottom="16dp">
 
     <EditText
         android:id="@+id/searchInflateEditText"
@@ -33,10 +34,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerBusquedaContactos"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchInflateEditText" />

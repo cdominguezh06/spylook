@@ -28,10 +28,10 @@ import org.mapstruct.factory.Mappers
 import java.util.Locale
 
 class TextWatcherSearchBarMiembros(
-private val text: EditText,
-private val recyclerView: RecyclerView?,
-private val onClickFunction: () -> Unit,
-private val context: Context?
+    private val text: EditText,
+    private val recyclerView: RecyclerView?,
+    private val onClickFunction: (ContactoCardItem) -> Unit,
+    private val context: Context?
 ) : TextWatcher {
     private val mapper: ContactoToCardItem =
         Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
@@ -125,7 +125,7 @@ private val context: Context?
                     }
 
                     override fun onClick(item: ContactoCardItem) {
-                        onClickFunction()
+                        onClickFunction(item)
                     }
                 }
                 recyclerView!!.setLayoutManager(LinearLayoutManager(context))

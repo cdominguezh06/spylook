@@ -1,5 +1,6 @@
 package com.cogu.spylook.adapters.search
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.PorterDuff
 import android.view.Gravity
@@ -24,13 +25,12 @@ import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class CrearGrupoCardAdapter (
+class CrearGrupoCardAdapter(
     internal val cardItemList: List<ContactoCardItem>,
     private val context: Context,
-    private val addLimit : Int
 ) : RecyclerView.Adapter<CrearGrupoCardAdapter.CardViewHolder>() {
-    private lateinit var onClickFunction: () -> Unit
-    private lateinit var mapper : ContactoToCardItem
+    private lateinit var onClickFunction: (ContactoCardItem) -> Unit
+    private lateinit var mapper: ContactoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
@@ -43,15 +43,16 @@ class CrearGrupoCardAdapter (
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
-        if(cardItem.idAnotable !=-1){
+        if (cardItem.idAnotable != -1) {
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
-        }else{
+        } else {
             holder.careto.setImageResource(R.drawable.notfound)
         }
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener {
-                val inflated = LayoutInflater.from(context).inflate(R.layout.buscar_contacto_inflate, null)
+                val inflated =
+                    LayoutInflater.from(context).inflate(R.layout.buscar_contacto_inflate, null)
                 val searchBar = inflated.findViewById<EditText>(R.id.searchInflateEditText)
                 val recycler = inflated.findViewById<RecyclerView>(R.id.recyclerBusquedaContactos)
                 val dialog = AlertDialog.Builder(context, R.style.CustomDialog)
@@ -60,26 +61,32 @@ class CrearGrupoCardAdapter (
                 var lista = listOf<ContactoCardItem>()
                 runBlocking {
                     lista = AppDatabase.getInstance(context)!!
-                        .contactoDAO()!!.getContactos().map{c-> mapper.toCardItem(c)}
+                        .contactoDAO()!!.getContactos().map { c -> mapper.toCardItem(c) }
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
-                val busquedaContactoCardAdapter = object : BusquedaContactoCardAdapter(lista, context){
-                    override fun onClick(cardItem: ContactoCardItem) {
-                        fun onClick() {
-                            dialog.dismiss()
-                            if (itemCount == NuevoGrupoActivity.creador.size) {
-                                NuevoGrupoActivity.creador.removeAt(0)
-                            }
-                            NuevoGrupoActivity.creador.add(cardItem)
-                            dialog.dismiss()
-                        }
-                        onClickFunction = ::onClick
-                        searchBar.addTextChangedListener(TextWatcherSearchBarMiembros(searchBar,recycler, onClickFunction, context))
-                        onClick()
-                    }
+                fun onClick(cardItem: ContactoCardItem) {
+                    NuevoGrupoActivity.creador.clear()
+                    NuevoGrupoActivity.creador.add(cardItem)
+                    notifyDataSetChanged()
+                    dialog.dismiss()
                 }
+                onClickFunction = ::onClick
+                val busquedaContactoCardAdapter =
+                    object : BusquedaContactoCardAdapter(lista, context) {
+                        override fun onClick(cardItem: ContactoCardItem) {
+                            onClick(cardItem)
+                        }
+                    }
                 recycler.adapter = busquedaContactoCardAdapter
                 dialog.show()
+                searchBar.addTextChangedListener(
+                    TextWatcherSearchBarMiembros(
+                        searchBar,
+                        recycler,
+                        onClickFunction,
+                        context
+                    )
+                )
                 dialog.window?.setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
