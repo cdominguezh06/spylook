@@ -1,7 +1,6 @@
 package com.cogu.spylook.model.utils.textWatchers
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.LinearGradient
 import android.graphics.PorterDuff
 import android.graphics.Shader
@@ -14,15 +13,13 @@ import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.PersonaCardAdapter
-import com.cogu.spylook.adapters.PersonaCardAdapter.CardViewHolder
+import com.cogu.spylook.adapters.ContactoCardAdapter
 import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
-import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
@@ -54,7 +51,7 @@ class TextWatcherSearchBarMiembros(
                 val collect =
                     contactos!!.map { contacto -> mapper.toCardItem(contacto!!) }.toMutableList()
                 recyclerView!!.setLayoutManager(LinearLayoutManager(context))
-                recyclerView.setAdapter(PersonaCardAdapter(collect, context!!))
+                recyclerView.setAdapter(ContactoCardAdapter(collect, context!!))
             }
         } else {
             runBlocking {

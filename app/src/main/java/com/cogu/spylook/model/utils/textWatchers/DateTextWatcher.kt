@@ -3,6 +3,7 @@ package com.cogu.spylook.model.utils.textWatchers
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.max
@@ -36,14 +37,26 @@ class DateTextWatcher(private val editText: EditText) : TextWatcher {
                 var mon = clean.substring(2, 4).toInt()
                 var year = clean.substring(4, 8).toInt()
 
-                mon = max(1.0, min(mon.toDouble(), 12.0)).toInt()
-                cal.set(Calendar.MONTH, mon - 1)
-                year = max(1900.0, min(year.toDouble(), 2100.0)).toInt()
+                year = max(1900.0, min(year.toDouble(), LocalDate.now().year.toDouble())).toInt()
+                if (year == LocalDate.now().year) {
+                    mon =
+                        max(1.0, min(mon.toDouble(), LocalDate.now().monthValue.toDouble())).toInt()
+                } else {
+                    mon = max(1.0, min(mon.toDouble(), 12.0)).toInt()
+                }
                 cal.set(Calendar.YEAR, year)
-                day = max(
-                    1.0,
-                    min(day.toDouble(), cal.getActualMaximum(Calendar.DAY_OF_MONTH).toDouble())
-                ).toInt()
+                cal.set(Calendar.MONTH, mon - 1)
+                if (mon == LocalDate.now().monthValue && year == LocalDate.now().year) {
+                    day = max(
+                        1.0,
+                        min(day.toDouble(), LocalDate.now().dayOfMonth.toDouble())
+                    ).toInt()
+                }else{
+                    day = max(
+                        1.0,
+                        min(day.toDouble(), cal.getActualMaximum(Calendar.DAY_OF_MONTH).toDouble())
+                    ).toInt()
+                }
                 clean = String.format(Locale.getDefault(), "%02d%02d%04d", day, mon, year)
             }
 

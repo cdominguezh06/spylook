@@ -1,22 +1,22 @@
-package com.cogu.spylook.adapters
+package com.cogu.spylook.adapters.slider
 
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.view.fragments.contacts.AmigosFragment
-import com.cogu.spylook.view.fragments.contacts.InformacionFragment
+import com.cogu.spylook.view.contacts.fragments.AmigosFragment
+import com.cogu.spylook.view.contacts.fragments.InformacionFragment
 
-class SliderAdapter(
+class ContactSliderAdapter(
     fragment: FragmentActivity,
     private val contacto: Contacto,
     private val context: Context?
 ) : FragmentStateAdapter(fragment) {
     override fun createFragment(position: Int): Fragment {
-        when (position) {
-            1 -> return AmigosFragment(contacto, context)
-            else -> return InformacionFragment(contacto)
+        return when (position) {
+            1 -> AmigosFragment(contacto, context)
+            else -> InformacionFragment(contacto)
         }
     }
 

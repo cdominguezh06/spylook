@@ -3,6 +3,7 @@ package com.cogu.spylook.adapters.group
 import android.app.Dialog
 import android.content.Context
 import android.graphics.PorterDuff
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +48,8 @@ class CreadorGrupoCardAdapter(
             holder.careto.setImageResource(R.drawable.notfound)
         }
         if (cardItem.clickable) {
-            holder.itemView.setOnClickListener(View.OnClickListener {
+            holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+                view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val inflated =
                     LayoutInflater.from(context).inflate(R.layout.buscar_contacto_inflate, null)
                 val searchBar = inflated.findViewById<EditText>(R.id.searchInflateEditText)

@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.fragments.contacts
+package com.cogu.spylook.view.contacts.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,7 +40,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fragment = inflater.inflate(R.layout.fragment_informacion, container, false)
+        val fragment = inflater.inflate(R.layout.fragment_contact_data, container, false)
 
         bindStaticFields(fragment)
         initializeRecyclerView(fragment)

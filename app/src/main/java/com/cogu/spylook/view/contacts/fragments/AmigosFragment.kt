@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.fragments.contacts
+package com.cogu.spylook.view.contacts.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.PersonaCardAdapter
+import com.cogu.spylook.adapters.ContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem
@@ -68,7 +68,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = PersonaCardAdapter(amigos, requireContext())
+        recyclerView.adapter = ContactoCardAdapter(amigos, requireContext())
         recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
 }

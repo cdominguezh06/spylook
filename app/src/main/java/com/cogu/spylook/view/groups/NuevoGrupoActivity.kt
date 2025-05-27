@@ -2,6 +2,8 @@ package com.cogu.spylook.view.groups
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
@@ -63,8 +65,8 @@ class NuevoGrupoActivity : AppCompatActivity() {
         textNombreGrupo = findViewById<EditText>(R.id.editTextNombre)
         boton = findViewById<Button>(R.id.buttonSiguiente)
 
-        boton.setOnClickListener {
-
+        boton.setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             var alert = AlertDialog.Builder(this).setTitle("Error al crear el grupo")
             val nombreGrupo = textNombreGrupo.text.toString().trim()
             if (nombreGrupo.isEmpty()) {
@@ -84,7 +86,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 idCreador = creador[0].idAnotable // ID del creador (asumimos que solo hay uno)
             )
             runBlocking {
-                val grupoId = db.grupoDAO()!!.addGrupo(nuevoGrupo).toInt()
+                val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupo).toInt()
                 val relaciones = miembros
                     .filter { it.idAnotable != -1 }
                     .map { miembro ->
@@ -95,6 +97,8 @@ class NuevoGrupoActivity : AppCompatActivity() {
                     }
                 db.grupoDAO()!!.insertarRelaciones(relaciones)
             }
+            creador = mutableListOf()
+            miembros = mutableListOf()
             finish()
         }
     }

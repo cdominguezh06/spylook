@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextWatcher
 import android.transition.Slide
+import android.view.HapticFeedbackConstants
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -18,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.GrupoCardAdapter
-import com.cogu.spylook.adapters.PersonaCardAdapter
+import com.cogu.spylook.adapters.ContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.controller.GithubController
 import com.cogu.spylook.mappers.ContactoToCardItem
@@ -62,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         searchEditText = findViewById<EditText>(R.id.searchEditText)
         setupButtons()
         intent = Intent(this, NuevoContactoActivity::class.java)
-        adapter = PersonaCardAdapter(listOf(), this)
+        adapter = ContactoCardAdapter(listOf(), this)
         runBlocking {
             loadDatas()
             val cardItems = if (contactos.isEmpty()) {
@@ -78,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 contactos.map { contactoMapper.toCardItem(it) }
             }
-            adapter = PersonaCardAdapter(cardItems, context = this@MainActivity)
+            adapter = ContactoCardAdapter(cardItems, context = this@MainActivity)
             adapter.notifyDataSetChanged()
         }
         setupRecyclerView()
@@ -106,19 +108,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        findViewById<Button>(R.id.button).setOnClickListener {
+        findViewById<Button>(R.id.button).setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val options = ActivityOptions.makeSceneTransitionAnimation(this)
             startActivity(intent, options.toBundle())
         }
 
-        findViewById<ImageView>(R.id.imageViewGrupos).setOnClickListener {
+        findViewById<ImageView>(R.id.imageViewGrupos).setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             setupSearchBar(TextWatcherSearchBarGroups(searchEditText, recyclerView, this))
             val cardItems = if (grupos.isEmpty()) {
                 listOf(
                     GrupoCardItem(
-                        idGrupo = -1,
+                        idAnotable = -1,
                         nombre = "Que vacío todo",
-                        colorFoto = 0,
                         clickable = false
                     )
                 )
@@ -130,7 +133,8 @@ class MainActivity : AppCompatActivity() {
             setupRecyclerView()
         }
 
-        findViewById<ImageView>(R.id.imageViewUsuarios).setOnClickListener {
+        findViewById<ImageView>(R.id.imageViewUsuarios).setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             setupSearchBar(TextWatcherSearchBarContacts(searchEditText, recyclerView, this))
             val cardItems = if (contactos.isEmpty()) {
                 listOf(
@@ -145,7 +149,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 contactos.map { contactoMapper.toCardItem(it) }
             }
-            adapter = PersonaCardAdapter(cardItems, this)
+            adapter = ContactoCardAdapter(cardItems, this)
             setupRecyclerView()
         }
     }
@@ -195,7 +199,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             contactos.map { contactoMapper.toCardItem(it) }
         }
-        adapter = PersonaCardAdapter(cardItems, this)
+        intent = Intent(this, NuevoContactoActivity::class.java)
+        NuevoGrupoActivity.creador = mutableListOf()
+        NuevoGrupoActivity.miembros = mutableListOf()
+        adapter = ContactoCardAdapter(cardItems, this)
         setupRecyclerView()
     }
 }

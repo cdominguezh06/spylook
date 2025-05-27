@@ -1,6 +1,7 @@
 package com.cogu.spylook.database
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
@@ -22,6 +23,7 @@ import com.cogu.spylook.model.entity.Cuenta
 import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.entity.Grupo
 import com.cogu.spylook.model.entity.Suceso
+import java.util.concurrent.Executors
 
 @Database(
     entities = [
@@ -59,6 +61,9 @@ abstract class AppDatabase : RoomDatabase() {
                             AppDatabase::class.java, "app_database.db"
                         )
                             .fallbackToDestructiveMigration(true)
+                            .setQueryCallback({ sqlQuery, _ ->
+                                Log.d("RoomQuery", sqlQuery) // Aquí vemos qué consultas ejecuta Room
+                            }, Executors.newSingleThreadExecutor())
                             .build()
                     }
                 }

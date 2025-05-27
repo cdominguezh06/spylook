@@ -3,11 +3,13 @@ package com.cogu.spylook.view.contacts
 import android.graphics.Color
 import android.os.Bundle
 import android.transition.Slide
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -73,12 +75,20 @@ class NuevoContactoActivity : AppCompatActivity() {
     }
 
     private fun setupNextButtonClickListener() {
-        nextButton.setOnClickListener {
+        nextButton.setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val contact = createContactFromInput()
             lifecycleScope.launch {
                 database = AppDatabase.getInstance(this@NuevoContactoActivity)!!
-                database.contactoDAO()!!.addContactoWithAnotable(contact)
+                database.contactoDAO()!!.findContactoByName(contact.nombre)?.let {
+                    AlertDialog.Builder(this@NuevoContactoActivity)
+                        .setTitle("Error al crear el contacto")
+                        .setMessage("Ya existe un contacto con ese nombre")
+                        .show()
+                    return@launch
+                }
                 finish()
+                database.contactoDAO()!!.addContactoWithAnotable(contact)
             }
         }
     }

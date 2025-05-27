@@ -1,21 +1,86 @@
 package com.cogu.spylook.view.groups
 
 import android.os.Bundle
+import android.transition.Slide
+import android.view.Window
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.viewpager2.widget.ViewPager2
 import com.cogu.spylook.R
+import com.cogu.spylook.adapters.slider.ContactSliderAdapter
+import com.cogu.spylook.adapters.slider.GroupSliderAdapter
+import com.cogu.spylook.database.AppDatabase
+import com.cogu.spylook.dao.GrupoDAO
+import com.cogu.spylook.model.entity.Grupo
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.runBlocking
 
 class GrupoActivity : AppCompatActivity() {
+
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager2
+    private lateinit var title: TextView
+    private lateinit var grupoDAO: GrupoDAO
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_grupo)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        setupWindowTransitions()
+        this.enableEdgeToEdge()
+        setContentView(R.layout.activity_contacto)
+        setupWindowInsets()
+        initializeDatabase()
+        setupUI()
+    }
+
+    private fun setupWindowTransitions() {
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = Slide()
+        window.exitTransition = Slide()
+    }
+
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun initializeDatabase() {
+        grupoDAO = AppDatabase.getInstance(this)!!.grupoDAO()!!
+    }
+
+    private fun setupUI() {
+        title = findViewById(R.id.contactoTitle)
+        viewPager = findViewById(R.id.pager)
+        tabLayout = findViewById(R.id.tabLayout)
+
+        runBlocking {
+            val grupo = grupoDAO.findGrupoById(intent.getIntExtra("id", 0))!!
+            setupGroupDetails(grupo)
+            setupViewPager(grupo)
+        }
+    }
+
+    private fun setupGroupDetails(grupo : Grupo) {
+        title.text = grupo.nombre
+        val image: ImageView = findViewById(R.id.imageView3)
+        image.setImageResource(R.drawable.group_icon)
+    }
+
+    private fun setupViewPager(grupo: Grupo) {
+        viewPager.adapter = GroupSliderAdapter(this, grupo, this)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "MIEMBROS"
+                1 -> "NOTAS"
+                else -> ""
+            }
+        }.attach()
     }
 }

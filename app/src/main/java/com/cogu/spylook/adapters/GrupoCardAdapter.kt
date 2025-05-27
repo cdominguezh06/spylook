@@ -2,7 +2,9 @@ package com.cogu.spylook.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -12,8 +14,11 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.view.contacts.ContactoActivity
+import com.cogu.spylook.view.groups.GrupoActivity
+import kotlinx.coroutines.runBlocking
+import org.w3c.dom.Text
 
 open class GrupoCardAdapter(
     internal val cardItemList: List<GrupoCardItem>,
@@ -27,12 +32,13 @@ open class GrupoCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
-        if (cardItem.idGrupo != -1) {
-            holder.careto.setImageResource(R.drawable.contact_icon)
-            holder.careto.setColorFilter(
-                cardItem.colorFoto,
-                android.graphics.PorterDuff.Mode.MULTIPLY
-            )
+        if (cardItem.idAnotable != -1) {
+            runBlocking {
+                val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!
+                    .obtenerRelacionesPorGrupo(cardItem.idAnotable).size+1
+                    holder.numeroMiembros.text = "${miembros} miembros"
+            }
+            holder.careto.setImageResource(R.drawable.group_icon)
             holder.itemView.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     v.setTag(R.id.touch_event_x, event.rawX.toInt())
@@ -42,6 +48,7 @@ open class GrupoCardAdapter(
             }
 
             holder.itemView.setOnLongClickListener(View.OnLongClickListener { view: View? ->
+                view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val inflater = LayoutInflater.from(context)
                 val popupView = inflater.inflate(
                     R.layout.long_press_contact,
@@ -63,7 +70,7 @@ open class GrupoCardAdapter(
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int
 
-                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x, y)
+                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x-200, y-100)
 
                 true
 
@@ -72,9 +79,11 @@ open class GrupoCardAdapter(
             holder.careto.setImageResource(R.drawable.notfound)
         }
         if (cardItem.clickable) {
-            holder.itemView.setOnClickListener(View.OnClickListener {
-                val intent = Intent(context, ContactoActivity::class.java)
-                intent.putExtra("id", cardItem.idGrupo)
+            holder.itemView.setOnClickListener(View.OnClickListener {l: View? ->
+                Log.e("click", "click")
+                l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                val intent = Intent(context, GrupoActivity::class.java)
+                intent.putExtra("id", cardItem.idAnotable)
                 context.startActivity(intent)
             })
         }
@@ -86,6 +95,7 @@ open class GrupoCardAdapter(
 
     class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name: TextView = itemView.findViewById(R.id.name)
+        var numeroMiembros : TextView = itemView.findViewById(R.id.numberOfMembers)
         var careto: ImageView = itemView.findViewById(R.id.imagen)
     }
 }

@@ -6,6 +6,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.Grupo
 import com.cogu.spylook.model.relations.ContactosGrupos
@@ -13,9 +15,23 @@ import com.cogu.spylook.model.relations.GruposContactos
 
 @Dao
 interface GrupoDAO {
+    @Insert
+    suspend fun addAnotable(anotable: Anotable): Long
 
     @Insert
     suspend fun addGrupo(grupo: Grupo) : Long
+
+    @Transaction
+    suspend fun addGrupoWithAnotable(grupo: Grupo) : Long {
+        val idAnotable = addAnotable(
+            Anotable(
+                idAnotable = grupo.idAnotable,
+                nombre = grupo.nombre
+            )
+        )
+        grupo.idAnotable = idAnotable.toInt()
+       return addGrupo(grupo)
+    }
     @Update
     suspend fun updateGrupo(grupo: Grupo)
     @Delete

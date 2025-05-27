@@ -62,8 +62,6 @@ class TextWatcherSearchBarGroups(
                         GrupoCardItem(
                             -1,
                             "Sin resultados",
-                            0,
-                            false
                         )
                     )
                 }
@@ -97,19 +95,15 @@ class TextWatcherSearchBarGroups(
                                 spannable.toString()
                             }
                         }
-                        if (cardItem.idGrupo != -1) {
-                            holder.careto.setImageResource(R.drawable.contact_icon)
-                            holder.careto.setColorFilter(
-                                cardItem.colorFoto,
-                                PorterDuff.Mode.MULTIPLY
-                            )
+                        if (cardItem.idAnotable != -1) {
+                            holder.careto.setImageResource(R.drawable.group_icon)
                         } else {
                             holder.careto.setImageResource(R.drawable.notfound)
                         }
                         if (cardItem.clickable) {
                             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                                 val intent = Intent(context, ContactoActivity::class.java)
-                                intent.putExtra("id", cardItem.idGrupo)
+                                intent.putExtra("id", cardItem.idAnotable)
                                 context!!.startActivity(intent)
                             })
                         }

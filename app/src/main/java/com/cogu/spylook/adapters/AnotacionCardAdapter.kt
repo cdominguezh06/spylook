@@ -1,6 +1,8 @@
 package com.cogu.spylook.adapters
 
 import android.content.Context
+import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +22,7 @@ import java.time.LocalDateTime
 class AnotacionCardAdapter(
     private val cardItemList: MutableList<AnotacionCardItem>,
     private val context: Context,
-    private val usuarioId: Int
+    private val anotableId: Int
 ) : RecyclerView.Adapter<AnotacionCardAdapter.CardViewHolder>() {
     private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -34,6 +36,7 @@ class AnotacionCardAdapter(
         holder.titulo.text = cardItem.titulo
         holder.fecha.text = cardItem.fecha
         holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             if (position == 0) {
                 writeNewAnotacion()
             } else {
@@ -66,7 +69,8 @@ class AnotacionCardAdapter(
         val editar = mostrarAnotacion.findViewById<TextView>(R.id.buttonEditarAnotacion)
         val cerrar = mostrarAnotacion.findViewById<TextView>(R.id.buttonCerrar)
         val borrar = mostrarAnotacion.findViewById<TextView>(R.id.buttonBorrarAnotacion)
-        editar.setOnClickListener {
+        editar.setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val anotacion = cardItemList[position]
             val anotacionView =
                 LayoutInflater.from(context)
@@ -77,10 +81,12 @@ class AnotacionCardAdapter(
                 anotacion.descripcion
             writeNewAnotacion(anotacionView, position, dialog)
         }
-        cerrar.setOnClickListener {
+        cerrar.setOnClickListener { l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             dialog.dismiss()
         }
-        borrar.setOnClickListener {
+        borrar.setOnClickListener {l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val db: AppDatabase = AppDatabase.getInstance(context)!!
             runBlocking {
                 db.anotacionDAO()!!.deleteAnotacion(
@@ -131,9 +137,10 @@ class AnotacionCardAdapter(
             view.findViewById<TextView>(R.id.editTextText).text.toString()
         anotacion.descripcion =
             view.findViewById<TextView>(R.id.editTextText2).text.toString()
-        anotacion.idAnotable = usuarioId
-        var element = mapper.toCardItem(anotacion)!!
-        db.anotacionDAO()!!.addAnotacion(anotacion)
+        anotacion.idAnotable = anotableId
+        val id = db.anotacionDAO()!!.addAnotacion(anotacion)
+        anotacion.id = id.toInt()
+        val element = mapper.toCardItem(anotacion)
         cardItemList.add(element)
         notifyItemInserted(cardItemList.size - 1)
     }
@@ -145,7 +152,9 @@ class AnotacionCardAdapter(
             view.findViewById<TextView>(R.id.editTextText).text.toString()
         editado.descripcion =
             view.findViewById<TextView>(R.id.editTextText2).text.toString()
-        db.anotacionDAO()!!.addAnotacion(editado)
+        editado.idAnotable = anotableId
+        val id = db.anotacionDAO()!!.addAnotacion(editado)
+        editado.id = id.toInt()
         cardItemList[position] = mapper.toCardItem(editado)
         notifyItemChanged(position)
     }

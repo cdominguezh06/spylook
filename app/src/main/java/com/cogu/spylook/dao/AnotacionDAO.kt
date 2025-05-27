@@ -13,14 +13,13 @@ import com.cogu.spylook.model.relations.AnotableConAnotaciones
 interface AnotacionDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addAnotacion(anotacion: Anotacion)
+    suspend fun addAnotacion(anotacion: Anotacion) : Long
 
-    @Transaction
     @Delete
     suspend fun deleteAnotacion(anotacion: Anotacion)
 
     @Query("SELECT * FROM anotaciones WHERE id = :id")
-    suspend fun findAnotacionById(id: Int): Anotacion
+    suspend fun findAnotacionById(id: Int): Anotacion?
 
     @Query("SELECT * FROM anotaciones WHERE idAnotable = :idAnotable")
     suspend fun getAnotacionesDeAnotable(idAnotable: Int): MutableList<Anotacion>

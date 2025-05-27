@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.SliderAdapter
+import com.cogu.spylook.adapters.slider.ContactSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.model.entity.Contacto
@@ -75,7 +75,7 @@ class ContactoActivity : AppCompatActivity() {
     }
 
     private fun setupViewPager(contact: Contacto) {
-        viewPager.adapter = SliderAdapter(this, contact, this)
+        viewPager.adapter = ContactSliderAdapter(this, contact, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.TAB_FRIENDS_TITLE)

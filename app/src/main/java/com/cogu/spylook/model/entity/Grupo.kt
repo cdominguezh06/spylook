@@ -2,7 +2,9 @@ package com.cogu.spylook.model.entity
 
 import androidx.room.Entity
 
-@Entity(tableName = "grupos")
+@Entity(
+    tableName = "grupos",
+)
 class Grupo(
     idAnotable: Int = 0,
     nombre: String,

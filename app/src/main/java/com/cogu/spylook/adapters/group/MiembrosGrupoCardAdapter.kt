@@ -2,6 +2,7 @@ package com.cogu.spylook.adapters.group
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +47,8 @@ class MiembrosGrupoCardAdapter(
             holder.careto.setImageResource(R.drawable.notfound)
         }
         if (cardItem.clickable) {
-            holder.itemView.setOnClickListener(View.OnClickListener {
+            holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+                view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val inflated =
                     LayoutInflater.from(context).inflate(R.layout.buscar_contacto_inflate, null)
                 val searchBar = inflated.findViewById<EditText>(R.id.searchInflateEditText)
@@ -59,11 +61,18 @@ class MiembrosGrupoCardAdapter(
                     lista = AppDatabase.getInstance(context)!!
                         .contactoDAO()!!.getContactos().map { c -> mapper.toCardItem(c) }
                 }
-                lista = lista.filter { c -> NuevoGrupoActivity.miembros.map { m -> m.idAnotable }.contains(c.idAnotable) == false }
-                lista = lista.filter { c -> NuevoGrupoActivity.creador.map { m -> m.idAnotable }.contains(c.idAnotable) == false }
+                lista = lista.filter { c ->
+                    NuevoGrupoActivity.miembros.map { m -> m.idAnotable }
+                        .contains(c.idAnotable) == false
+                }
+                lista = lista.filter { c ->
+                    NuevoGrupoActivity.creador.map { m -> m.idAnotable }
+                        .contains(c.idAnotable) == false
+                }
                 recycler.layoutManager = LinearLayoutManager(context)
                 fun onClick(cardItem: ContactoCardItem) {
-                    val buscarCard = NuevoGrupoActivity.miembros[NuevoGrupoActivity.miembros.size - 1]
+                    val buscarCard =
+                        NuevoGrupoActivity.miembros[NuevoGrupoActivity.miembros.size - 1]
                     NuevoGrupoActivity.miembros.removeAt(NuevoGrupoActivity.miembros.size - 1)
                     NuevoGrupoActivity.miembros.add(cardItem)
                     NuevoGrupoActivity.miembros.add(buscarCard)
@@ -95,11 +104,17 @@ class MiembrosGrupoCardAdapter(
             })
 
             holder.itemView.setOnLongClickListener {
-                if(cardItem.idAnotable == -1) return@setOnLongClickListener true
+                    view: View? ->
+                view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                if (cardItem.idAnotable == -1) return@setOnLongClickListener true
                 AlertDialog.Builder(context)
                     .setTitle("¿Desea eliminar al miembro ${cardItem.nombre} A.K.A ${cardItem.alias}?")
                     .setPositiveButton("OK") { dialog, _ ->
-                        NuevoGrupoActivity.miembros.removeAt(NuevoGrupoActivity.miembros.indexOf(cardItem))
+                        NuevoGrupoActivity.miembros.removeAt(
+                            NuevoGrupoActivity.miembros.indexOf(
+                                cardItem
+                            )
+                        )
                         notifyDataSetChanged()
                         dialog.dismiss()
                     }

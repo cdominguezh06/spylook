@@ -38,6 +38,9 @@ interface ContactoDAO {
     @Query("SELECT * FROM contactos WHERE idAnotable = :id")
     suspend fun findContactoById(id: Int): Contacto
 
+    @Query("SELECT * FROM contactos WHERE nombre = :nombre")
+    suspend fun findContactoByName(nombre: String): Contacto?
+
     @Query("SELECT * FROM contactos")
     suspend fun getContactos(): List<Contacto>
 
