@@ -21,7 +21,7 @@ class GithubController {
         private const val BASE_URL = "https://api.github.com/"
         private const val REPO_OWNER = "cdominguezh06"
         private const val REPO_NAME = "spylook"
-        private const val CURRENT_VERSION = "0.1.2"
+        private const val CURRENT_VERSION = "0.2.0"
 
         private lateinit var INSTANCE: GithubController
         fun getInstance(): GithubController {
