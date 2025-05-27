@@ -77,7 +77,6 @@ class MiembrosGrupoCardAdapter(
                     NuevoGrupoActivity.miembros.add(cardItem)
                     NuevoGrupoActivity.miembros.add(buscarCard)
                     notifyDataSetChanged()
-                    notifyDataSetChanged()
                     dialog.dismiss()
                 }
                 onClickFunction = ::onClick

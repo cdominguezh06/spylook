@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -19,6 +20,7 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.Grupo
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class NuevoGrupoActivity : AppCompatActivity() {
@@ -83,9 +85,9 @@ class NuevoGrupoActivity : AppCompatActivity() {
             }
             val nuevoGrupo = Grupo(
                 nombre = nombreGrupo,
-                idCreador = creador[0].idAnotable // ID del creador (asumimos que solo hay uno)
+                idCreador = creador[0].idAnotable
             )
-            runBlocking {
+            lifecycleScope.launch {
                 val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupo).toInt()
                 val relaciones = miembros
                     .filter { it.idAnotable != -1 }
@@ -96,10 +98,11 @@ class NuevoGrupoActivity : AppCompatActivity() {
                         )
                     }
                 db.grupoDAO()!!.insertarRelaciones(relaciones)
+                creador = mutableListOf()
+                miembros = mutableListOf()
+                finish()
             }
-            creador = mutableListOf()
-            miembros = mutableListOf()
-            finish()
+
         }
     }
 }

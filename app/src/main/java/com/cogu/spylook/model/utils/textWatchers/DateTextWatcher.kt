@@ -37,7 +37,7 @@ class DateTextWatcher(private val editText: EditText) : TextWatcher {
                 var mon = clean.substring(2, 4).toInt()
                 var year = clean.substring(4, 8).toInt()
 
-                year = max(1900.0, min(year.toDouble(), LocalDate.now().year.toDouble())).toInt()
+                year = max(1970.0, min(year.toDouble(), LocalDate.now().year.toDouble())).toInt()
                 if (year == LocalDate.now().year) {
                     mon =
                         max(1.0, min(mon.toDouble(), LocalDate.now().monthValue.toDouble())).toInt()

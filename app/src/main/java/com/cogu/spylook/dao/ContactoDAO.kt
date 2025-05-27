@@ -4,6 +4,7 @@ import androidx.room.*
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
+import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.relations.AmigosDeContacto
 import com.cogu.spylook.model.relations.ContactoConCuentas
 import com.cogu.spylook.model.relations.CreadorGrupo
@@ -52,13 +53,12 @@ interface ContactoDAO {
     suspend fun insertAmistad(crossRef: ContactoAmistadCrossRef)
 
     @Transaction
-    @Query("SELECT * FROM contactos WHERE idAnotable = :id")
-    suspend fun getAmigosDeContacto(id: Int): AmigosDeContacto
+    @Query("SELECT * FROM contacto_amistad_cross_ref WHERE idContacto = :idContacto")
+    suspend fun getAmistadesPorContacto(idContacto: Int): List<ContactoAmistadCrossRef>
 
     @Transaction
-    @Query("SELECT * FROM contactos")
-    suspend fun getTodosLosContactosConAmigos(): List<AmigosDeContacto>
-
+    @Query("SELECT * FROM contacto_amistad_cross_ref WHERE idAmigo = :idAmigo")
+    suspend fun getContactosPorAmigo(idAmigo: Int): List<ContactoAmistadCrossRef>
     @Transaction
     @Query("SELECT * FROM contactos WHERE idAnotable = :idContacto")
     fun obtenerContactoConCuentas(idContacto: Int): List<ContactoConCuentas>

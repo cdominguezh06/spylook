@@ -87,8 +87,8 @@ class NuevoContactoActivity : AppCompatActivity() {
                         .show()
                     return@launch
                 }
-                finish()
                 database.contactoDAO()!!.addContactoWithAnotable(contact)
+                finish()
             }
         }
     }

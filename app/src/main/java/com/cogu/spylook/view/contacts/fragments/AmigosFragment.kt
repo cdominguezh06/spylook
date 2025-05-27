@@ -9,13 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.ContactoCardAdapter
+import com.cogu.spylook.adapters.cards.AmigoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.relations.AmigosDeContacto
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
@@ -24,14 +23,8 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private val mapper: ContactoToCardItem = Mappers.getMapper(ContactoToCardItem::class.java)
 
-    private companion object {
-        val ERROR_CARD_ITEM = ContactoCardItem(
-            idAnotable = -1,
-            nombre = "Error",
-            alias = "No hay amigos",
-            colorFoto = R.drawable.notfound,
-            clickable = false
-        )
+    companion object {
+        var amigos = mutableListOf<ContactoCardItem>()
     }
 
     override fun onCreateView(
@@ -48,7 +41,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private fun setupRecyclerView(recyclerView: RecyclerView) = runBlocking {
         val contactoDAO = getContactoDAO()
-        val amigos = fetchAmigos(contactoDAO)
+        amigos = fetchAmigos(contactoDAO)
         initializeRecyclerView(recyclerView, amigos)
     }
 
@@ -57,18 +50,30 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
         return db!!.contactoDAO()!!
     }
 
-    private suspend fun fetchAmigos(contactoDAO: ContactoDAO): List<ContactoCardItem> {
-        val amigosDeContacto: AmigosDeContacto = contactoDAO.getAmigosDeContacto(contacto.idAnotable)
-        val amigos = amigosDeContacto.amigos?.mapNotNull { amigo ->
-            mapper.toCardItem(amigo!!)
-        } ?: emptyList()
-
-        return amigos.ifEmpty { listOf(ERROR_CARD_ITEM) }
+    private suspend fun fetchAmigos(contactoDAO: ContactoDAO): MutableList<ContactoCardItem> {
+        val busquedaComoContacto = contactoDAO.getAmistadesPorContacto(contacto.idAnotable).map {
+            contactoDAO.findContactoById(it.idAmigo)
+        }.toMutableList()
+        val busquedaComoAmigo = contactoDAO.getContactosPorAmigo(contacto.idAnotable).map {
+            contactoDAO.findContactoById(it.idContacto)
+        }.toMutableList()
+        busquedaComoAmigo.addAll(busquedaComoContacto)
+        val amigos = busquedaComoAmigo.distinct().map {
+            mapper.toCardItem(it)
+        }.toMutableList()
+        amigos.add(ContactoCardItem(
+            idAnotable = -1,
+            nombre = "Añade más amigos",
+            alias = "Agregar",
+            colorFoto = R.drawable.notfound,
+            clickable = false
+        ))
+        return amigos
     }
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = ContactoCardAdapter(amigos, requireContext())
+        recyclerView.adapter = AmigoCardAdapter(amigos, requireContext(), contacto)
         recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
 }

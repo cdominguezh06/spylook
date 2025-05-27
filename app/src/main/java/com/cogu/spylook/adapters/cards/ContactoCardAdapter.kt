@@ -1,7 +1,8 @@
-package com.cogu.spylook.adapters
+package com.cogu.spylook.adapters.cards
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -13,7 +14,7 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.ContactoCardAdapter.CardViewHolder
+import com.cogu.spylook.adapters.cards.ContactoCardAdapter.CardViewHolder
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.view.contacts.ContactoActivity
 
@@ -33,7 +34,7 @@ open class ContactoCardAdapter(
         holder.mostknownalias.text = cardItem.alias
         if(cardItem.idAnotable !=-1){
             holder.careto.setImageResource(R.drawable.contact_icon)
-            holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+            holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     v.setTag(R.id.touch_event_x, event.rawX.toInt())

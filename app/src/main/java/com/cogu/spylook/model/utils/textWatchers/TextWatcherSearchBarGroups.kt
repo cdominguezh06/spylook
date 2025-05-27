@@ -3,7 +3,6 @@ package com.cogu.spylook.model.utils.textWatchers
 import android.content.Context
 import android.content.Intent
 import android.graphics.LinearGradient
-import android.graphics.PorterDuff
 import android.graphics.Shader
 import android.text.Editable
 import android.text.Spannable
@@ -14,7 +13,7 @@ import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.GrupoCardAdapter
+import com.cogu.spylook.adapters.cards.GrupoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem

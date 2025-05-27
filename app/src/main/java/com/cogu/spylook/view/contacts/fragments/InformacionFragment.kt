@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.AnotacionCardAdapter
+import com.cogu.spylook.adapters.cards.AnotacionCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem

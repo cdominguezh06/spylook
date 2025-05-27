@@ -1,7 +1,6 @@
-package com.cogu.spylook.adapters
+package com.cogu.spylook.adapters.cards
 
 import android.content.Context
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View

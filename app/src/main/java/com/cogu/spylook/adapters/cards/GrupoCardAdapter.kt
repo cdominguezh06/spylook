@@ -1,4 +1,4 @@
-package com.cogu.spylook.adapters
+package com.cogu.spylook.adapters.cards
 
 import android.content.Context
 import android.content.Intent
@@ -18,7 +18,6 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
-import org.w3c.dom.Text
 
 open class GrupoCardAdapter(
     internal val cardItemList: List<GrupoCardItem>,
