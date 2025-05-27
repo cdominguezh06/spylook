@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.view.contacts.fragments.AmigosFragment
+import com.cogu.spylook.view.contacts.fragments.ContactGroupsFragment
 import com.cogu.spylook.view.contacts.fragments.InformacionFragment
 
 class ContactSliderAdapter(
@@ -16,11 +17,12 @@ class ContactSliderAdapter(
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             1 -> AmigosFragment(contacto, context)
+            2 -> ContactGroupsFragment(contacto)
             else -> InformacionFragment(contacto)
         }
     }
 
     override fun getItemCount(): Int {
-        return 2
+        return 3
     }
 }

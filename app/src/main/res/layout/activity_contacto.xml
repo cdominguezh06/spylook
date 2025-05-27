@@ -56,12 +56,12 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Grupos" />
+            android:text="Amigos" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Amigos" />
+            android:text="Grupos" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tabItem"

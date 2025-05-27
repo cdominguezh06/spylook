@@ -65,6 +65,11 @@ interface GrupoDAO {
     @Query("DELETE FROM contacto_grupo_cross_ref WHERE idGrupo = :idGrupo")
     suspend fun eliminarRelacionesPorGrupo(idGrupo: Int)
 
+    @Query("SELECT * FROM contacto_grupo_cross_ref WHERE idContacto = :idMiembro")
+    suspend fun findGruposByMiembro(idMiembro : Int) : List<ContactoGrupoCrossRef>
+
+    @Query("SELECT * FROM grupos WHERE idCreador = :idAnotable")
+    suspend fun findGruposByCreador(idAnotable: Int): List<Grupo>
     @Transaction
     @Query("SELECT * FROM contacto_grupo_cross_ref WHERE idGrupo = :idGrupo")
     suspend fun obtenerRelacionesPorGrupo(idGrupo: Int): List<ContactoGrupoCrossRef>

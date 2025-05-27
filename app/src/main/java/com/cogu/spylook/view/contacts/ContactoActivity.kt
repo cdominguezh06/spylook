@@ -80,6 +80,7 @@ class ContactoActivity : AppCompatActivity() {
             tab.text = when (position) {
                 0 -> getString(R.string.TAB_INFO_TITLE)
                 1 -> getString(R.string.TAB_FRIENDS_TITLE)
+                2 -> "Grupos"
                 else -> ""
             }
         }.attach()
