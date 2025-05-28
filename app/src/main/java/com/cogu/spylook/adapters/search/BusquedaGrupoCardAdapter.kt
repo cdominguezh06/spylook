@@ -37,6 +37,7 @@ abstract class BusquedaGrupoCardAdapter(
                 holder.numeroMiembros.text = "${miembros} miembros"
             }
             holder.careto.setImageResource(R.drawable.group_icon)
+            holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     v.setTag(R.id.touch_event_x, event.rawX.toInt())

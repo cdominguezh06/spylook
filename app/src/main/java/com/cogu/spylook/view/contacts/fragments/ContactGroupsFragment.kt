@@ -50,13 +50,7 @@ class ContactGroupsFragment(private val contacto: Contacto) : Fragment() {
                     mapper.toCardItem(it)
                 }
             )
-            grupos.add(
-                GrupoCardItem(
-                    idAnotable = -1,
-                    nombre = "Añadir a grupo",
-                    clickable = false
-                )
-            )
+            grupos.add(GrupoCardItem.ADD_TO_GROUP)
             setupRecyclerView(grupos)
         }
     }

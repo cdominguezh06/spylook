@@ -17,7 +17,8 @@ import androidx.room.ForeignKey
 class Grupo(
     idAnotable: Int = 0,
     nombre: String,
-
+    @JvmField
+    var colorFoto : Int,
     @JvmField
     var idCreador: Int = 0,
 ): Anotable(idAnotable, nombre) {

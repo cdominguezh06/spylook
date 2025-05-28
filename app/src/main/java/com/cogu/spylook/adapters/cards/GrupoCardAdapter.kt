@@ -2,6 +2,7 @@ package com.cogu.spylook.adapters.cards
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
@@ -43,6 +44,7 @@ open class GrupoCardAdapter(
                 holder.numeroMiembros.text = "${miembros} miembros"
             }
             holder.careto.setImageResource(R.drawable.group_icon)
+            holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     v.setTag(R.id.touch_event_x, event.rawX.toInt())

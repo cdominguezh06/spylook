@@ -148,7 +148,8 @@ open class GruposDeContactoCardAdapter(
                         searchBar,
                         recycler,
                         onClickFunction,
-                        context
+                        context,
+                        contacto
                     )
                 )
                 dialog.window?.setLayout(

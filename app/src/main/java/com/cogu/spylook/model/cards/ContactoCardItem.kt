@@ -12,7 +12,7 @@ data class ContactoCardItem(
         val DEFAULT_FOR_EMPTY_LIST = ContactoCardItem(
             idAnotable = -1,
             nombre = "Vaya...",
-            alias = "Que vacio todo",
+            alias = "Que vacío todo",
             colorFoto = 0,
             clickable = false
         )

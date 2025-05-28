@@ -1,6 +1,7 @@
 package com.cogu.spylook.view.groups
 
 import android.app.AlertDialog
+import android.graphics.Color
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -83,10 +84,8 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 alert.setMessage("Debes agregar un creador").show()
                 return@setOnClickListener
             }
-            val nuevoGrupo = Grupo(
-                nombre = nombreGrupo,
-                idCreador = creador[0].idAnotable
-            )
+            val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
+            val nuevoGrupo = Grupo(0, nombreGrupo, color, creador.first().idAnotable,)
             lifecycleScope.launch {
                 val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupo).toInt()
                 val relaciones = miembros

@@ -3,11 +3,13 @@ package com.cogu.spylook.model.utils.textWatchers
 import android.content.Context
 import android.content.Intent
 import android.graphics.LinearGradient
+import android.graphics.PorterDuff
 import android.graphics.Shader
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
+import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
@@ -32,15 +35,10 @@ class TextWatcherSearchBarGroups(
         Mappers.getMapper<GrupoToCardItem>(GrupoToCardItem::class.java)
     private val db: AppDatabase
     private lateinit var collect: MutableList<GrupoCardItem>
+    private val retriever = StringWithSpacesIndexRetriever()
 
     init {
         this.db = AppDatabase.getInstance(context!!)!!
-        runBlocking {
-            collect = db.grupoDAO()!!
-                    .getGrupos()
-                    .map { c -> mapper.toCardItem(c) }
-                    .toMutableList()
-        }
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -49,69 +47,77 @@ class TextWatcherSearchBarGroups(
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
         val busqueda = text.getText().toString().lowercase(
             Locale.getDefault()
-        )
-        if (busqueda.isEmpty()) {
-            runBlocking {
-                recyclerView?.setAdapter(GrupoCardAdapter(collect, context!!))
-            }
-        } else {
-            runBlocking {
-                if (collect.isEmpty()) {
-                    collect.add(
-                        GrupoCardItem(
-                            -1,
-                            "Sin resultados",
-                        )
-                    )
+        ).replace(" ", "")
+        runBlocking {
+            collect = db.grupoDAO()!!
+                .getGrupos()
+                .map { c -> mapper.toCardItem(c) }
+                .toMutableList()
+        }
+        busqueda.ifEmpty {
+            recyclerView!!.setAdapter(GrupoCardAdapter(collect, context!!))
+            return@onTextChanged
+        }
+        collect = collect.filter { c ->
+            c.nombre.replace(" ", "").lowercase(Locale.getDefault()).contains(busqueda)
+        }.toMutableList()
+        collect.ifEmpty {
+            collect.add(GrupoCardItem.DEFAULT_FOR_NO_RESULTS)
+            recyclerView!!.setAdapter(GrupoCardAdapter(collect, context!!))
+            return@onTextChanged
+        }
+        val newAdapter = object : GrupoCardAdapter(collect, context!!) {
+            override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+                val cardItem = cardItemList[position]
+                runBlocking {
+                    val miembros = AppDatabase.getInstance(context!!)!!.grupoDAO()!!
+                        .getRelacionesByGrupo(cardItem.idAnotable).size + 1
+                    holder.numeroMiembros.text = "${miembros} miembros"
                 }
+                holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
+                holder.name.text = SpannableString(cardItem.nombre).apply {
+                    cardItem.nombre = cardItem.nombre.let {
+                        val spannable = SpannableString(it)
+                        var startIndex = retriever.getStartIndex(busqueda, cardItem.nombre)
 
-                val newAdapter = object : GrupoCardAdapter(collect, context!!) {
-                    override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-                        val cardItem = cardItemList[position]
-                        holder.name.text = SpannableString(cardItem.nombre).apply {
-                            cardItem.nombre = cardItem.nombre.let {
-                                val spannable = SpannableString(it)
-                                val startIndex = it.lowercase(Locale.getDefault()).indexOf(busqueda)
-                                if (startIndex >= 0) {
-                                    val shader = LinearGradient(
-                                        0f, 0f, holder.name.textSize * 2, 0f,
-                                        intArrayOf(
-                                            context!!.getColor(R.color.red),
-                                            context.getColor(R.color.yellow),
-                                            context.getColor(R.color.green),
+                        if (startIndex >= 0) {
+                            val shader = LinearGradient(
+                                0f, 0f, holder.name.textSize * 2, 0f,
+                                intArrayOf(
+                                    context!!.getColor(R.color.red),
+                                    context.getColor(R.color.yellow),
+                                    context.getColor(R.color.green),
 
-                                            ),
-                                        floatArrayOf(0f, 0.5f, 1f),
-                                        Shader.TileMode.MIRROR
-                                    )
-                                    setSpan(
-                                        ForegroundShaderSpan(shader),
-                                        startIndex,
-                                        startIndex + busqueda.length,
-                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                    )
-                                }
-                                spannable.toString()
-                            }
+                                    ),
+                                floatArrayOf(0f, 0.5f, 1f),
+                                Shader.TileMode.MIRROR
+                            )
+                            setSpan(
+                                ForegroundShaderSpan(shader),
+                                startIndex,
+                                retriever.getSpanIntervalJump(busqueda, cardItem.nombre, startIndex),
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                         }
-                        if (cardItem.idAnotable != -1) {
-                            holder.careto.setImageResource(R.drawable.group_icon)
-                        } else {
-                            holder.careto.setImageResource(R.drawable.notfound)
-                        }
-                        if (cardItem.clickable) {
-                            holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
-                                val intent = Intent(context, ContactoActivity::class.java)
-                                intent.putExtra("id", cardItem.idAnotable)
-                                context!!.startActivity(intent)
-                            })
-                        }
+                        spannable.toString()
                     }
                 }
-                recyclerView!!.setLayoutManager(LinearLayoutManager(context))
-                recyclerView.setAdapter(newAdapter)
+                if (cardItem.idAnotable != -1) {
+                    holder.careto.setImageResource(R.drawable.group_icon)
+                } else {
+                    holder.careto.setImageResource(R.drawable.notfound)
+                }
+                if (cardItem.clickable) {
+                    holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
+                        val intent = Intent(context, ContactoActivity::class.java)
+                        intent.putExtra("id", cardItem.idAnotable)
+                        context!!.startActivity(intent)
+                    })
+                }
             }
         }
+        recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+        recyclerView.setAdapter(newAdapter)
     }
 
     override fun afterTextChanged(s: Editable?) {
