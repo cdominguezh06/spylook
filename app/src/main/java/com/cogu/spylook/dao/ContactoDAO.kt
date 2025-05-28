@@ -36,6 +36,18 @@ interface ContactoDAO {
     @Delete
     suspend fun deleteContacto(contacto: Contacto)
 
+    @Query("DELETE FROM contactos WHERE idAnotable = :id")
+    suspend fun deleteContactosById(id: Int)
+
+    @Query("DELETE FROM anotables WHERE idAnotable = :id")
+    suspend fun deleteAnotableById(id: Int)
+
+    @Transaction
+    suspend fun deleteContactoWithAnotableById(id : Int) {
+        deleteContactosById(id)
+        deleteAnotableById(id)
+    }
+
     @Query("SELECT * FROM contactos WHERE idAnotable = :id")
     suspend fun findContactoById(id: Int): Contacto
 

@@ -9,30 +9,42 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter.CardViewHolder
+import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.ContactoCardItem
+import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.contacts.ContactoActivity
+import kotlinx.coroutines.runBlocking
 
 open class ContactoCardAdapter(
-    internal val cardItemList: List<ContactoCardItem>,
-    private val context: Context
+    internal val cardItemList: MutableList<ContactoCardItem>,
+    private val context: Context,
 ) : RecyclerView.Adapter<CardViewHolder?>() {
+    private lateinit var recyclerAnimator: RecyclerViewAnimator
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
         return CardViewHolder(view)
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerAnimator = RecyclerViewAnimator(recyclerView, cardItemList, this)
+    }
+
+
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.mostknownalias.text = cardItem.alias
-        if(cardItem.idAnotable !=-1){
+        if (cardItem.idAnotable != -1) {
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
@@ -43,11 +55,13 @@ open class ContactoCardAdapter(
                 false
             }
 
-            holder.itemView.setOnLongClickListener(View.OnLongClickListener {
-                view: View? ->
+            holder.itemView.setOnLongClickListener(View.OnLongClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val inflater = LayoutInflater.from(context)
-                val popupView = inflater.inflate(R.layout.long_press_contact, null) // Diseña tu layout personalizado
+                val popupView = inflater.inflate(
+                    R.layout.long_press_contact,
+                    null
+                ) // Diseña tu layout personalizado
 
                 val popupWindow = PopupWindow(
                     popupView,
@@ -58,23 +72,40 @@ open class ContactoCardAdapter(
 
                 val popupNombre = popupView.findViewById<TextView>(R.id.textViewPopUp1)
                 val popupApodo = popupView.findViewById<TextView>(R.id.textViewPopUp2)
+                val popupBoton = popupView.findViewById<Button>(R.id.buttonEliminar)
                 popupNombre.text = cardItem.nombre
                 popupApodo.text = cardItem.alias
+                popupBoton.setOnClickListener { v ->
+                    v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                    runBlocking {
+                        dao.deleteContactoWithAnotableById(cardItem.idAnotable)
+                        val index = cardItemList.indexOf(cardItem)
+                        recyclerAnimator.deleteItemWithAnimation(
+                            holder.itemView,
+                            index,
+                            onEmptyCallback = {
+                                cardItemList.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                            },
+                            afterDeleteCallBack = {
+                                popupWindow.dismiss()
+                            })
+                    }
 
+                }
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int
 
-                popupWindow.showAtLocation(view,  Gravity.NO_GRAVITY, x-200, y-100)
+                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x - 200, y - 100)
 
                 true
 
             })
-        }else{
+        } else {
             holder.careto.setImageResource(R.drawable.notfound)
         }
         if (cardItem.clickable) {
-            holder.itemView.setOnClickListener(View.OnClickListener {
-                view: View? ->
+            holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, ContactoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)

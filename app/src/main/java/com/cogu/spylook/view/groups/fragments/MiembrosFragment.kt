@@ -45,7 +45,7 @@ class MiembrosFragment(private val grupo: Grupo) : Fragment() {
             }
             val creador = contactoDao!!.findContactoById(grupo.idCreador)
             recyclerViewCreador.layoutManager = LinearLayoutManager(requireContext())
-            recyclerViewCreador.adapter = ContactoCardAdapter(listOf(mapper.toCardItem(creador)), requireContext())
+            recyclerViewCreador.adapter = ContactoCardAdapter(mutableListOf(mapper.toCardItem(creador)), requireContext())
             if (recyclerViewCreador.itemDecorationCount == 0) {
                 recyclerViewCreador.addItemDecoration(SpacingItemDecoration(requireContext()))
             }

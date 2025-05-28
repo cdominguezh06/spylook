@@ -66,6 +66,18 @@
             android:text="apodo"
             android:textColor="@color/white"
             android:textSize="16sp" />
+
     </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonEliminar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginVertical="8dp"
+        android:layout_weight="1"
+        android:background="@drawable/rainbow_border"
+        android:text="Eliminar"
+        android:textColor="#FFFFFF" />
 
 </LinearLayout>

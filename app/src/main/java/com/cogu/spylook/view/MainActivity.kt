@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -35,6 +36,7 @@ import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarContacts
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarGroups
 import com.cogu.spylook.view.contacts.NuevoContactoActivity
 import com.cogu.spylook.view.groups.NuevoGrupoActivity
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -43,14 +45,15 @@ class MainActivity : AppCompatActivity() {
     private val transitionEffect = Slide()
     private lateinit var adapter: RecyclerView.Adapter<*>
     private lateinit var recyclerView: RecyclerView
-    private val contactoMapper: ContactoToCardItem = Mappers.getMapper(ContactoToCardItem::class.java)
+    private val contactoMapper: ContactoToCardItem =
+        Mappers.getMapper(ContactoToCardItem::class.java)
     private val grupoMapper = Mappers.getMapper(GrupoToCardItem::class.java)
     private lateinit var githubController: GithubController
     private lateinit var searchEditText: EditText
     private lateinit var database: AppDatabase
-    private var contactos = mutableListOf<Contacto>()
-    private lateinit var intent : Intent
-    private var grupos = mutableListOf<Grupo>()
+    private var contactos = mutableListOf<ContactoCardItem>()
+    private lateinit var intent: Intent
+    private var grupos = mutableListOf<GrupoCardItem>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -64,28 +67,15 @@ class MainActivity : AppCompatActivity() {
         searchEditText = findViewById<EditText>(R.id.searchEditText)
         setupButtons()
         intent = Intent(this, NuevoContactoActivity::class.java)
-        adapter = ContactoCardAdapter(listOf(), this)
-        runBlocking {
-            loadDatas()
-            val cardItems = if (contactos.isEmpty()) {
-                listOf(
-                    ContactoCardItem(
-                        idAnotable = -1,
-                        nombre = "Vaya...",
-                        alias = "Qué vacío...",
-                        colorFoto = 0,
-                        clickable = false
-                    )
-                )
-            } else {
-                contactos.map { contactoMapper.toCardItem(it) }
-            }
-            adapter = ContactoCardAdapter(cardItems, context = this@MainActivity)
-            adapter.notifyDataSetChanged()
+        adapter = ContactoCardAdapter(mutableListOf(), this)
+        lifecycleScope.launch {
+            loadContacts()
+            adapter = ContactoCardAdapter(contactos, context = this@MainActivity)
+            adapter.notifyItemRangeChanged(0, contactos.size-1)
+            setupRecyclerView()
+            setupSearchBar(TextWatcherSearchBarContacts(searchEditText, recyclerView, this@MainActivity))
+            applyRainbowDecorators()
         }
-        setupRecyclerView()
-        setupSearchBar(TextWatcherSearchBarContacts(searchEditText, recyclerView, this))
-        applyRainbowDecorators()
     }
 
     private fun setupWindowTransitions() {
@@ -108,49 +98,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        findViewById<Button>(R.id.button).setOnClickListener {l: View? ->
+        findViewById<Button>(R.id.button).setOnClickListener { l: View? ->
             l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val options = ActivityOptions.makeSceneTransitionAnimation(this)
             startActivity(intent, options.toBundle())
         }
 
-        findViewById<ImageView>(R.id.imageViewGrupos).setOnClickListener {l: View? ->
+        findViewById<ImageView>(R.id.imageViewGrupos).setOnClickListener { l: View? ->
             l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             setupSearchBar(TextWatcherSearchBarGroups(searchEditText, recyclerView, this))
-            val cardItems = if (grupos.isEmpty()) {
-                listOf(
-                    GrupoCardItem(
-                        idAnotable = -1,
-                        nombre = "Que vacío todo",
-                        clickable = false
-                    )
-                )
-            } else {
-                grupos.map { grupoMapper.toCardItem(it) }
+            lifecycleScope.launch {
+                loadGroups()
+                adapter = GrupoCardAdapter(grupos, this@MainActivity)
+                setupRecyclerView()
             }
-            adapter = GrupoCardAdapter(cardItems, this)
-            intent = Intent(this, NuevoGrupoActivity::class.java)
-            setupRecyclerView()
         }
 
-        findViewById<ImageView>(R.id.imageViewUsuarios).setOnClickListener {l: View? ->
+        findViewById<ImageView>(R.id.imageViewUsuarios).setOnClickListener { l: View? ->
             l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             setupSearchBar(TextWatcherSearchBarContacts(searchEditText, recyclerView, this))
-            val cardItems = if (contactos.isEmpty()) {
-                listOf(
-                    ContactoCardItem(
-                        idAnotable = -1,
-                        nombre = "Vaya...",
-                        alias = "Que vacio todo",
-                        colorFoto = 0,
-                        clickable = false
-                    )
-                )
-            } else {
-                contactos.map { contactoMapper.toCardItem(it) }
+            lifecycleScope.launch {
+                loadContacts()
+                adapter = ContactoCardAdapter(contactos, this@MainActivity)
+                setupRecyclerView()
             }
-            adapter = ContactoCardAdapter(cardItems, this)
-            setupRecyclerView()
         }
     }
 
@@ -178,31 +149,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun loadDatas() {
-        contactos = database.contactoDAO()!!.getContactos().toMutableList()
-        grupos = database.grupoDAO()!!.getGrupos().toMutableList()
+    private suspend fun loadContacts(){
+        contactos = database.contactoDAO()!!.getContactos()
+            .map { contactoMapper.toCardItem(it) }.toMutableList()
+        contactos.ifEmpty { contactos.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST) }
+    }
+
+    private suspend fun loadGroups(){
+        grupos = database.grupoDAO()!!.getGrupos()
+            .map { grupoMapper.toCardItem(it) }.toMutableList()
+        grupos.ifEmpty { grupos.add(GrupoCardItem.DEFAULT_FOR_EMPTY_LIST) }
     }
 
     override fun onResume() {
         super.onResume()
-        runBlocking { loadDatas() }
-        val cardItems = if (contactos.isEmpty()) {
-            listOf(
-                ContactoCardItem(
-                    idAnotable = -1,
-                    nombre = "Vaya...",
-                    alias = "Que vacio todo",
-                    colorFoto = 0,
-                    clickable = false
-                )
-            )
-        } else {
-            contactos.map { contactoMapper.toCardItem(it) }
+        lifecycleScope.launch {
+            loadContacts()
+            intent = Intent(this@MainActivity, NuevoContactoActivity::class.java)
+            NuevoGrupoActivity.creador = mutableListOf()
+            NuevoGrupoActivity.miembros = mutableListOf()
+            adapter = ContactoCardAdapter(contactos.toMutableList(), this@MainActivity)
+            setupRecyclerView()
         }
-        intent = Intent(this, NuevoContactoActivity::class.java)
-        NuevoGrupoActivity.creador = mutableListOf()
-        NuevoGrupoActivity.miembros = mutableListOf()
-        adapter = ContactoCardAdapter(cardItems, this)
-        setupRecyclerView()
     }
 }
