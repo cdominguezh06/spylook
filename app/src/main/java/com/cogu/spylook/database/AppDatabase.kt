@@ -37,7 +37,7 @@ import java.util.concurrent.Executors
         ContactoAmistadCrossRef::class,
         CuentaContactoCrossRef::class,
         Anotable::class
-    ], version = 1, exportSchema = false
+    ], version = 2, exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -61,9 +61,6 @@ abstract class AppDatabase : RoomDatabase() {
                             AppDatabase::class.java, "app_database.db"
                         )
                             .fallbackToDestructiveMigration(true)
-                            .setQueryCallback({ sqlQuery, _ ->
-                                Log.d("RoomQuery", sqlQuery) // Aquí vemos qué consultas ejecuta Room
-                            }, Executors.newSingleThreadExecutor())
                             .build()
                     }
                 }

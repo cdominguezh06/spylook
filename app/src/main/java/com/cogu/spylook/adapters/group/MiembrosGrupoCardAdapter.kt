@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.collection.IntSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -17,10 +18,13 @@ import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
+import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
+import java.util.stream.IntStream
+import kotlin.streams.toList
 
 class MiembrosGrupoCardAdapter(
     internal val cardItemList: List<ContactoCardItem>,
@@ -93,7 +97,20 @@ class MiembrosGrupoCardAdapter(
                         searchBar,
                         recycler,
                         onClickFunction,
-                        context
+                        context,
+                        cardItem.idAnotable,
+                        onExclude = {
+                            val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                            runBlocking {
+                                NuevoGrupoActivity.miembros
+                                    .map { it.copy() }
+                                    .toMutableList()
+                                    .apply { addAll(NuevoGrupoActivity.creador) }
+                                    .filter { it.idAnotable != -1 }
+                                    .ifEmpty { return@runBlocking listOf() }
+                                    .map { dao.findContactoById(it.idAnotable) }
+                            }
+                        }
                     )
                 )
                 dialog.window?.setLayout(

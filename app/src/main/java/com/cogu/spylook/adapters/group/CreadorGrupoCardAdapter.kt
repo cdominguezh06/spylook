@@ -83,7 +83,11 @@ class CreadorGrupoCardAdapter(
                         searchBar,
                         recycler,
                         onClickFunction,
-                        context
+                        context,
+                        cardItem.idAnotable,
+                        onExclude = {
+                            listOf()
+                        }
                     )
                 )
                 dialog.window?.setLayout(

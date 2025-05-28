@@ -111,7 +111,7 @@ class TextWatcherSearchBarGruposDeContacto(
                         if (cardItem.idAnotable != -1) {
                             runBlocking {
                                 val miembros = AppDatabase.getInstance(context!!)!!.grupoDAO()!!
-                                    .obtenerRelacionesPorGrupo(cardItem.idAnotable).size+1
+                                    .getRelacionesByGrupo(cardItem.idAnotable).size+1
                                 holder.numeroMiembros.text = "${miembros} miembros"
                             }
                             holder.careto.setImageResource(R.drawable.group_icon)

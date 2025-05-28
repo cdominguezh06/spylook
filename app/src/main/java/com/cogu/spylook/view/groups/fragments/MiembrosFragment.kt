@@ -40,7 +40,7 @@ class MiembrosFragment(private val grupo: Grupo) : Fragment() {
         val grupoDao = AppDatabase.getInstance(requireContext())!!.grupoDAO()
         val contactoDao = AppDatabase.getInstance(requireContext())!!.contactoDAO()
         runBlocking {
-            val miembros = grupoDao!!.obtenerRelacionesPorGrupo(grupo.idAnotable).map {
+            val miembros = grupoDao!!.getRelacionesByGrupo(grupo.idAnotable).map {
                 contactoDao!!.findContactoById(it.idContacto)
             }
             val creador = contactoDao!!.findContactoById(grupo.idCreador)

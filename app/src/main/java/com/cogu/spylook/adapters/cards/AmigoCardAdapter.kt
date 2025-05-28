@@ -98,11 +98,12 @@ open class AmigoCardAdapter(
                 val dialog = AlertDialog.Builder(context, R.style.CustomDialog)
                     .setView(inflated)
                     .create()
-                var lista = listOf<ContactoCardItem>()
+                var lista = mutableListOf<ContactoCardItem>()
                 runBlocking {
                     val contactoDAO = AppDatabase.getInstance(context)!!
                         .contactoDAO()!!
-                    lista = contactoDAO.getContactos().map { c -> mapper.toCardItem(c) }
+                    lista =
+                        contactoDAO.getContactos().map { c -> mapper.toCardItem(c) }.toMutableList()
                     val busquedaComoContacto =
                         contactoDAO.getAmistadesPorContacto(contacto.idAnotable).map {
                             contactoDAO.findContactoById(it.idAmigo)
@@ -116,7 +117,8 @@ open class AmigoCardAdapter(
                     val excluded = busquedaComoAmigo.distinct().map {
                         mapper.toCardItem(it)
                     }.toMutableList()
-                    lista = lista.filter { c -> excluded.contains(c) == false }
+                    lista = lista.filter { c -> excluded.contains(c) == false }.toMutableList()
+                    lista.ifEmpty { lista.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST) }
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
                 fun onClick(cardItem: ContactoCardItem) {
@@ -145,7 +147,22 @@ open class AmigoCardAdapter(
                         searchBar,
                         recycler,
                         onClickFunction,
-                        context
+                        context,
+                        contacto.idAnotable,
+                        onExclude = {
+                            runBlocking {
+                                val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                                dao.getAmistadesPorContacto(contacto.idAnotable)
+                                    .map { dao.findContactoById(it.idAmigo) }
+                                    .toMutableList()
+                                    .apply {
+                                        addAll(
+                                            dao.getContactosPorAmigo(contacto.idAnotable)
+                                                .map { dao.findContactoById(it.idContacto) }
+                                        )
+                                    }
+                            }
+                        }
                     )
                 )
                 dialog.window?.setLayout(

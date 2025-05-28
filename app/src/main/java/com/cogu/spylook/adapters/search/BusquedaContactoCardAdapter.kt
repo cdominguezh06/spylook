@@ -15,7 +15,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.model.cards.ContactoCardItem
 
 abstract class BusquedaContactoCardAdapter (
-    internal val cardItemList: List<ContactoCardItem>,
+    var cardItemList: List<ContactoCardItem>,
     private val context: Context,
 ) : RecyclerView.Adapter<BusquedaContactoCardAdapter.CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {

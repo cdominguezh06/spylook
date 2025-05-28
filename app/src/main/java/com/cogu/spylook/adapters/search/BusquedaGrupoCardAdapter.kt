@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import kotlinx.coroutines.runBlocking
 
@@ -34,7 +33,7 @@ abstract class BusquedaGrupoCardAdapter(
         if (cardItem.idAnotable != -1) {
             runBlocking {
                 val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!
-                    .obtenerRelacionesPorGrupo(cardItem.idAnotable).size+1
+                    .getRelacionesByGrupo(cardItem.idAnotable).size+1
                 holder.numeroMiembros.text = "${miembros} miembros"
             }
             holder.careto.setImageResource(R.drawable.group_icon)

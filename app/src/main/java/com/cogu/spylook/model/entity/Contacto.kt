@@ -53,6 +53,7 @@ class Contacto(
             return if (fechaNacimiento != null) {
                 if (LocalDate.now().isAfter(
                         fechaNacimiento.withYear(LocalDate.now().year)
+                            .withDayOfMonth(fechaNacimiento.dayOfMonth-1)
                     )
                 ) {
                     LocalDate.now().year - fechaNacimiento.year
@@ -62,4 +63,33 @@ class Contacto(
             } else 0
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Contacto
+
+        if (colorFoto != other.colorFoto) return false
+        if (edad != other.edad) return false
+        if (alias != other.alias) return false
+        if (fechaNacimiento != other.fechaNacimiento) return false
+        if (ciudad != other.ciudad) return false
+        if (estado != other.estado) return false
+        if (pais != other.pais) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = colorFoto
+        result = 31 * result + edad
+        result = 31 * result + alias.hashCode()
+        result = 31 * result + fechaNacimiento.hashCode()
+        result = 31 * result + ciudad.hashCode()
+        result = 31 * result + estado.hashCode()
+        result = 31 * result + pais.hashCode()
+        return result
+    }
+
 }

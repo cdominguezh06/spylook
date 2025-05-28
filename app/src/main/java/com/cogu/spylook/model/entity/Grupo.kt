@@ -1,9 +1,18 @@
 package com.cogu.spylook.model.entity
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 
 @Entity(
     tableName = "grupos",
+    foreignKeys = [
+        ForeignKey(
+            entity = Anotable::class,
+            parentColumns = ["idAnotable"],
+            childColumns = ["idCreador"], // Relación con Anotable
+            onDelete = ForeignKey.CASCADE // Si se elimina un Anotable, sus grupos también se eliminan
+        )
+    ]
 )
 class Grupo(
     idAnotable: Int = 0,

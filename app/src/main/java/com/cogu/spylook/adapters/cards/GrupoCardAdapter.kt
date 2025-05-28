@@ -12,12 +12,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
+import com.cogu.spylook.mappers.ContactoToMiniCard
+import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.GrupoCardItem
+import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
+import org.mapstruct.factory.Mappers
 
 open class GrupoCardAdapter(
     internal val cardItemList: List<GrupoCardItem>,
@@ -34,8 +39,8 @@ open class GrupoCardAdapter(
         if (cardItem.idAnotable != -1) {
             runBlocking {
                 val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!
-                    .obtenerRelacionesPorGrupo(cardItem.idAnotable).size+1
-                    holder.numeroMiembros.text = "${miembros} miembros"
+                    .getRelacionesByGrupo(cardItem.idAnotable).size + 1
+                holder.numeroMiembros.text = "${miembros} miembros"
             }
             holder.careto.setImageResource(R.drawable.group_icon)
             holder.itemView.setOnTouchListener { v, event ->
@@ -50,7 +55,7 @@ open class GrupoCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val inflater = LayoutInflater.from(context)
                 val popupView = inflater.inflate(
-                    R.layout.long_press_contact,
+                    R.layout.long_press_group,
                     null
                 )
 
@@ -61,24 +66,42 @@ open class GrupoCardAdapter(
                     true
                 )
 
-                val popupNombre = popupView.findViewById<TextView>(R.id.textViewPopUp1)
-                val popupCantidad = popupView.findViewById<TextView>(R.id.textViewPopUp2)
-                popupNombre.text = cardItem.nombre
-                popupCantidad.text = cardItemList.size.toString() + " contactos"
+                val miembrosRecycler = popupView.findViewById<RecyclerView>(R.id.recyclerLongPress)
+                runBlocking {
+                    val grupoDao = AppDatabase.getInstance(context)!!.grupoDAO()!!
+                    val contactoDao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                    val mapper =
+                        Mappers.getMapper<ContactoToMiniCard>(ContactoToMiniCard::class.java)
+                    val miembros =
+                        mutableListOf<ContactoMiniCard>()
+                            .apply {
+                                val grupo = grupoDao.findGrupoById(cardItem.idAnotable)!!
+                                add(mapper.toMiniCard(contactoDao.findContactoById(grupo.idCreador)))
+                            }.apply {
+                                addAll(
+                                    grupoDao
+                                        .getRelacionesByGrupo(cardItem.idAnotable)
+                                        .map { mapper.toMiniCard(contactoDao.findContactoById(it.idContacto)) }
+                                )
+                            }
+                    miembrosRecycler.layoutManager = LinearLayoutManager(context)
+                    miembrosRecycler.adapter =
+                        ContactoMiniCardAdapter(miembros, context, onClick = {
+                            popupWindow.dismiss()
+                        })
+                    val x = view!!.getTag(R.id.touch_event_x) as Int
+                    val y = view.getTag(R.id.touch_event_y) as Int
 
-                val x = view!!.getTag(R.id.touch_event_x) as Int
-                val y = view.getTag(R.id.touch_event_y) as Int
+                    popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x, y - 100)
 
-                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x-200, y-100)
-
-                true
-
+                    true
+                }
             })
         } else {
             holder.careto.setImageResource(R.drawable.notfound)
         }
         if (cardItem.clickable) {
-            holder.itemView.setOnClickListener(View.OnClickListener {l: View? ->
+            holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
                 Log.e("click", "click")
                 l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, GrupoActivity::class.java)
@@ -94,7 +117,7 @@ open class GrupoCardAdapter(
 
     class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name: TextView = itemView.findViewById(R.id.name)
-        var numeroMiembros : TextView = itemView.findViewById(R.id.numberOfMembers)
+        var numeroMiembros: TextView = itemView.findViewById(R.id.numberOfMembers)
         var careto: ImageView = itemView.findViewById(R.id.imagen)
     }
 }

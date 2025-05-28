@@ -17,6 +17,14 @@ data class ContactoCardItem(
             clickable = false
         )
 
+        val DEFAULT_FOR_NO_RESULTS = ContactoCardItem(
+            -1,
+            "",
+            "Sin resultados",
+            0,
+            false
+        )
+
     }
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

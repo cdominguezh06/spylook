@@ -7,7 +7,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.Grupo
 import com.cogu.spylook.model.relations.ContactosGrupos
@@ -72,6 +71,6 @@ interface GrupoDAO {
     suspend fun findGruposByCreador(idAnotable: Int): List<Grupo>
     @Transaction
     @Query("SELECT * FROM contacto_grupo_cross_ref WHERE idGrupo = :idGrupo")
-    suspend fun obtenerRelacionesPorGrupo(idGrupo: Int): List<ContactoGrupoCrossRef>
+    suspend fun getRelacionesByGrupo(idGrupo: Int): List<ContactoGrupoCrossRef>
 
 }
