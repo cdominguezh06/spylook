@@ -2,16 +2,21 @@ package com.cogu.spylook.view
 
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.text.TextWatcher
 import android.transition.Slide
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -54,15 +59,27 @@ class MainActivity : AppCompatActivity() {
     private var contactos = mutableListOf<ContactoCardItem>()
     private lateinit var intent: Intent
     private var grupos = mutableListOf<GrupoCardItem>()
+    private lateinit var unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
         this.enableEdgeToEdge()
+
+        unknownAppsPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (packageManager.canRequestPackageInstalls()) {
+                Log.d("PermissionCheck", "Permiso otorgado para instalar aplicaciones desconocidas.")
+            } else {
+                Toast.makeText(this, "Permiso denegado. No se puede instalar la actualización.", Toast.LENGTH_SHORT).show()
+            }
+        }
+        githubController = GithubController.getInstance()
+        githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
+
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         applyWindowInsets()
-        githubController = GithubController.getInstance()
-        githubController.checkForUpdates(this)
         database = AppDatabase.getInstance(this)!!
         searchEditText = findViewById<EditText>(R.id.searchEditText)
         setupButtons()
@@ -172,4 +189,5 @@ class MainActivity : AppCompatActivity() {
             setupRecyclerView()
         }
     }
+
 }

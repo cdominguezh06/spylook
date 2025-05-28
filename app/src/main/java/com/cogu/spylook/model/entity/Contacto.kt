@@ -53,12 +53,11 @@ class Contacto(
             return if (fechaNacimiento != null) {
                 if (LocalDate.now().isAfter(
                         fechaNacimiento.withYear(LocalDate.now().year)
-                            .withDayOfYear(LocalDate.now().dayOfYear - 1)
                     )
                 ) {
                     LocalDate.now().year - fechaNacimiento.year
                 } else {
-                    LocalDate.now().year - (fechaNacimiento.year - 1)
+                    (LocalDate.now().year - (fechaNacimiento.year))- 1
                 }
             } else 0
         }

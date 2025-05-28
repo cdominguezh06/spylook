@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -23,68 +24,39 @@ object ApplicationUpdater {
 
     private var downloadId: Long = -1
 
-    fun downloadAndInstallAPK(context: Context, url: String, fileName: String) {
+    fun downloadAndInstallAPK(context: Context, url: String, fileName: String, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+    ) {
         if (!context.packageManager.canRequestPackageInstalls()) {
-            handleUnknownAppSourcesPermission(context)
+            handleUnknownAppSourcesPermission(context, unknownAppsPermissionLauncher)
             return
         }
 
-        Log.d("DownloadTest", "URI de descarga: ${url.toUri()}")
+        Log.d("GithubController", "URI de descarga: ${url.toUri()}")
         val request = DownloadManager.Request(url.toUri())
-            .setTitle("Descargando actualización...")
+            .setTitle("Actualizacion de SpyLook")
             .setDescription("Espere mientras se descarga la actualización.")
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, fileName)
+            .setAllowedNetworkTypes(
+                DownloadManager.Request.NETWORK_WIFI or
+                        DownloadManager.Request.NETWORK_MOBILE
+            )
             .setAllowedOverMetered(true)
-            .setAllowedOverRoaming(false)
+            .setAllowedOverRoaming(true)
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         downloadId = downloadManager.enqueue(request)
-        registerDownloadReceiver(context, fileName)
-        Log.d("DownloadTest", "Solicitud de descarga realizada. ID de descarga: $downloadId")
+        Log.d("GithubController", "Solicitud de descarga realizada. ID de descarga: $downloadId")
     }
 
-    private fun handleUnknownAppSourcesPermission(context: Context) {
+    private fun handleUnknownAppSourcesPermission(context: Context, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>) {
         val intent = Intent(
             Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
             ("package:" + context.packageName).toUri()
         )
         Toast.makeText(context, UNKNOWN_APPS_PERMISSION_MSG, Toast.LENGTH_LONG).show()
-        context.startActivity(intent)
-    }
+        unknownAppsPermissionLauncher.launch(intent)
 
-    private fun registerDownloadReceiver(context: Context, fileName: String) {
-        val onCompleteReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                if (id == downloadId) {
-                    Log.d("DownloadTest", "$DOWNLOAD_COMPLETE_LOG$id")
-
-                    val apkFile =
-                        File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName)
-                    if (apkFile.exists()) {
-                        val apkUri: Uri = FileProvider.getUriForFile(
-                            context,
-                            "${context.packageName}.provider",
-                            apkFile
-                        )
-                        installAPK(context, apkUri)
-                    } else {
-                        Log.e("DownloadTest", "El archivo descargado no se encontró.")
-                    }
-                } else {
-                    Log.d("DownloadTest", "El ID de la descarga completada no coincide. Ignorando.")
-                }
-            }
-        }
-
-        val intentFilter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-        ContextCompat.registerReceiver(
-            context,
-            onCompleteReceiver,
-            intentFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
     }
 
     private fun installAPK(context: Context, uri: Uri) {
@@ -96,7 +68,7 @@ object ApplicationUpdater {
         try {
             context.startActivity(intent)
         } catch (e: Exception) {
-            Log.e("installAPK", "Error al iniciar la instalación del APK", e)
+            Log.e("GithubController", "Error al iniciar la instalación del APK", e)
             Toast.makeText(context, "No se pudo iniciar la instalación", Toast.LENGTH_SHORT).show()
         }
     }
