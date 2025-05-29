@@ -30,14 +30,14 @@ class AnotacionesFragment(private val anotable: Anotable, val contexto : Context
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fragment = inflater.inflate(R.layout.fragment_anotaciones, container, false)
+        val fragment = inflater.inflate(R.layout.fragment_empty_recycler, container, false)
         initializeRecyclerView(fragment)
 
         return fragment
     }
 
     private fun initializeRecyclerView(fragment: View) {
-        recyclerView = fragment.findViewById(R.id.recyclerNotas)
+        recyclerView = fragment.findViewById(R.id.recyclerGeneric)
         val db = AppDatabase.Companion.getInstance(requireContext())!!.anotacionDAO()
         runBlocking {
             val anotaciones = db!!.getAnotacionesDeAnotable(anotable.idAnotable)
