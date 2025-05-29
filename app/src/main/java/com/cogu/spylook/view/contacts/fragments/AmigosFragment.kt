@@ -22,10 +22,7 @@ import org.mapstruct.factory.Mappers
 class AmigosFragment(private val contacto: Contacto, private val context: Context?) : Fragment() {
 
     private val mapper: ContactoToCardItem = Mappers.getMapper(ContactoToCardItem::class.java)
-
-    companion object {
-        var amigos = mutableListOf<ContactoCardItem>()
-    }
+    var amigos = mutableListOf<ContactoCardItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,7 +70,8 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = AmigoCardAdapter(amigos, requireContext(), contacto)
+        recyclerView.adapter = AmigoCardAdapter(amigos, requireContext(), contacto, amigos.toMutableList())
         recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
+
 }

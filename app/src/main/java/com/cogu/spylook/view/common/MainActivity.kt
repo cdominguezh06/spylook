@@ -215,9 +215,9 @@ class MainActivity : AppCompatActivity() {
 
         override fun onResume() {
             super.onResume()
+            searchEditText.clearFocus()
+            searchEditText.text.clear()
             lifecycleScope.launch(block = toExecute)
-            NuevoGrupoActivity.Companion.creador = mutableListOf()
-            NuevoGrupoActivity.Companion.miembros = mutableListOf()
         }
 
     }

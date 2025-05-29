@@ -26,14 +26,14 @@ import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import com.cogu.spylook.view.contacts.ContactoActivity
 import com.cogu.spylook.view.contacts.fragments.AmigosFragment
-import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
 open class AmigoCardAdapter(
     internal val cardItemList: List<ContactoCardItem>,
     private val context: Context,
-    private val contacto: Contacto
+    private val contacto: Contacto,
+    val amigos : MutableList<ContactoCardItem>
 ) : RecyclerView.Adapter<AmigoCardAdapter.CardViewHolder?>() {
     private lateinit var onClickFunction: (ContactoCardItem) -> Unit
     private lateinit var mapper: ContactoToCardItem
@@ -122,10 +122,10 @@ open class AmigoCardAdapter(
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
                 fun onClick(cardItem: ContactoCardItem) {
-                    val agregar = AmigosFragment.amigos[AmigosFragment.amigos.size - 1]
-                    AmigosFragment.amigos.removeAt(AmigosFragment.amigos.size - 1)
-                    AmigosFragment.amigos.add(cardItem)
-                    AmigosFragment.amigos.add(agregar)
+                    val agregar = amigos[amigos.size - 1]
+                    amigos.removeAt(amigos.size - 1)
+                    amigos.add(cardItem)
+                    amigos.add(agregar)
                     val amistad = ContactoAmistadCrossRef(contacto.idAnotable, cardItem.idAnotable)
                     runBlocking {
                         AppDatabase.getInstance(context)!!.contactoDAO()!!.insertAmistad(amistad)

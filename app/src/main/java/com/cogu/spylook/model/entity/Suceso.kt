@@ -2,7 +2,6 @@ package com.cogu.spylook.model.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 import java.time.LocalDate
 
 @Entity(
@@ -17,10 +16,11 @@ import java.time.LocalDate
     ]
 )
 class Suceso(
-    @JvmField
-    @PrimaryKey(autoGenerate = true)
-    var idSuceso: Int,
-    @JvmField var fecha: LocalDate,
+    idAnotable: Int,
+    nombre: String,
+    @JvmField var fecha: String,
+    @JvmField var lugar: String,
     @JvmField var descripcion: String,
-    @JvmField var idCausante: Int
-)
+    @JvmField var idCausante: Int,
+    @JvmField var colorFoto: Int
+) : Anotable(idAnotable, nombre)

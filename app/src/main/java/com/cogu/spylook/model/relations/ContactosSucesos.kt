@@ -15,7 +15,7 @@ class ContactosSucesos {
     @JvmField
     @Relation(
         parentColumn = "idAnotable",
-        entityColumn = "idSuceso",
+        entityColumn = "idAnotable",
         associateBy = Junction(
             value = ContactoSucesoCrossRef::class,
             parentColumn = "idContacto",

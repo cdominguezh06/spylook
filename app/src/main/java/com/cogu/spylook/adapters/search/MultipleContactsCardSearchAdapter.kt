@@ -1,5 +1,6 @@
-package com.cogu.spylook.adapters.group
+package com.cogu.spylook.adapters.search
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.PorterDuff
 import android.view.HapticFeedbackConstants
@@ -10,27 +11,23 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.collection.IntSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
-import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
-import java.util.stream.IntStream
-import kotlin.streams.toList
 
-class MiembrosGrupoCardAdapter(
+class MultipleContactsCardSearchAdapter(
     internal val cardItemList: List<ContactoCardItem>,
     private val context: Context,
-) : RecyclerView.Adapter<MiembrosGrupoCardAdapter.CardViewHolder>() {
-    private lateinit var onClickFunction: (ContactoCardItem) -> Unit
+    private val onClick : (ContactoCardItem, Dialog, MultipleContactsCardSearchAdapter) -> Unit,
+    private val onLongClick : (ContactoCardItem, Context, MultipleContactsCardSearchAdapter, CardViewHolder) -> Boolean,
+    private val filter : () -> List<ContactoCardItem>
+) : RecyclerView.Adapter<MultipleContactsCardSearchAdapter.CardViewHolder>() {
     private lateinit var mapper: ContactoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
@@ -63,31 +60,18 @@ class MiembrosGrupoCardAdapter(
                 var lista = listOf<ContactoCardItem>()
                 runBlocking {
                     lista = AppDatabase.getInstance(context)!!
-                        .contactoDAO()!!.getContactos().map { c -> mapper.toCardItem(c) }
-                }
-                lista = lista.filter { c ->
-                    NuevoGrupoActivity.miembros.map { m -> m.idAnotable }
-                        .contains(c.idAnotable) == false
-                }
-                lista = lista.filter { c ->
-                    NuevoGrupoActivity.creador.map { m -> m.idAnotable }
-                        .contains(c.idAnotable) == false
+                        .contactoDAO()!!.getContactos()
+                        .map { c -> mapper.toCardItem(c) }
+                        .filter {
+                            !filter().contains(it)
+                        }
+                        .toList()
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
-                fun onClick(cardItem: ContactoCardItem) {
-                    val buscarCard =
-                        NuevoGrupoActivity.miembros[NuevoGrupoActivity.miembros.size - 1]
-                    NuevoGrupoActivity.miembros.removeAt(NuevoGrupoActivity.miembros.size - 1)
-                    NuevoGrupoActivity.miembros.add(cardItem)
-                    NuevoGrupoActivity.miembros.add(buscarCard)
-                    notifyDataSetChanged()
-                    dialog.dismiss()
-                }
-                onClickFunction = ::onClick
                 val busquedaContactoCardAdapter =
                     object : BusquedaContactoCardAdapter(lista, context) {
                         override fun onClick(cardItem: ContactoCardItem) {
-                            onClick(cardItem)
+                            onClick(cardItem, dialog, this@MultipleContactsCardSearchAdapter)
                         }
                     }
                 recycler.adapter = busquedaContactoCardAdapter
@@ -96,17 +80,17 @@ class MiembrosGrupoCardAdapter(
                     TextWatcherSearchBarMiembros(
                         searchBar,
                         recycler,
-                        onClickFunction,
+                        onClickFunction = { cardItem ->
+                            onClick(cardItem, dialog, this)
+                        },
                         context,
                         cardItem.idAnotable,
                         onExclude = {
                             val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
                             runBlocking {
-                                NuevoGrupoActivity.miembros
+                                filter()
                                     .map { it.copy() }
                                     .toMutableList()
-                                    .apply { addAll(NuevoGrupoActivity.creador) }
-                                    .filter { it.idAnotable != -1 }
                                     .ifEmpty { return@runBlocking listOf() }
                                     .map { dao.findContactoById(it.idAnotable) }
                             }
@@ -122,23 +106,7 @@ class MiembrosGrupoCardAdapter(
             holder.itemView.setOnLongClickListener {
                     view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                if (cardItem.idAnotable == -1) return@setOnLongClickListener true
-                AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al miembro ${cardItem.nombre} A.K.A ${cardItem.alias}?")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        NuevoGrupoActivity.miembros.removeAt(
-                            NuevoGrupoActivity.miembros.indexOf(
-                                cardItem
-                            )
-                        )
-                        notifyDataSetChanged()
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-                true
+               onLongClick(cardItem, context, this, holder)
             }
         }
     }

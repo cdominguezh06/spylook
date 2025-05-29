@@ -1,4 +1,4 @@
-package com.cogu.spylook.adapters.group
+package com.cogu.spylook.adapters.search
 
 import android.app.Dialog
 import android.content.Context
@@ -14,27 +14,25 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
-import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class CreadorGrupoCardAdapter(
+class SingleContactCardSearchAdapter(
     internal val cardItemList: List<ContactoCardItem>,
     private val context: Context,
-) : RecyclerView.Adapter<CreadorGrupoCardAdapter.CardViewHolder>() {
-    private lateinit var onClickFunction: (ContactoCardItem) -> Unit
+    private val onClick : (ContactoCardItem, Dialog, SingleContactCardSearchAdapter) -> Unit,
+    private val onLongClick : (ContactoCardItem, Context, SingleContactCardSearchAdapter, CardViewHolder) -> Boolean,
+) : RecyclerView.Adapter<SingleContactCardSearchAdapter.CardViewHolder>() {
     private lateinit var mapper: ContactoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
         return CardViewHolder(view)
     }
-
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         mapper = Mappers.getMapper(ContactoToCardItem::class.java)
@@ -63,17 +61,10 @@ class CreadorGrupoCardAdapter(
                         .contactoDAO()!!.getContactos().map { c -> mapper.toCardItem(c) }
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
-                fun onClick(cardItem: ContactoCardItem) {
-                    NuevoGrupoActivity.creador.clear()
-                    NuevoGrupoActivity.creador.add(cardItem)
-                    notifyDataSetChanged()
-                    dialog.dismiss()
-                }
-                onClickFunction = ::onClick
                 val busquedaContactoCardAdapter =
                     object : BusquedaContactoCardAdapter(lista, context) {
                         override fun onClick(cardItem: ContactoCardItem) {
-                            onClick(cardItem)
+                            onClick(cardItem,dialog,this@SingleContactCardSearchAdapter)
                         }
                     }
                 recycler.adapter = busquedaContactoCardAdapter
@@ -82,7 +73,9 @@ class CreadorGrupoCardAdapter(
                     TextWatcherSearchBarMiembros(
                         searchBar,
                         recycler,
-                        onClickFunction,
+                        onClickFunction = {item ->
+                            onClick(item, dialog, this)
+                        },
                         context,
                         cardItem.idAnotable,
                         onExclude = {
@@ -97,28 +90,7 @@ class CreadorGrupoCardAdapter(
             })
 
             holder.itemView.setOnLongClickListener {
-                if (cardItem.idAnotable == -1) return@setOnLongClickListener true
-                AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al creador?")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        NuevoGrupoActivity.creador.clear()
-                        NuevoGrupoActivity.creador.add(
-                            ContactoCardItem(
-                                -1,
-                                "Pulsa para...",
-                                "Buscar",
-                                0,
-                                true
-                            )
-                        )
-                        notifyDataSetChanged()
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-                true
+                onLongClick(cardItem, context, this, holder)
             }
         }
     }

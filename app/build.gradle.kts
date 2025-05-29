@@ -39,6 +39,7 @@ android {
     }
 }
 dependencies {
+    implementation(libs.legacy.support.v4)
     ksp(libs.room.compiler)
     kapt(libs.mapstruct.processor)
     implementation(libs.appcompat)

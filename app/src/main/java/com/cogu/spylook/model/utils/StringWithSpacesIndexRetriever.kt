@@ -1,7 +1,5 @@
 package com.cogu.spylook.model.utils
 
-import android.util.Log
-
 class StringWithSpacesIndexRetriever {
 
     var contador = 0

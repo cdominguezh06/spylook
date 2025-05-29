@@ -18,6 +18,12 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".view.sucesos.NuevoSucesoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.common.SucesoActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.groups.NuevoGrupoActivity"
             android:exported="false" />
         <activity

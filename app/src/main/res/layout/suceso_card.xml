@@ -10,40 +10,56 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rainbow_border"
-        android:baselineAligned="false"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:paddingStart="16dp">
 
-        <TextView
-            android:id="@+id/textTitulo"
+        <ImageView
+            android:id="@+id/imagenSuceso"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/suceso_icon" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/bruno_ace"
-            android:text="Titulo (22chars max)"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp" />
+            android:baselineAligned="false"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/textFecha"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="0dp"
-            android:fontFamily="@font/bruno_ace"
-            android:text="DD-MM-YYY"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/textTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/bruno_ace"
+                android:text="Titulo (22chars max)"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/textCantidadImplicados"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="0dp"
-            android:fontFamily="@font/bruno_ace"
-            android:text="XX implicados"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/textFecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="0dp"
+                android:fontFamily="@font/bruno_ace"
+                android:text="DD-MM-YYY"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textCantidadImplicados"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/bruno_ace"
+                android:text="XX implicados"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

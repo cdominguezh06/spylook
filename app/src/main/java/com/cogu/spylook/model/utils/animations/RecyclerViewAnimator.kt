@@ -7,9 +7,9 @@ import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerViewAnimator(
-    private val recyclerView: RecyclerView,
-    private val dataSource: MutableList<*>,
-    private val adapter: RecyclerView.Adapter<*>
+    var recyclerView: RecyclerView,
+    var dataSource: MutableList<*>,
+    var adapter: RecyclerView.Adapter<*>
 ) {
 
     /**

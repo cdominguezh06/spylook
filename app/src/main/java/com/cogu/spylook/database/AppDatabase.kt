@@ -10,7 +10,6 @@ import com.cogu.spylook.dao.AnotacionDAO
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.dao.CuentaDao
 import com.cogu.spylook.dao.GrupoDAO
-import com.cogu.spylook.dao.GrupoSucesosDAO
 import com.cogu.spylook.dao.SucesoDAO
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.utils.converters.DateConverters
@@ -37,7 +36,7 @@ import java.util.concurrent.Executors
         ContactoAmistadCrossRef::class,
         CuentaContactoCrossRef::class,
         Anotable::class
-    ], version = 2, exportSchema = false
+    ], version = 1, exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -46,7 +45,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun grupoDAO(): GrupoDAO?
     abstract fun anotacionDAO(): AnotacionDAO?
     abstract fun cuentaDAO(): CuentaDao?
-    abstract fun grupoSucesosDAO(): GrupoSucesosDAO?
 
     companion object {
         @Volatile

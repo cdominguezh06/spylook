@@ -10,14 +10,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.ContactSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.view.common.fragments.SucesosFragment
+import com.cogu.spylook.view.contacts.fragments.AmigosFragment
+import com.cogu.spylook.view.contacts.fragments.ContactGroupsFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ContactoActivity : AppCompatActivity() {
@@ -60,7 +65,7 @@ class ContactoActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.pager)
         tabLayout = findViewById(R.id.tabLayout)
 
-        runBlocking {
+        lifecycleScope.launch {
             val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
             setupContactDetails(contact)
             setupViewPager(contact)
@@ -81,8 +86,18 @@ class ContactoActivity : AppCompatActivity() {
                 0 -> getString(R.string.TAB_INFO_TITLE)
                 1 -> getString(R.string.TAB_FRIENDS_TITLE)
                 2 -> "Grupos"
+                3 -> "Sucesos"
                 else -> ""
             }
         }.attach()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
+            setupViewPager(contact)
+        }
+
     }
 }

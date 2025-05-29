@@ -1,5 +1,6 @@
 package com.cogu.spylook.model.utils.textWatchers
 
+import android.app.Dialog
 import android.content.Context
 import android.graphics.LinearGradient
 import android.graphics.PorterDuff
@@ -10,11 +11,9 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
-import androidx.core.util.Predicate
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.cards.ContactoCardAdapter
 import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
@@ -32,7 +31,7 @@ class TextWatcherSearchBarMiembros(
     private val onClickFunction: (ContactoCardItem) -> Unit,
     private val context: Context?,
     private val currentMiembroId: Int,
-    private val onExclude : () -> List<Contacto>,
+    private val onExclude: () -> List<Contacto>,
 ) : TextWatcher {
     private val mapper: ContactoToCardItem =
         Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
@@ -124,13 +123,13 @@ class TextWatcherSearchBarMiembros(
                 }
                 if (cardItem.clickable) {
                     holder.itemView.setOnClickListener(View.OnClickListener {
-                        onClick(cardItem)
+                        onClickFunction(cardItem)
                     })
                 }
             }
 
             override fun onClick(item: ContactoCardItem) {
-                onClickFunction(item)
+                onClickFunction
             }
         }
         recyclerView!!.setLayoutManager(LinearLayoutManager(context))

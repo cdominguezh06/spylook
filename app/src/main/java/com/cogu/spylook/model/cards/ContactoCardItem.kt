@@ -25,6 +25,14 @@ data class ContactoCardItem(
             false
         )
 
+        val DEFAULT_FOR_SEARCH = ContactoCardItem(
+            -1,
+            "Pulsa para...",
+            "Buscar",
+            0,
+            true
+        )
+
     }
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
