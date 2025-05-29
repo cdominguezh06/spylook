@@ -1,5 +1,6 @@
 package com.cogu.spylook.view.common
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
@@ -34,6 +35,7 @@ import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
+import com.cogu.spylook.model.utils.ApplicationUpdater
 import com.cogu.spylook.model.utils.decorators.RainbowTextViewDecorator
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarContacts
@@ -65,23 +67,16 @@ class MainActivity : AppCompatActivity() {
         setupWindowTransitions()
         this.enableEdgeToEdge()
 
+        githubController = GithubController.Companion.getInstance()
         unknownAppsPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ) {
-            if (packageManager.canRequestPackageInstalls()) {
-                Log.d(
-                    "PermissionCheck",
-                    "Permiso otorgado para instalar aplicaciones desconocidas."
-                )
+        ) { result ->
+            if (this@MainActivity.packageManager.canRequestPackageInstalls()) {
+                githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
             } else {
-                Toast.makeText(
-                    this,
-                    "Permiso denegado. No se puede instalar la actualización.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@MainActivity, "Permiso denegado.", Toast.LENGTH_SHORT).show()
             }
         }
-        githubController = GithubController.Companion.getInstance()
         githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
 
         setContentView(R.layout.activity_main)

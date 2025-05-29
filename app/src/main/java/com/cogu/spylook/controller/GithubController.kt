@@ -25,7 +25,7 @@ class GithubController {
         private const val BASE_URL = "https://api.github.com/"
         private const val REPO_OWNER = "cdominguezh06"
         private const val REPO_NAME = "spylook"
-        private const val CURRENT_VERSION = "0.3.1"
+        private const val CURRENT_VERSION = "0.3.0"
 
         private lateinit var INSTANCE: GithubController
         fun getInstance(): GithubController {
@@ -36,7 +36,7 @@ class GithubController {
         }
     }
 
-    fun checkForUpdates(context: Context, unknownAppsPermissionLauncher : ActivityResultLauncher<Intent>) {
+    fun checkForUpdates(context: Context, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>) {
         val retrofit = getRetrofit();
         val gitHubApi = retrofit.create(GitHubAPI::class.java)
         Log.d("GithubController", "MANDO PETICION")
@@ -88,7 +88,10 @@ class GithubController {
             .any { (latest, current) -> latest > current }
     }
 
-    private fun displayUpdateDialog(context: Context, release: GitHubRelease, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+    private fun displayUpdateDialog(
+        context: Context,
+        release: GitHubRelease,
+        unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     ) {
         val markdownBody = release.body
         val styledMarkdown = formatMarkdownWithCustomTags(markdownBody)
@@ -103,16 +106,30 @@ class GithubController {
         val downloadUrl = release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url!!
         builder.setPositiveButton("Descargar") { _, _ ->
                 Log.d("GithubController", "Descargando desde URL: $downloadUrl")
-                downloadFile(context, downloadUrl, "spylook-${release.tag_name}.apk", unknownAppsPermissionLauncher)
+                downloadFile(
+                    context,
+                    downloadUrl,
+                    "spylook-${release.tag_name}.apk",
+                    unknownAppsPermissionLauncher
+                )
             }
 
         builder.setNegativeButton("Cancelar", null)
         builder.show()
     }
 
-    private fun downloadFile(context: Context, url: String, fileName: String, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+    private fun downloadFile(
+        context: Context,
+        url: String,
+        fileName: String,
+        unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     ) {
-        ApplicationUpdater.downloadAndInstallAPK(context, url, fileName, unknownAppsPermissionLauncher)
+        ApplicationUpdater.downloadAndInstallAPK(
+            context,
+            url,
+            fileName,
+            unknownAppsPermissionLauncher
+        )
     }
 
     private fun formatMarkdownWithCustomTags(markdown: String): Spannable {
