@@ -36,7 +36,7 @@ import java.util.concurrent.Executors
         ContactoAmistadCrossRef::class,
         CuentaContactoCrossRef::class,
         Anotable::class
-    ], version = 1, exportSchema = false
+    ], version = 10, exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
