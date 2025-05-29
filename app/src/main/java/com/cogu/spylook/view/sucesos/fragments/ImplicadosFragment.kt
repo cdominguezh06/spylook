@@ -42,6 +42,9 @@ class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
                 contactoDao!!.findContactoById(it.idContacto)
             }
             val cardItems = buildCardItemList(implicados)
+            cardItems.ifEmpty {
+                cardItems.add(ContactoCardItem.DEFAULT_FOR_NO_RESULTS)
+            }
             setupMemberRecyclerView(cardItems)
         }
     }

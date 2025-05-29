@@ -1,7 +1,5 @@
 package com.cogu.spylook.model.cards
 
-import com.cogu.spylook.model.utils.converters.DateConverters
-import java.time.LocalDateTime
 
 class CuentaCardItem(
     @JvmField var idAnotable: Int,

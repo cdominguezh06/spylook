@@ -1,15 +1,12 @@
 package com.cogu.spylook.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.entity.Cuenta
 import com.cogu.spylook.model.entity.CuentaContactoCrossRef
-import com.cogu.spylook.model.entity.Suceso
 import com.cogu.spylook.model.relations.CuentaConContactos
 
 @Dao
@@ -49,16 +46,16 @@ interface CuentaDao {
     fun obtenerCuentaConContactosPorLink(link: String): List<CuentaConContactos>
 
     @Transaction
-    suspend fun deleteSucesoAnotable(suceso: Suceso) {
+    suspend fun deleteCuentaAnotable(suceso: Int) {
+        deleteById(suceso)
         deleteAnotable(suceso)
-        delete(suceso)
     }
 
-    @Delete
-    suspend fun delete(suceso: Suceso)
+    @Query("DELETE FROM cuentas WHERE idAnotable = :idAnotable")
+    suspend fun deleteById(idAnotable: Int)
 
-    @Delete
-    suspend fun deleteAnotable(anotable: Anotable)
+    @Query("DELETE FROM cuentas WHERE idAnotable = :idAnotable")
+    suspend fun deleteAnotable(idAnotable: Int)
 
     @Insert
     suspend fun insertarRelaciones(relaciones: List<CuentaContactoCrossRef>)

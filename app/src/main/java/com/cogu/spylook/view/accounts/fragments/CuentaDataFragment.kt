@@ -2,7 +2,6 @@ package com.cogu.spylook.view.accounts.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,17 +22,16 @@ import org.mapstruct.factory.Mappers
 
 class CuentaDataFragment(private val cuenta: Cuenta, val contexto: Context) : Fragment() {
 
-    private lateinit var descripcionTextView: TextView
-    private lateinit var fechaTextView: TextView
-    private lateinit var lugarTextView: TextView
-    private lateinit var recyclerCausante : RecyclerView
+    private lateinit var linkTextView: TextView
+    private lateinit var redSocialTextView: TextView
+    private lateinit var recyclerPropietario : RecyclerView
     private var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private lateinit var contactoDAO : ContactoDAO
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fragment = inflater.inflate(R.layout.fragment_suceso_data, container, false)
+        val fragment = inflater.inflate(R.layout.fragment_account_data, container, false)
         bindStaticFields(fragment)
         lifecycleScope.launch {
             initializeRecyclerView(fragment)
@@ -43,21 +41,18 @@ class CuentaDataFragment(private val cuenta: Cuenta, val contexto: Context) : Fr
 
     private suspend fun initializeRecyclerView(fragment: View) {
         contactoDAO = AppDatabase.getInstance(contexto)!!.contactoDAO()!!
-        recyclerCausante = fragment.findViewById<RecyclerView>(R.id.recyclerCausante)
-        val causante = mutableListOf<ContactoCardItem>(
-            mapper.toCardItem(contactoDAO.findContactoById(cuenta.idCausante))
+        recyclerPropietario = fragment.findViewById<RecyclerView>(R.id.recyclerPropietario)
+        val propietario = mutableListOf<ContactoCardItem>(
+            mapper.toCardItem(contactoDAO.findContactoById(cuenta.idPropietario))
         )
-        recyclerCausante.layoutManager = LinearLayoutManager(contexto)
-        recyclerCausante.adapter = ContactoCardAdapter(causante, contexto)
+        recyclerPropietario.layoutManager = LinearLayoutManager(contexto)
+        recyclerPropietario.adapter = ContactoCardAdapter(propietario, contexto)
     }
 
     private fun bindStaticFields(fragment: View) {
-        descripcionTextView = fragment.findViewById<TextView>(R.id.descripcionText)
-        descripcionTextView.text = cuenta.descripcion
-        descripcionTextView.movementMethod = ScrollingMovementMethod()
-        fechaTextView = fragment.findViewById<TextView>(R.id.sucesoFechaText)
-        fechaTextView.text = cuenta.fecha
-        lugarTextView = fragment.findViewById<TextView>(R.id.sucesoLugarText)
-        lugarTextView.text = cuenta.lugar
+        linkTextView = fragment.findViewById<TextView>(R.id.linkText)
+        linkTextView.text = cuenta.link
+        redSocialTextView = fragment.findViewById<TextView>(R.id.redSocialText)
+        redSocialTextView.text = cuenta.redSocial
     }
 }

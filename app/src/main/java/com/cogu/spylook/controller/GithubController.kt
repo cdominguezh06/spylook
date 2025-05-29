@@ -25,7 +25,7 @@ class GithubController {
         private const val BASE_URL = "https://api.github.com/"
         private const val REPO_OWNER = "cdominguezh06"
         private const val REPO_NAME = "spylook"
-        private const val CURRENT_VERSION = "0.3.2"
+        private const val CURRENT_VERSION = "1.0.0"
 
         private lateinit var INSTANCE: GithubController
         fun getInstance(): GithubController {
@@ -81,11 +81,23 @@ class GithubController {
     }
 
     private fun isUpdateAvailable(latestVersion: String, currentVersion: String): Boolean {
-        val latestVersionParts = latestVersion.substring(2).split(".").map { it.toInt() }
+        val latestVersionParts = latestVersion
+            .replace("v.", "")
+            .replace("v", "")
+            .split(".").map { it.toInt() }
         val currentVersionParts = currentVersion.split(".").map { it.toInt() }
 
-        return latestVersionParts.zip(currentVersionParts)
-            .any { (latest, current) -> latest > current }
+        val maxLength = maxOf(latestVersionParts.size, currentVersionParts.size)
+        val adjustedLatest = latestVersionParts + List(maxLength - latestVersionParts.size) { 0 }
+        val adjustedCurrent = currentVersionParts + List(maxLength - currentVersionParts.size) { 0 }
+
+        for (i in adjustedLatest.indices) {
+            if (adjustedLatest[i] > adjustedCurrent[i]) return true
+            if (adjustedLatest[i] < adjustedCurrent[i]) return false
+        }
+
+        return false
+
     }
 
     private fun displayUpdateDialog(

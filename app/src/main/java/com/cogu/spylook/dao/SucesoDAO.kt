@@ -1,7 +1,6 @@
 package com.cogu.spylook.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -9,8 +8,6 @@ import androidx.room.Update
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.entity.Suceso
-import com.cogu.spylook.model.relations.ContactosSucesos
-import com.cogu.spylook.model.relations.SucesosContactos
 
 @Dao
 interface SucesoDAO {
@@ -21,8 +18,8 @@ interface SucesoDAO {
     @Insert
     suspend fun addAnotable(anotable: Anotable): Long
 
-    @Delete
-    suspend fun deleteAnotable(anotable: Anotable)
+    @Query("DELETE FROM anotables WHERE idAnotable = :idAnotable")
+    suspend fun deleteAnotable(idAnotable: Int)
 
     @Query("SELECT * FROM sucesos WHERE idAnotable = :id")
     suspend fun findSucesoById(id: Int): Suceso?
@@ -44,13 +41,13 @@ interface SucesoDAO {
     }
 
     @Transaction
-    suspend fun deleteSucesoAnotable(suceso: Suceso) {
-        deleteAnotable(suceso)
-        delete(suceso)
+    suspend fun deleteSucesoAnotable(idAnotable: Int) {
+        delete(idAnotable)
+        deleteAnotable(idAnotable)
     }
 
-    @Delete
-    suspend fun delete(suceso: Suceso)
+    @Query("DELETE FROM sucesos WHERE idAnotable = :idAnotable")
+    suspend fun delete(idAnotable: Int)
 
     @Insert
     suspend fun insertarRelaciones(relaciones: List<ContactoSucesoCrossRef>)

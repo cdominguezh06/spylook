@@ -19,20 +19,26 @@ import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
+import com.cogu.spylook.model.cards.CuentaCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
+import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
 open class GrupoCardAdapter(
-    internal val cardItemList: List<GrupoCardItem>,
+    internal val cardItemList: MutableList<GrupoCardItem>,
     private val context: Context
 ) : RecyclerView.Adapter<GrupoCardAdapter.CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.grupo_card, parent, false)
         return CardViewHolder(view)
     }
-
+    private lateinit var recyclerAnimator: RecyclerViewAnimator
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerAnimator = RecyclerViewAnimator(recyclerView, cardItemList, this)
+    }
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
@@ -56,7 +62,7 @@ open class GrupoCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val inflater = LayoutInflater.from(context)
                 val popupView = inflater.inflate(
-                    R.layout.long_press_group,
+                    R.layout.long_press_list,
                     null
                 )
 
@@ -66,7 +72,8 @@ open class GrupoCardAdapter(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     true
                 )
-
+                val titulo = popupView.findViewById<TextView>(R.id.textTitle)
+                titulo.text = "Miembros"
                 val miembrosRecycler = popupView.findViewById<RecyclerView>(R.id.recyclerLongPress)
                 runBlocking {
                     val grupoDao = AppDatabase.getInstance(context)!!.grupoDAO()!!
@@ -90,6 +97,24 @@ open class GrupoCardAdapter(
                         ContactoMiniCardAdapter(miembros, context, onClick = {
                             popupWindow.dismiss()
                         })
+                    val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
+                    buttonEliminar.setOnClickListener {view: View? ->
+                        view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                        val dao = AppDatabase.getInstance(context)!!.grupoDAO()!!
+                        runBlocking {
+                            dao.deleteGrupoAnotable(cardItem.idAnotable)
+                            val index = cardItemList.indexOf(cardItem)
+                            recyclerAnimator.deleteItemWithAnimation(
+                                holder.itemView,
+                                index,
+                                onEmptyCallback = {
+                                    cardItemList.add(GrupoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                                },
+                                afterDeleteCallBack = {
+                                    popupWindow.dismiss()
+                                })
+                        }
+                    }
                     val x = view!!.getTag(R.id.touch_event_x) as Int
                     val y = view.getTag(R.id.touch_event_y) as Int
 
@@ -103,7 +128,6 @@ open class GrupoCardAdapter(
         }
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
-                Log.e("click", "click")
                 l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, GrupoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)

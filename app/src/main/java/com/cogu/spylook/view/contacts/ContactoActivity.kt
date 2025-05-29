@@ -87,6 +87,7 @@ class ContactoActivity : AppCompatActivity() {
                 1 -> getString(R.string.TAB_FRIENDS_TITLE)
                 2 -> "Grupos"
                 3 -> "Sucesos"
+                4 -> "Cuentas"
                 else -> ""
             }
         }.attach()

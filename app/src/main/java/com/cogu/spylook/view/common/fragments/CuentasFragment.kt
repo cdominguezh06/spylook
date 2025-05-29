@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
+import com.cogu.spylook.adapters.cards.CuentaCardAdapter
 import com.cogu.spylook.adapters.cards.SucesoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.CuentaToCardItem
@@ -46,13 +47,13 @@ class CuentasFragment(private val anotable: Anotable, private val context: Conte
         val db = AppDatabase.Companion.getInstance(requireContext())
         val cuentaDao = db?.cuentaDAO()!!
         cuentas = mutableListOf()
-        cuentas.add(SucesoCardItem.Companion.DEFAULT_FOR_ADD)
-        val temp = cuentaDao.findSucesosByCausante(anotable.idAnotable)
+        cuentas.add(CuentaCardItem.DEFAULT_FOR_ADD)
+        val temp = cuentaDao.findCuentasByPropietario(anotable.idAnotable)
             .map { mapper.toCardItem(it) }
             .toMutableList()
             .apply {
-                addAll(cuentaDao.findSucesosByImplicado(anotable.idAnotable)
-                    .map { cuentaDao.findSucesoById(it.idSuceso)!! }
+                addAll(cuentaDao.findCuentasByContacto(anotable.idAnotable)
+                    .map { cuentaDao.findCuentaById(it.idCuenta)!! }
                     .map { mapper.toCardItem(it) }) }
             .sortedByDescending { it.idAnotable }
         cuentas.apply { addAll(temp) }
@@ -61,7 +62,7 @@ class CuentasFragment(private val anotable: Anotable, private val context: Conte
 
     private fun initializeRecyclerView(recyclerView: RecyclerView) {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SucesoCardAdapter(cuentas, context, anotable)
+        recyclerView.adapter = CuentaCardAdapter(cuentas, context, anotable)
         recyclerView.addItemDecoration(SpacingItemDecoration(context))
     }
 }

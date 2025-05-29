@@ -17,24 +17,24 @@ import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
-import com.cogu.spylook.model.cards.SucesoCardItem
+import com.cogu.spylook.model.cards.CuentaCardItem
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
-import com.cogu.spylook.view.sucesos.SucesoActivity
-import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
+import com.cogu.spylook.view.accounts.CuentaActivity
+import com.cogu.spylook.view.accounts.NuevaCuentaActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-open class SucesoCardAdapter(
-    internal val cardItemList: MutableList<SucesoCardItem>,
+class CuentaCardAdapter(
+    internal val cardItemList: MutableList<CuentaCardItem>,
     private val context: Context,
     private val anotableOrigen: Anotable
-) : RecyclerView.Adapter<SucesoCardAdapter.CardViewHolder?>() {
+) : RecyclerView.Adapter<CuentaCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
-    private lateinit var implicados: MutableList<ContactoMiniCard>
+    private lateinit var usuarios: MutableList<ContactoMiniCard>
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.suceso_card, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.account_card, parent, false)
         return CardViewHolder(view)
     }
 
@@ -46,9 +46,11 @@ open class SucesoCardAdapter(
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
-        holder.titulo.text = cardItem.nombre
-        holder.fecha.text = cardItem.fecha.toString()
-        holder.imagen.setImageResource(R.drawable.suceso_icon)
+        holder.nombre.text = cardItem.nombre
+        holder.link.text = cardItem.link
+        holder.link.isSelected = true
+        holder.redSocial.text = cardItem.redSocial
+        holder.imagen.setImageResource(R.drawable.account_icon)
         if (cardItem.idAnotable != -1) {
             holder.imagen.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
             holder.itemView.setOnTouchListener { v, event ->
@@ -59,22 +61,21 @@ open class SucesoCardAdapter(
                 false
             }
             runBlocking {
-                val sucesoDao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
+                val cuentaDAO = AppDatabase.getInstance(context)!!.cuentaDAO()!!
                 val contactoDao = AppDatabase.getInstance(context)!!.contactoDAO()!!
                 val mapper =
                     Mappers.getMapper<ContactoToMiniCard>(ContactoToMiniCard::class.java)
-                implicados =
+                usuarios =
                     mutableListOf<ContactoMiniCard>()
                         .apply {
-                            val suceso = sucesoDao.findSucesoById(cardItem.idAnotable)!!
-                            add(mapper.toMiniCard(contactoDao.findContactoById(suceso.idCausante)))
+                            val cuenta = cuentaDAO.findCuentaById(cardItem.idAnotable)!!
+                            add(mapper.toMiniCard(contactoDao.findContactoById(cuenta.idPropietario)))
                             addAll(
-                                sucesoDao.getRelacionesBySuceso(suceso.idAnotable).map {
+                                cuentaDAO.findContactosByCuenta(cuenta.idAnotable).map {
                                     mapper.toMiniCard(contactoDao.findContactoById(it.idContacto))
                                 }
                             )
                         }
-                holder.cantidadImplicados.text = "${implicados.size} implicados"
             }
             holder.itemView.setOnLongClickListener(View.OnLongClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
@@ -91,25 +92,25 @@ open class SucesoCardAdapter(
                     true
                 )
                 val titulo = popupView.findViewById<TextView>(R.id.textTitle)
-                titulo.text = "Implicados"
-                val implicadosRecyclerView = popupView.findViewById<RecyclerView>(R.id.recyclerLongPress)
-                implicadosRecyclerView.layoutManager = LinearLayoutManager(context)
-                implicadosRecyclerView.adapter =
-                    ContactoMiniCardAdapter(implicados, context, onClick = {
+                titulo.text = "Usuarios de la cuenta"
+                val usuariosRecyclerView = popupView.findViewById<RecyclerView>(R.id.recyclerLongPress)
+                usuariosRecyclerView.layoutManager = LinearLayoutManager(context)
+                usuariosRecyclerView.adapter =
+                    ContactoMiniCardAdapter(usuarios, context, onClick = {
                         popupWindow.dismiss()
                     })
                 val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
                 buttonEliminar.setOnClickListener {view: View? ->
                     view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
+                    val dao = AppDatabase.getInstance(context)!!.cuentaDAO()!!
                     runBlocking {
-                        dao.deleteSucesoAnotable(cardItem.idAnotable)
+                        dao.deleteCuentaAnotable(cardItem.idAnotable)
                         val index = cardItemList.indexOf(cardItem)
                         recyclerAnimator.deleteItemWithAnimation(
                             holder.itemView,
                             index,
                             onEmptyCallback = {
-                                cardItemList.add(SucesoCardItem.DEFAULT_FOR_ADD)
+                                cardItemList.add(CuentaCardItem.DEFAULT_FOR_ADD)
                             },
                             afterDeleteCallBack = {
                                 popupWindow.dismiss()
@@ -127,7 +128,7 @@ open class SucesoCardAdapter(
         if(position==0){
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                val intent = Intent(context, NuevoSucesoActivity::class.java)
+                val intent = Intent(context, NuevaCuentaActivity::class.java)
                 intent.putExtra("id", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
@@ -136,7 +137,7 @@ open class SucesoCardAdapter(
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                val intent = Intent(context, SucesoActivity::class.java)
+                val intent = Intent(context, CuentaActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
                 context.startActivity(intent)
             })
@@ -148,9 +149,9 @@ open class SucesoCardAdapter(
     }
 
     class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var titulo: TextView = itemView.findViewById(R.id.textTitulo)
-        var fecha: TextView = itemView.findViewById(R.id.textFecha)
-        var cantidadImplicados: TextView = itemView.findViewById(R.id.textCantidadImplicados)
-        var imagen : ImageView = itemView.findViewById<ImageView>(R.id.imagenSuceso)
+        var nombre: TextView = itemView.findViewById(R.id.textNickCuenta)
+        var link: TextView = itemView.findViewById(R.id.textLinkCuenta)
+        var redSocial: TextView = itemView.findViewById(R.id.textRedSocialCuenta)
+        var imagen : ImageView = itemView.findViewById<ImageView>(R.id.imagenCuenta)
     }
 }

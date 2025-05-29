@@ -11,7 +11,7 @@ data class CuentaConContactos(
     @Embedded
     val cuenta: Cuenta,
     @Relation(
-        parentColumn = "idCuenta",
+        parentColumn = "idAnotable",
         entityColumn = "idAnotable",
         associateBy = Junction(
             value = CuentaContactoCrossRef::class,

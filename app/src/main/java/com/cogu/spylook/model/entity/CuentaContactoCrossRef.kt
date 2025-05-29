@@ -10,7 +10,7 @@ import androidx.room.Index
     foreignKeys = [
         ForeignKey(
             entity = Cuenta::class,
-            parentColumns = ["idCuenta"],
+            parentColumns = ["idAnotable"],
             childColumns = ["idCuenta"],
             onDelete = ForeignKey.CASCADE
         ),

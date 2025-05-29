@@ -1,7 +1,6 @@
 package com.cogu.spylook.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -20,6 +19,9 @@ interface GrupoDAO {
     @Insert
     suspend fun addGrupo(grupo: Grupo) : Long
 
+    @Query("DELETE FROM anotables WHERE idAnotable = :idAnotable")
+    suspend fun deleteAnotable(idAnotable: Int)
+
     @Transaction
     suspend fun addGrupoWithAnotable(grupo: Grupo) : Long {
         val idAnotable = addAnotable(
@@ -33,8 +35,15 @@ interface GrupoDAO {
     }
     @Update
     suspend fun updateGrupo(grupo: Grupo)
-    @Delete
-    suspend fun deleteGrupo(grupo: Grupo)
+
+    @Transaction
+    suspend fun deleteGrupoAnotable(idAnotable: Int) {
+        delete(idAnotable)
+        deleteAnotable(idAnotable)
+    }
+
+    @Query("DELETE FROM grupos WHERE idAnotable = :idAnotable")
+    suspend fun delete(idAnotable: Int)
 
     @Query("SELECT * FROM grupos WHERE idAnotable = :id")
     suspend fun findGrupoById(id: Int): Grupo?

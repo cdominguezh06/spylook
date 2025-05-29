@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.sucesos
+package com.cogu.spylook.view.accounts
 
 import android.app.AlertDialog
 import android.graphics.Color
@@ -21,33 +21,32 @@ import com.cogu.spylook.adapters.search.SingleContactCardSearchAdapter
 import com.cogu.spylook.adapters.search.MultipleContactsCardSearchAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.Cuenta
+import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import kotlinx.coroutines.launch
 
-class NuevoSucesoActivity : AppCompatActivity() {
+class NuevaCuentaActivity : AppCompatActivity() {
 
-    private lateinit var recyclerCausante: RecyclerView
-    private lateinit var recyclerImplicados: RecyclerView
-    private lateinit var textNombreSuceso: EditText
-    private lateinit var textDescripcionSuceso: EditText
-    private lateinit var textFechaSuceso: EditText
-    private lateinit var textLugarSuceso: EditText
+    private lateinit var recyclerPropietario: RecyclerView
+    private lateinit var recyclerUsuarios: RecyclerView
+    private lateinit var textNombreCuenta: EditText
+    private lateinit var textLinkCuenta: EditText
+    private lateinit var textRedSocialCuenta: EditText
     private lateinit var boton: Button
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
-    var causante = mutableListOf<ContactoCardItem>()
-    var implicados = mutableListOf<ContactoCardItem>()
+    var propietario = mutableListOf<ContactoCardItem>()
+    var usuarios = mutableListOf<ContactoCardItem>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
         window.enterTransition = Slide()
         window.exitTransition = Slide()
         enableEdgeToEdge()
-        setContentView(R.layout.activity_nuevo_suceso)
+        setContentView(R.layout.activity_nueva_cuenta)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -55,39 +54,36 @@ class NuevoSucesoActivity : AppCompatActivity() {
         }
         db = AppDatabase.getInstance(this)!!
         anotableOrigen = intent.getIntExtra("id", -1)
-        recyclerCausante = findViewById<RecyclerView>(R.id.recyclerCausante)
-        recyclerImplicados = findViewById<RecyclerView>(R.id.recyclerImplicados)
-        textNombreSuceso = findViewById<EditText>(R.id.editTextNombreSuceso)
-        textDescripcionSuceso = findViewById<EditText>(R.id.editTextDescripcion)
-        textFechaSuceso = findViewById<EditText>(R.id.editTextFechaSuceso).apply {
-            addTextChangedListener(DateTextWatcher(this))
-        }
-        textLugarSuceso = findViewById<EditText>(R.id.editTextLugar)
+        recyclerPropietario = findViewById<RecyclerView>(R.id.recyclerPropietario)
+        recyclerUsuarios = findViewById<RecyclerView>(R.id.recyclerUsuarios)
+        textNombreCuenta = findViewById<EditText>(R.id.editTextNombreCuenta)
+        textLinkCuenta = findViewById<EditText>(R.id.editTextLink)
+        textRedSocialCuenta = findViewById<EditText>(R.id.editTextRedSocial)
 
         val card = ContactoCardItem.DEFAULT_FOR_SEARCH
-        causante.add(card)
-        implicados.add(card)
+        propietario.add(card)
+        usuarios.add(card)
         var adapter = SingleContactCardSearchAdapter(
-            causante,
+            propietario,
             this,
             onClick = { cardItem, dialog, adapter ->
-                causante.clear()
-                causante.add(cardItem)
+                propietario.clear()
+                propietario.add(cardItem)
                 adapter.notifyItemRangeChanged(0, 1)
                 dialog.dismiss()
             },
             onLongClick = { cardItem, context, adapter, holder ->
                 if (cardItem.idAnotable == -1) false
                 AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al causante?")
+                    .setTitle("¿Desea eliminar al propietario de la cuenta?")
                     .setPositiveButton("OK") { dialog, _ ->
                         recyclerAnimator.adapter = adapter
-                        recyclerAnimator.dataSource = causante
+                        recyclerAnimator.dataSource = propietario
                         recyclerAnimator.deleteItemWithAnimation(
                             holder.itemView,
                             0,
                             onEmptyCallback = {
-                                causante.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
+                                propietario.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
                             },
                             afterDeleteCallBack = {
                                 adapter.notifyItemRangeChanged(0, 1)
@@ -101,42 +97,42 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 true
             }
         )
-        recyclerCausante.layoutManager = LinearLayoutManager(this)
-        recyclerCausante.adapter = adapter
-        recyclerAnimator = RecyclerViewAnimator(recyclerCausante, causante, adapter)
-        recyclerImplicados.layoutManager = LinearLayoutManager(this)
+        recyclerPropietario.layoutManager = LinearLayoutManager(this)
+        recyclerPropietario.adapter = adapter
+        recyclerAnimator = RecyclerViewAnimator(recyclerPropietario, propietario, adapter)
+        recyclerUsuarios.layoutManager = LinearLayoutManager(this)
         var adapterMiembros = MultipleContactsCardSearchAdapter(
-            implicados,
+            usuarios,
             this,
             filter = {
                 val lista = mutableListOf<ContactoCardItem>()
                 lista.apply {
-                    addAll(causante.filter { it.idAnotable != -1 })
-                    addAll(implicados.filter { it.idAnotable != -1 })
+                    addAll(propietario.filter { it.idAnotable != -1 })
+                    addAll(usuarios.filter { it.idAnotable != -1 })
                 }
             },
             onClick = { cardItem, dialog, adapter ->
                 val buscarCard =
-                    implicados[implicados.size - 1]
-                implicados.removeAt(implicados.size - 1)
-                implicados.add(cardItem)
-                implicados.add(buscarCard)
+                    usuarios[usuarios.size - 1]
+                usuarios.removeAt(usuarios.size - 1)
+                usuarios.add(cardItem)
+                usuarios.add(buscarCard)
                 adapter.notifyDataSetChanged()
                 dialog.dismiss()
             },
             onLongClick = { cardItem, context, adapter, holder ->
                 if (cardItem.idAnotable == -1) false
                 AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al implicado ${cardItem.nombre} A.K.A ${cardItem.alias}?")
+                    .setTitle("¿Desea eliminar al usuario ${cardItem.nombre} A.K.A ${cardItem.alias}?")
                     .setPositiveButton("OK") { dialog, _ ->
-                        val index = implicados.indexOf(cardItem)
-                        recyclerAnimator.dataSource = implicados
+                        val index = usuarios.indexOf(cardItem)
+                        recyclerAnimator.dataSource = usuarios
                         recyclerAnimator.adapter = adapter
                         recyclerAnimator.deleteItemWithAnimation(
                             holder.itemView,
                             index,
                             onEmptyCallback = {
-                                implicados.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
+                                usuarios.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
                             },
                             afterDeleteCallBack = {
                                 adapter.notifyItemRangeChanged(index, 1)
@@ -151,53 +147,61 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 true
             }
         )
-        recyclerImplicados.adapter = adapterMiembros
+        recyclerUsuarios.adapter = adapterMiembros
         boton = findViewById<Button>(R.id.buttonSiguiente)
 
         boton.setOnClickListener { l: View? ->
             l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             var alert = AlertDialog.Builder(this).setTitle("Error al crear el suceso")
-            val nombreSuceso = textNombreSuceso.text.toString().trim()
-            if (nombreSuceso.isEmpty()) {
-                alert.setMessage("Por favor, ingresa un nombre para el suceso").show()
+            val nombreCuenta = textNombreCuenta.text.toString().trim()
+            val linkCuenta = textLinkCuenta.text.toString().trim()
+            val redSocial = textRedSocialCuenta.text.toString().trim()
+            nombreCuenta.ifEmpty{
+                alert.setMessage("Por favor, ingresa un nombre para la cuenta").show()
                 return@setOnClickListener
             }
-            if (causante.none { it.idAnotable != -1 }) {
-                alert.setMessage("Debes agregar un causante").show()
+            linkCuenta.ifEmpty{
+                alert.setMessage("Por favor, ingresa un link para la cuenta").show()
                 return@setOnClickListener
             }
-            val origenIsInSuceso = implicados
+            propietario.filter{ it.idAnotable != -1 }.ifEmpty {
+                alert.setMessage("Debes agregar un propietario").show()
+                return@setOnClickListener
+            }
+
+            redSocial.ifEmpty{
+                alert.setMessage("Por favor, ingresa una red social para la cuenta").show()
+                return@setOnClickListener
+            }
+
+            val origenIsInCuenta = usuarios
                 .filter { it.idAnotable == anotableOrigen }
                 .toMutableList()
                 .apply {
-                    addAll(causante.filter {
+                    addAll(propietario.filter {
                         it.idAnotable == anotableOrigen
                     })
                 }
-            origenIsInSuceso.ifEmpty {
-                alert.setMessage("El contacto actual debe ser parte del suceso (causante o implicado)").show()
+            origenIsInCuenta.ifEmpty {
+                alert.setMessage("El contacto actual debe figurar en la cuenta (propietario o usuario)").show()
                 return@setOnClickListener
             }
             val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
-            val fecha = textFechaSuceso.text.toString()
-            val descripcion = textDescripcionSuceso.text.toString()
-            val lugar = textLugarSuceso.text.toString()
-            val suceso = Suceso(
+            val cuenta = Cuenta(
                 idAnotable = 0,
-                nombre = nombreSuceso,
-                fecha = fecha,
-                lugar = lugar,
-                descripcion = descripcion,
+                nombre = nombreCuenta,
+                link = linkCuenta,
+                redSocial = redSocial,
                 colorFoto = color,
-                idCausante = causante.first().idAnotable
+                idPropietario = propietario.first().idAnotable
             )
             lifecycleScope.launch {
-                val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(suceso).toInt()
-                val relaciones = implicados
+                val cuentaId = db.cuentaDAO()!!.addCuentaWithAnotable(cuenta).toInt()
+                val relaciones = usuarios
                     .filter { it.idAnotable != -1 }
                     .map { miembro ->
-                        ContactoSucesoCrossRef(
-                            idSuceso = sucesoId,
+                        CuentaContactoCrossRef(
+                            idCuenta = cuentaId,
                             idContacto = miembro.idAnotable
                         )
                     }
@@ -208,7 +212,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
                     return@launch
                 }
 
-                db.sucesoDAO()!!.insertarRelaciones(relaciones)
+                db.cuentaDAO()!!.insertarRelaciones(relaciones)
                 finish()
             }
 

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.cogu.spylook.model.entity.Cuenta
+import com.cogu.spylook.view.accounts.fragments.CuentaDataFragment
 import com.cogu.spylook.view.accounts.fragments.UsuariosCuentaFragment
 import com.cogu.spylook.view.common.fragments.AnotacionesFragment
 

@@ -42,6 +42,9 @@ class UsuariosCuentaFragment(private val cuenta: Cuenta) : Fragment() {
                 contactoDao!!.findContactoById(it.idContacto)
             }
             val cardItems = buildCardItemList(usuarios)
+            cardItems.ifEmpty {
+                cardItems.add(ContactoCardItem.DEFAULT_FOR_NO_RESULTS)
+            }
             setupMemberRecyclerView(cardItems)
         }
     }
