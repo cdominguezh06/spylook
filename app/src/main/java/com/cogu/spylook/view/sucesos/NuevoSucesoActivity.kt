@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.common.sucesos
+package com.cogu.spylook.view.sucesos
 
 import android.app.AlertDialog
 import android.graphics.Color

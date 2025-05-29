@@ -25,7 +25,6 @@ import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import com.cogu.spylook.view.contacts.ContactoActivity
-import com.cogu.spylook.view.contacts.fragments.AmigosFragment
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -39,7 +38,7 @@ open class AmigoCardAdapter(
     private lateinit var mapper: ContactoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.contact_card, parent, false)
         return CardViewHolder(view)
     }
 

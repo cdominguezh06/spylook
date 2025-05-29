@@ -4,27 +4,26 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.Cuenta
+import com.cogu.spylook.view.accounts.fragments.UsuariosCuentaFragment
 import com.cogu.spylook.view.common.fragments.AnotacionesFragment
-import com.cogu.spylook.view.sucesos.fragments.ImplicadosFragment
-import com.cogu.spylook.view.sucesos.fragments.SucesoDataFragment
 
-class SucesoSliderAdapter(
+class CuentaSliderAdapter(
     fragment: FragmentActivity,
-    private val suceso: Suceso,
+    private val cuenta: Cuenta,
     private val context: Context?
 ) : FragmentStateAdapter(fragment) {
     lateinit var anotaciones : AnotacionesFragment
-    lateinit var implicados : ImplicadosFragment
+    lateinit var usuarios : UsuariosCuentaFragment
     init {
-        anotaciones = AnotacionesFragment(suceso, context!!)
-        implicados = ImplicadosFragment(suceso)
+        anotaciones = AnotacionesFragment(cuenta, context!!)
+        usuarios = UsuariosCuentaFragment(cuenta)
     }
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            1 -> implicados
+            1 -> usuarios
             2 -> anotaciones
-            else -> SucesoDataFragment(suceso, context!!)
+            else -> CuentaDataFragment(cuenta, context!!)
         }
     }
 

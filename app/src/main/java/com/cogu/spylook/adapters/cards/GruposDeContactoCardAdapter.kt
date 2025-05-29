@@ -38,7 +38,7 @@ open class GruposDeContactoCardAdapter(
     private lateinit var mapper: GrupoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.grupocard, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.grupo_card, parent, false)
         return CardViewHolder(view)
     }
 

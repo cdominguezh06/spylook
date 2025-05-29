@@ -19,10 +19,9 @@ import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.SucesoCardItem
 import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
-import com.cogu.spylook.view.common.sucesos.SucesoActivity
-import com.cogu.spylook.view.common.sucesos.NuevoSucesoActivity
+import com.cogu.spylook.view.sucesos.SucesoActivity
+import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 

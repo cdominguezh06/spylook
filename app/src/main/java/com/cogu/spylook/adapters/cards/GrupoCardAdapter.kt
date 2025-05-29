@@ -20,7 +20,6 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
@@ -30,7 +29,7 @@ open class GrupoCardAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<GrupoCardAdapter.CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.grupocard, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.grupo_card, parent, false)
         return CardViewHolder(view)
     }
 

@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.common.sucesos.fragments
+package com.cogu.spylook.view.accounts.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,12 +13,12 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.Cuenta
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
+class UsuariosCuentaFragment(private val cuenta: Cuenta) : Fragment() {
 
     private lateinit var recycler: RecyclerView
     private val mapper = Mappers.getMapper(ContactoToCardItem::class.java)
@@ -35,13 +35,13 @@ class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
 
     private fun initializeRecyclerView(fragment: View) {
         recycler = fragment.findViewById(R.id.recyclerGeneric)
-        val sucesoDao = AppDatabase.getInstance(requireContext())!!.sucesoDAO()
+        val cuentaDao = AppDatabase.getInstance(requireContext())!!.cuentaDAO()
         val contactoDao = AppDatabase.getInstance(requireContext())!!.contactoDAO()
         runBlocking {
-            val implicados = sucesoDao!!.getRelacionesBySuceso(suceso.idAnotable).map {
+            val usuarios = cuentaDao!!.findContactosByCuenta(cuenta.idAnotable).map {
                 contactoDao!!.findContactoById(it.idContacto)
             }
-            val cardItems = buildCardItemList(implicados)
+            val cardItems = buildCardItemList(usuarios)
             setupMemberRecyclerView(cardItems)
         }
     }

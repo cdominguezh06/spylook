@@ -30,7 +30,7 @@ open class ContactoCardAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.contact_card, parent, false)
         return CardViewHolder(view)
     }
 

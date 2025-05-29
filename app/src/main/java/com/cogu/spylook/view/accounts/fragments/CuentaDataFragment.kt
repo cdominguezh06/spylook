@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.common.sucesos.fragments
+package com.cogu.spylook.view.accounts.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -17,11 +17,11 @@ import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.Cuenta
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 
-class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fragment() {
+class CuentaDataFragment(private val cuenta: Cuenta, val contexto: Context) : Fragment() {
 
     private lateinit var descripcionTextView: TextView
     private lateinit var fechaTextView: TextView
@@ -45,7 +45,7 @@ class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fr
         contactoDAO = AppDatabase.getInstance(contexto)!!.contactoDAO()!!
         recyclerCausante = fragment.findViewById<RecyclerView>(R.id.recyclerCausante)
         val causante = mutableListOf<ContactoCardItem>(
-            mapper.toCardItem(contactoDAO.findContactoById(suceso.idCausante))
+            mapper.toCardItem(contactoDAO.findContactoById(cuenta.idCausante))
         )
         recyclerCausante.layoutManager = LinearLayoutManager(contexto)
         recyclerCausante.adapter = ContactoCardAdapter(causante, contexto)
@@ -53,11 +53,11 @@ class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fr
 
     private fun bindStaticFields(fragment: View) {
         descripcionTextView = fragment.findViewById<TextView>(R.id.descripcionText)
-        descripcionTextView.text = suceso.descripcion
+        descripcionTextView.text = cuenta.descripcion
         descripcionTextView.movementMethod = ScrollingMovementMethod()
         fechaTextView = fragment.findViewById<TextView>(R.id.sucesoFechaText)
-        fechaTextView.text = suceso.fecha
+        fechaTextView.text = cuenta.fecha
         lugarTextView = fragment.findViewById<TextView>(R.id.sucesoLugarText)
-        lugarTextView.text = suceso.lugar
+        lugarTextView.text = cuenta.lugar
     }
 }

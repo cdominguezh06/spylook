@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.common.sucesos
+package com.cogu.spylook.view.sucesos
 
 import android.graphics.PorterDuff
 import android.os.Bundle

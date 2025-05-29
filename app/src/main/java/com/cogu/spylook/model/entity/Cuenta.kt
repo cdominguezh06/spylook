@@ -11,20 +11,19 @@ import androidx.room.PrimaryKey
             entity = Anotable::class,
             parentColumns = ["idAnotable"],
             childColumns = ["idPropietario"], // Relación con Anotable
-            onDelete = ForeignKey.CASCADE // Si se elimina un Anotable, sus anotaciones también se eliminan
+            onDelete = ForeignKey.CASCADE // Si se elimina un Anotable, sus cuentas también se eliminan
         )
     ]
 )
-data class Cuenta(
-    @PrimaryKey(autoGenerate = true)
+class Cuenta(
+    idAnotable: Int,
+    nombre: String,
     @JvmField
-    val idCuenta: Int,
-    @JvmField
-    val link: String,
-    @JvmField
-    var nickname: String,
+    var link: String,
     @JvmField
     var redSocial: String,
     @JvmField
+    var colorFoto: Int,
+    @JvmField
     var idPropietario: Int
-)
+) : Anotable(idAnotable, nombre)

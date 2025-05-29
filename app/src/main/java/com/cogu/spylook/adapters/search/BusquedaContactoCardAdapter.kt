@@ -2,13 +2,10 @@ package com.cogu.spylook.adapters.search
 
 import android.content.Context
 import android.graphics.PorterDuff
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -20,7 +17,7 @@ abstract class BusquedaContactoCardAdapter (
 ) : RecyclerView.Adapter<BusquedaContactoCardAdapter.CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.personacard, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.contact_card, parent, false)
         return CardViewHolder(view)
     }
 
