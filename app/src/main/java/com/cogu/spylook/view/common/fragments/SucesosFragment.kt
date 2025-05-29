@@ -31,9 +31,9 @@ class SucesosFragment(private val anotable: Anotable, private val context: Conte
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_sucesos, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_empty_recycler, container, false)
 
-        setupRecyclerView(rootView.findViewById(R.id.recyclerSucesos))
+        setupRecyclerView(rootView.findViewById(R.id.recyclerGeneric))
 
         return rootView
     }

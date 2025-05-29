@@ -32,14 +32,14 @@ class ContactGroupsFragment(private val contacto: Contacto) : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         grupos = mutableListOf<GrupoCardItem>()
-        val fragment = inflater.inflate(R.layout.fragment_contact_groups, container, false)
+        val fragment = inflater.inflate(R.layout.fragment_empty_recycler, container, false)
         initializeRecyclerView(fragment)
 
         return fragment
     }
 
     private fun initializeRecyclerView(fragment: View) {
-        recyclerView = fragment.findViewById(R.id.recyclerGrupos)
+        recyclerView = fragment.findViewById(R.id.recyclerGeneric)
         val db = AppDatabase.getInstance(requireContext())!!.grupoDAO()
         lifecycleScope.launch {
             grupos = db!!.findGruposByMiembro(contacto.idAnotable).map {

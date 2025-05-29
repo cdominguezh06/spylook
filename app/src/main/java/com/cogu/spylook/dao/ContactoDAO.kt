@@ -67,6 +67,9 @@ interface ContactoDAO {
     @Insert
     suspend fun insertAmistad(crossRef: ContactoAmistadCrossRef)
 
+    @Delete
+    suspend fun deleteAmistad(crossRef: ContactoAmistadCrossRef)
+
     @Transaction
     @Query("SELECT * FROM contacto_amistad_cross_ref WHERE idContacto = :idContacto")
     suspend fun getAmistadesPorContacto(idContacto: Int): List<ContactoAmistadCrossRef>

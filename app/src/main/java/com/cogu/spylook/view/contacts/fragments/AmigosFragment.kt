@@ -70,7 +70,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = AmigoCardAdapter(amigos, requireContext(), contacto, amigos.toMutableList())
+        recyclerView.adapter = AmigoCardAdapter(amigos.toMutableList(), requireContext(), contacto)
         recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
 

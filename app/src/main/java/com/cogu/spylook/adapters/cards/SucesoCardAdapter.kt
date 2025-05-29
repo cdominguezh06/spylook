@@ -1,5 +1,6 @@
 package com.cogu.spylook.adapters.cards
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.view.Gravity
@@ -101,20 +102,28 @@ open class SucesoCardAdapter(
                 val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
                 buttonEliminar.setOnClickListener {view: View? ->
                     view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
-                    runBlocking {
-                        dao.deleteSucesoAnotable(cardItem.idAnotable)
-                        val index = cardItemList.indexOf(cardItem)
-                        recyclerAnimator.deleteItemWithAnimation(
-                            holder.itemView,
-                            index,
-                            onEmptyCallback = {
-                                cardItemList.add(SucesoCardItem.DEFAULT_FOR_ADD)
-                            },
-                            afterDeleteCallBack = {
-                                popupWindow.dismiss()
-                            })
-                    }
+                    AlertDialog.Builder(context)
+                        .setTitle("Eliminar suceso")
+                        .setMessage("Desea eliminar por completo el suceso \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
+                        .setPositiveButton("Continuar") { dialog, which ->
+                            val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
+                            runBlocking {
+                                dao.deleteSucesoAnotable(cardItem.idAnotable)
+                                val index = cardItemList.indexOf(cardItem)
+                                recyclerAnimator.deleteItemWithAnimation(
+                                    holder.itemView,
+                                    index,
+                                    onEmptyCallback = {
+                                        cardItemList.add(SucesoCardItem.DEFAULT_FOR_ADD)
+                                    },
+                                    afterDeleteCallBack = {
+                                        popupWindow.dismiss()
+                                    })
+                            }
+                        }.setNegativeButton("Cancelar") { dialog, which ->
+                            dialog.dismiss()
+                            popupWindow.dismiss()
+                        }.show()
                 }
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int

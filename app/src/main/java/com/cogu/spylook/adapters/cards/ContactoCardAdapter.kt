@@ -13,11 +13,13 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter.CardViewHolder
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.ContactoCardItem
+import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
@@ -77,21 +79,28 @@ open class ContactoCardAdapter(
                 popupApodo.text = cardItem.alias
                 popupBoton.setOnClickListener { v ->
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
-                    runBlocking {
-                        dao.deleteContactoWithAnotableById(cardItem.idAnotable)
-                        val index = cardItemList.indexOf(cardItem)
-                        recyclerAnimator.deleteItemWithAnimation(
-                            holder.itemView,
-                            index,
-                            onEmptyCallback = {
-                                cardItemList.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST)
-                            },
-                            afterDeleteCallBack = {
-                                popupWindow.dismiss()
-                            })
-                    }
-
+                    AlertDialog.Builder(context)
+                        .setTitle("Eliminar contacto")
+                        .setMessage("Desea eliminar por completo al contacto \"${cardItem.nombre}\" A.K.A \"${cardItem.alias}\"? \n\nEste proceso no se puede deshacer.")
+                        .setPositiveButton("Continuar") { dialog, which ->
+                            val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                            runBlocking {
+                                dao.deleteContactoWithAnotableById(cardItem.idAnotable)
+                                val index = cardItemList.indexOf(cardItem)
+                                recyclerAnimator.deleteItemWithAnimation(
+                                    holder.itemView,
+                                    index,
+                                    onEmptyCallback = {
+                                        cardItemList.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                                    },
+                                    afterDeleteCallBack = {
+                                        popupWindow.dismiss()
+                                    })
+                            }
+                        }.setNegativeButton("Cancelar") { dialog, which ->
+                            dialog.dismiss()
+                            popupWindow.dismiss()
+                        }.show()
                 }
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int

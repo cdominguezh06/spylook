@@ -18,11 +18,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.BusquedaGrupoCardAdapter
 import com.cogu.spylook.database.AppDatabase
+import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.mappers.GrupoToCardItem
+import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
+import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarGruposDeContacto
 import com.cogu.spylook.view.contacts.ContactoActivity
 import com.cogu.spylook.view.contacts.fragments.ContactGroupsFragment
@@ -30,16 +33,23 @@ import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
 open class GruposDeContactoCardAdapter(
-    internal val cardItemList: List<GrupoCardItem>,
+    internal val cardItemList: MutableList<GrupoCardItem>,
     private val context: Context,
     private val contacto: Contacto
 ) : RecyclerView.Adapter<GruposDeContactoCardAdapter.CardViewHolder?>() {
     private lateinit var onClickFunction: (GrupoCardItem) -> Unit
     private lateinit var mapper: GrupoToCardItem
+    private lateinit var recyclerAnimator: RecyclerViewAnimator
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.grupo_card, parent, false)
         return CardViewHolder(view)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerAnimator = RecyclerViewAnimator(recyclerView, cardItemList, this)
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
@@ -50,7 +60,7 @@ open class GruposDeContactoCardAdapter(
         if (cardItem.idAnotable != -1) {
             runBlocking {
                 val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!
-                    .getRelacionesByGrupo(cardItem.idAnotable).size+1
+                    .getRelacionesByGrupo(cardItem.idAnotable).size + 1
                 holder.numeroMiembros.text = "${miembros} miembros"
             }
             holder.careto.setImageResource(R.drawable.group_icon)
@@ -65,7 +75,7 @@ open class GruposDeContactoCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 val inflater = LayoutInflater.from(context)
                 val popupView = inflater.inflate(
-                    R.layout.long_press_contact,
+                    R.layout.long_press_list,
                     null
                 )
 
@@ -75,19 +85,88 @@ open class GruposDeContactoCardAdapter(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     true
                 )
+                val titulo = popupView.findViewById<TextView>(R.id.textTitle)
+                titulo.text = "Miembros"
+                val miembrosRecycler = popupView.findViewById<RecyclerView>(R.id.recyclerLongPress)
+                runBlocking {
+                    val grupoDao = AppDatabase.getInstance(context)!!.grupoDAO()!!
+                    val contactoDao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                    val mapper =
+                        Mappers.getMapper<ContactoToMiniCard>(ContactoToMiniCard::class.java)
+                    val miembros =
+                        mutableListOf<ContactoMiniCard>()
+                            .apply {
+                                val grupo = grupoDao.findGrupoById(cardItem.idAnotable)!!
+                                add(mapper.toMiniCard(contactoDao.findContactoById(grupo.idCreador)))
+                            }.apply {
+                                addAll(
+                                    grupoDao
+                                        .getRelacionesByGrupo(cardItem.idAnotable)
+                                        .map { mapper.toMiniCard(contactoDao.findContactoById(it.idContacto)) }
+                                )
+                            }
+                    miembrosRecycler.layoutManager = LinearLayoutManager(context)
+                    miembrosRecycler.adapter =
+                        ContactoMiniCardAdapter(miembros, context, onClick = {
+                            popupWindow.dismiss()
+                        })
+                    val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
+                    buttonEliminar.setOnClickListener { view: View? ->
+                        view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                        val dao = AppDatabase.getInstance(context)!!.grupoDAO()!!
+                        runBlocking {
+                            val grupo = dao.findGrupoById(cardItem.idAnotable)!!
+                            if (contacto.idAnotable == grupo.idCreador) {
+                                AlertDialog.Builder(context)
+                                    .setTitle("Si continúas borrarás completamente el grupo")
+                                    .setMessage(
+                                        "El contacto \"${contacto.alias}\" es el creador de este grupo, eliminar " +
+                                                "el grupo de la lista implica borrarlo permanentemente"
+                                    )
+                                    .setPositiveButton("Continuar") { dialog, which ->
+                                        runBlocking {
+                                            dao.deleteGrupoAnotable(cardItem.idAnotable)
+                                            val index = cardItemList.indexOf(cardItem)
+                                            recyclerAnimator.deleteItemWithAnimation(
+                                                holder.itemView,
+                                                index,
+                                                onEmptyCallback = {
+                                                    cardItemList.add(GrupoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                                                },
+                                                afterDeleteCallBack = {
+                                                    popupWindow.dismiss()
+                                                })
+                                        }
+                                    }.setNegativeButton("Cancelar") { dialog, which ->
+                                        dialog.dismiss()
+                                        popupWindow.dismiss()
+                                    }.show()
+                            } else {
+                                val crossRef = ContactoGrupoCrossRef(
+                                    idContacto = contacto.idAnotable,
+                                    idGrupo = cardItem.idAnotable
+                                )
+                                dao.deleteMiembroDeGrupo(crossRef)
+                                val index = cardItemList.indexOf(cardItem)
+                                recyclerAnimator.deleteItemWithAnimation(
+                                    holder.itemView,
+                                    index,
+                                    onEmptyCallback = {
+                                        cardItemList.add(GrupoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                                    },
+                                    afterDeleteCallBack = {
+                                        popupWindow.dismiss()
+                                    })
+                            }
+                        }
+                    }
+                    val x = view!!.getTag(R.id.touch_event_x) as Int
+                    val y = view.getTag(R.id.touch_event_y) as Int
 
-                val popupNombre = popupView.findViewById<TextView>(R.id.textViewPopUp1)
-                val popupCantidad = popupView.findViewById<TextView>(R.id.textViewPopUp2)
-                popupNombre.text = cardItem.nombre
-                popupCantidad.text = cardItemList.size.toString() + " contactos"
+                    popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x, y - 100)
 
-                val x = view!!.getTag(R.id.touch_event_x) as Int
-                val y = view.getTag(R.id.touch_event_y) as Int
-
-                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, x-200, y-100)
-
-                true
-
+                    true
+                }
             })
         } else {
             holder.careto.setImageResource(R.drawable.notfound)
@@ -121,14 +200,16 @@ open class GruposDeContactoCardAdapter(
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
                 fun onClick(cardItem: GrupoCardItem) {
-                    val agregar = ContactGroupsFragment.grupos[ContactGroupsFragment.grupos.size - 1]
+                    val agregar =
+                        ContactGroupsFragment.grupos[ContactGroupsFragment.grupos.size - 1]
                     ContactGroupsFragment.grupos.removeAt(ContactGroupsFragment.grupos.size - 1)
                     ContactGroupsFragment.grupos.add(cardItem)
                     ContactGroupsFragment.grupos.add(agregar)
                     val amistad = ContactoAmistadCrossRef(contacto.idAnotable, cardItem.idAnotable)
                     runBlocking {
                         AppDatabase.getInstance(context)!!.grupoDAO()!!.insertarRelaciones(
-                            listOf(ContactoGrupoCrossRef(contacto.idAnotable, cardItem.idAnotable)))
+                            listOf(ContactoGrupoCrossRef(contacto.idAnotable, cardItem.idAnotable))
+                        )
                         notifyDataSetChanged()
                         dialog.dismiss()
                     }
@@ -174,7 +255,7 @@ open class GruposDeContactoCardAdapter(
 
     class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name: TextView = itemView.findViewById(R.id.name)
-        var numeroMiembros : TextView = itemView.findViewById(R.id.numberOfMembers)
+        var numeroMiembros: TextView = itemView.findViewById(R.id.numberOfMembers)
         var careto: ImageView = itemView.findViewById(R.id.imagen)
     }
 

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.PopupWindow
@@ -23,25 +24,29 @@ import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
+import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
 open class AmigoCardAdapter(
-    internal val cardItemList: List<ContactoCardItem>,
+    internal val cardItemList: MutableList<ContactoCardItem>,
     private val context: Context,
     private val contacto: Contacto,
-    val amigos : MutableList<ContactoCardItem>
 ) : RecyclerView.Adapter<AmigoCardAdapter.CardViewHolder?>() {
     private lateinit var onClickFunction: (ContactoCardItem) -> Unit
     private lateinit var mapper: ContactoToCardItem
+    private lateinit var recyclerAnimator: RecyclerViewAnimator
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.contact_card, parent, false)
         return CardViewHolder(view)
     }
-
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerAnimator = RecyclerViewAnimator(recyclerView, cardItemList, this)
+    }
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         val cardItem = cardItemList[position]
@@ -75,9 +80,28 @@ open class AmigoCardAdapter(
 
                 val popupNombre = popupView.findViewById<TextView>(R.id.textViewPopUp1)
                 val popupApodo = popupView.findViewById<TextView>(R.id.textViewPopUp2)
+                val popupBoton = popupView.findViewById<Button>(R.id.buttonEliminar)
                 popupNombre.text = cardItem.nombre
                 popupApodo.text = cardItem.alias
+                popupBoton.setOnClickListener { v ->
+                    v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
+                    runBlocking {
+                        val amistad = ContactoAmistadCrossRef(idContacto = contacto.idAnotable, idAmigo = cardItem.idAnotable)
+                        dao.deleteAmistad(amistad)
+                        val index = cardItemList.indexOf(cardItem)
+                        recyclerAnimator.deleteItemWithAnimation(
+                            holder.itemView,
+                            index,
+                            onEmptyCallback = {
+                                cardItemList.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                            },
+                            afterDeleteCallBack = {
+                                popupWindow.dismiss()
+                            })
+                    }
 
+                }
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int
 
@@ -121,10 +145,10 @@ open class AmigoCardAdapter(
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
                 fun onClick(cardItem: ContactoCardItem) {
-                    val agregar = amigos[amigos.size - 1]
-                    amigos.removeAt(amigos.size - 1)
-                    amigos.add(cardItem)
-                    amigos.add(agregar)
+                    val agregar = cardItemList[cardItemList.size - 1]
+                    cardItemList.removeAt(cardItemList.size - 1)
+                    cardItemList.add(cardItem)
+                    cardItemList.add(agregar)
                     val amistad = ContactoAmistadCrossRef(contacto.idAnotable, cardItem.idAnotable)
                     runBlocking {
                         AppDatabase.getInstance(context)!!.contactoDAO()!!.insertAmistad(amistad)
@@ -136,7 +160,7 @@ open class AmigoCardAdapter(
                 val busquedaContactoCardAdapter =
                     object : BusquedaContactoCardAdapter(lista, context) {
                         override fun onClick(cardItem: ContactoCardItem) {
-                            onClick(cardItem)
+                            onClickFunction(cardItem)
                         }
                     }
                 recycler.adapter = busquedaContactoCardAdapter

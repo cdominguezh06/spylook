@@ -13,11 +13,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
+import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.CuentaCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
@@ -34,11 +36,13 @@ open class GrupoCardAdapter(
         val view = LayoutInflater.from(parent.context).inflate(R.layout.grupo_card, parent, false)
         return CardViewHolder(view)
     }
+
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         recyclerAnimator = RecyclerViewAnimator(recyclerView, cardItemList, this)
     }
+
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
@@ -98,22 +102,30 @@ open class GrupoCardAdapter(
                             popupWindow.dismiss()
                         })
                     val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
-                    buttonEliminar.setOnClickListener {view: View? ->
+                    buttonEliminar.setOnClickListener { view: View? ->
                         view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                        val dao = AppDatabase.getInstance(context)!!.grupoDAO()!!
-                        runBlocking {
-                            dao.deleteGrupoAnotable(cardItem.idAnotable)
-                            val index = cardItemList.indexOf(cardItem)
-                            recyclerAnimator.deleteItemWithAnimation(
-                                holder.itemView,
-                                index,
-                                onEmptyCallback = {
-                                    cardItemList.add(GrupoCardItem.DEFAULT_FOR_EMPTY_LIST)
-                                },
-                                afterDeleteCallBack = {
-                                    popupWindow.dismiss()
-                                })
-                        }
+                        AlertDialog.Builder(context)
+                            .setTitle("Eliminar grupo")
+                            .setMessage("Desea eliminar por completo al grupo \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
+                            .setPositiveButton("Continuar") { dialog, which ->
+                                val dao = AppDatabase.getInstance(context)!!.grupoDAO()!!
+                                runBlocking {
+                                    dao.deleteGrupoAnotable(cardItem.idAnotable)
+                                    val index = cardItemList.indexOf(cardItem)
+                                    recyclerAnimator.deleteItemWithAnimation(
+                                        holder.itemView,
+                                        index,
+                                        onEmptyCallback = {
+                                            cardItemList.add(GrupoCardItem.DEFAULT_FOR_EMPTY_LIST)
+                                        },
+                                        afterDeleteCallBack = {
+                                            popupWindow.dismiss()
+                                        })
+                                }
+                            }.setNegativeButton("Cancelar") { dialog, which ->
+                                dialog.dismiss()
+                                popupWindow.dismiss()
+                            }.show()
                     }
                     val x = view!!.getTag(R.id.touch_event_x) as Int
                     val y = view.getTag(R.id.touch_event_y) as Int

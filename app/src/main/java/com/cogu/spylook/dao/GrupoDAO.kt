@@ -1,6 +1,7 @@
 package com.cogu.spylook.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -72,6 +73,9 @@ interface GrupoDAO {
 
     @Query("DELETE FROM contacto_grupo_cross_ref WHERE idGrupo = :idGrupo")
     suspend fun eliminarRelacionesPorGrupo(idGrupo: Int)
+
+    @Delete
+    suspend fun deleteMiembroDeGrupo(crossRef: ContactoGrupoCrossRef)
 
     @Query("SELECT * FROM contacto_grupo_cross_ref WHERE idContacto = :idMiembro")
     suspend fun findGruposByMiembro(idMiembro : Int) : List<ContactoGrupoCrossRef>
