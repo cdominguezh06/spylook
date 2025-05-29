@@ -1,4 +1,4 @@
-package com.cogu.spylook.view.sucesos
+package com.cogu.spylook.view.common.sucesos
 
 import android.app.AlertDialog
 import android.graphics.Color
@@ -38,6 +38,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
     private lateinit var boton: Button
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator: RecyclerViewAnimator
+    private var anotableOrigen: Int = -1
     var causante = mutableListOf<ContactoCardItem>()
     var implicados = mutableListOf<ContactoCardItem>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +54,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
             insets
         }
         db = AppDatabase.getInstance(this)!!
+        anotableOrigen = intent.getIntExtra("id", -1)
         recyclerCausante = findViewById<RecyclerView>(R.id.recyclerCausante)
         recyclerImplicados = findViewById<RecyclerView>(R.id.recyclerImplicados)
         textNombreSuceso = findViewById<EditText>(R.id.editTextNombreSuceso)
@@ -164,6 +166,18 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 alert.setMessage("Debes agregar un causante").show()
                 return@setOnClickListener
             }
+            val origenIsInSuceso = implicados
+                .filter { it.idAnotable == anotableOrigen }
+                .toMutableList()
+                .apply {
+                    addAll(causante.filter {
+                        it.idAnotable == anotableOrigen
+                    })
+                }
+            origenIsInSuceso.ifEmpty {
+                alert.setMessage("El contacto actual debe ser parte del suceso (causante o implicado)").show()
+                return@setOnClickListener
+            }
             val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
             val fecha = textFechaSuceso.text.toString()
             val descripcion = textDescripcionSuceso.text.toString()
@@ -175,7 +189,8 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 lugar = lugar,
                 descripcion = descripcion,
                 colorFoto = color,
-                idCausante = causante.first().idAnotable)
+                idCausante = causante.first().idAnotable
+            )
             lifecycleScope.launch {
                 val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(suceso).toInt()
                 val relaciones = implicados
@@ -186,10 +201,13 @@ class NuevoSucesoActivity : AppCompatActivity() {
                             idContacto = miembro.idAnotable
                         )
                     }
+
+
                 relaciones.ifEmpty {
                     finish()
                     return@launch
                 }
+
                 db.sucesoDAO()!!.insertarRelaciones(relaciones)
                 finish()
             }

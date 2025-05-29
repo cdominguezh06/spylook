@@ -1,6 +1,7 @@
 package com.cogu.spylook.adapters.cards
 
 import android.content.Context
+import android.text.method.ScrollingMovementMethod
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
@@ -58,6 +59,7 @@ class AnotacionCardAdapter(
         fecha.text = cardItemList[position].fecha
         val descripcion = mostrarAnotacion.findViewById<TextView>(R.id.textViewDescription)
         descripcion.text = cardItemList[position].descripcion
+        descripcion.movementMethod = ScrollingMovementMethod()
         val dialog = AlertDialog.Builder(context, R.style.CustomDialog)
             .setView(mostrarAnotacion)
             .create()

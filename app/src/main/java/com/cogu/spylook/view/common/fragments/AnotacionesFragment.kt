@@ -1,5 +1,6 @@
-package com.cogu.spylook.view.sucesos.fragments
+package com.cogu.spylook.view.common.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,16 +13,15 @@ import com.cogu.spylook.adapters.cards.AnotacionCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
+import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.Anotacion
-import com.cogu.spylook.model.entity.Grupo
-import com.cogu.spylook.model.entity.Suceso
-import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.converters.DateConverters
+import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.time.LocalDateTime
 
-class SucesoAnotacionesFragment(private val suceso: Suceso) : Fragment() {
+class AnotacionesFragment(private val anotable: Anotable, val contexto : Context) : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
@@ -30,7 +30,7 @@ class SucesoAnotacionesFragment(private val suceso: Suceso) : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fragment = inflater.inflate(R.layout.fragment_group_notes, container, false)
+        val fragment = inflater.inflate(R.layout.fragment_anotaciones, container, false)
         initializeRecyclerView(fragment)
 
         return fragment
@@ -38,9 +38,9 @@ class SucesoAnotacionesFragment(private val suceso: Suceso) : Fragment() {
 
     private fun initializeRecyclerView(fragment: View) {
         recyclerView = fragment.findViewById(R.id.recyclerNotas)
-        val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
+        val db = AppDatabase.Companion.getInstance(requireContext())!!.anotacionDAO()
         runBlocking {
-            val anotaciones = db!!.getAnotacionesDeAnotable(suceso.idAnotable)
+            val anotaciones = db!!.getAnotacionesDeAnotable(anotable.idAnotable)
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)
         }
@@ -54,7 +54,7 @@ class SucesoAnotacionesFragment(private val suceso: Suceso) : Fragment() {
                 titulo = "Nueva Anotacion",
                 descripcion = "",
                 fecha = DateConverters.toDateTimeString(LocalDateTime.now())!!,
-                idAnotable = suceso.idAnotable
+                idAnotable = anotable.idAnotable
             )
         )
         cardItems.sortBy { it.id }
@@ -62,11 +62,11 @@ class SucesoAnotacionesFragment(private val suceso: Suceso) : Fragment() {
     }
 
     private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
-        val adapter = AnotacionCardAdapter(cardItems, requireContext(), suceso.idAnotable)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val adapter = AnotacionCardAdapter(cardItems, contexto, anotable.idAnotable)
+        recyclerView.layoutManager = LinearLayoutManager(contexto)
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {
-            recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
+            recyclerView.addItemDecoration(SpacingItemDecoration(contexto))
         }
     }
 }

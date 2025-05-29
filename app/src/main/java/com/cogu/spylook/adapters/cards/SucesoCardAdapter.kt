@@ -18,15 +18,18 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.SucesoCardItem
+import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
-import com.cogu.spylook.view.contacts.ContactoActivity
-import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
+import com.cogu.spylook.view.common.sucesos.SucesoActivity
+import com.cogu.spylook.view.common.sucesos.NuevoSucesoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
 open class SucesoCardAdapter(
     internal val cardItemList: MutableList<SucesoCardItem>,
     private val context: Context,
+    private val anotableOrigen: Anotable
 ) : RecyclerView.Adapter<SucesoCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private lateinit var implicados: MutableList<ContactoMiniCard>
@@ -107,6 +110,7 @@ open class SucesoCardAdapter(
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, NuevoSucesoActivity::class.java)
+                intent.putExtra("id", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
             return
@@ -114,7 +118,7 @@ open class SucesoCardAdapter(
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                val intent = Intent(context, ContactoActivity::class.java)
+                val intent = Intent(context, SucesoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
                 context.startActivity(intent)
             })

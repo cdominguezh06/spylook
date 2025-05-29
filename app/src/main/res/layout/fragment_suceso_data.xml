@@ -3,204 +3,149 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:fillViewport="true">
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#000000">
+        android:background="#000000"
+        android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
-            android:layout_width="330dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="40dp"
-            android:outlineAmbientShadowColor="#00FFFFFF"
-            android:outlineSpotShadowColor="#00FFFFFF"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardViewDatos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:outlineAmbientShadowColor="#00FFFFFF"
-                android:outlineSpotShadowColor="#00FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rainbow_box"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:id="@+id/descripcionTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Descripcion"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/descripcionText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Descripcion"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/sucesoFechaTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Fecha"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/sucesoFechaText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Fecha"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/sucesoLugarTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Lugar"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/sucesoLugarText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Lugar"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout2"
-            android:layout_width="330dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="40dp"
-            android:outlineAmbientShadowColor="#00FFFFFF"
-            android:outlineSpotShadowColor="#00FFFFFF"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:outlineAmbientShadowColor="#00FFFFFF"
-                android:outlineSpotShadowColor="#00FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rainbow_box"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:id="@+id/causanteTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/adlam_display"
-                        android:gravity="center"
-                        android:paddingBottom="8dp"
-                        android:text="Causado por"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerCausante"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false" />
-
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerImplicados"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:background="#00FFFFFF"
-            android:nestedScrollingEnabled="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            android:layout_margin="16dp"
+            android:background="@drawable/rainbow_box"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-        <TextView
-            android:id="@+id/textView2"
+            <TextView
+                android:id="@+id/descripcionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:text="Descripcion"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/descripcionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
+                android:text="Descripcion"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/adlam_display"
-            android:gravity="center"
-            android:text="Implicados adicionales"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+            android:layout_margin="16dp"
+            android:background="@drawable/rainbow_box"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/sucesoFechaTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:text="Fecha"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/sucesoFechaText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:text="Fecha"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rainbow_box"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/sucesoLugarTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:text="Lugar"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/sucesoLugarText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
+                android:text="Lugar"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rainbow_box"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/sucesoCausanteTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/adlam_display"
+                android:gravity="center"
+                android:paddingBottom="8dp"
+                android:text="Causado por"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerCausante"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp" />
+
+        </LinearLayout>
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>

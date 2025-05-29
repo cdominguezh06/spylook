@@ -47,23 +47,23 @@ class SucesosFragment(private val anotable: Anotable, private val context: Conte
     private suspend fun fetchSucesos() {
         val db = AppDatabase.getInstance(requireContext())
         val sucesoDao = db?.sucesoDAO()!!
-        sucesos = sucesoDao.findSucesosByCausante(anotable.idAnotable).toMutableList()
-            .apply {
-                addAll(
-                    sucesoDao.findSucesosByImplicado(anotable.idAnotable).map {
-                        sucesoDao.findSucesoById(it.idSuceso)!!
-                    }
-                )
-            }.map {
-                mapper.toCardItem(it)
-            }
-            .toMutableList()
+        sucesos = mutableListOf()
         sucesos.add(SucesoCardItem.DEFAULT_FOR_ADD)
+        val temp = sucesoDao.findSucesosByCausante(anotable.idAnotable)
+            .map { mapper.toCardItem(it) }
+            .toMutableList()
+            .apply {
+                addAll(sucesoDao.findSucesosByImplicado(anotable.idAnotable)
+                    .map { sucesoDao.findSucesoById(it.idSuceso)!! }
+                    .map { mapper.toCardItem(it) }) }
+            .sortedByDescending { it.idAnotable }
+        sucesos.apply { addAll(temp) }
+            .toMutableList()
     }
 
     private fun initializeRecyclerView(recyclerView: RecyclerView) {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SucesoCardAdapter(sucesos, context)
+        recyclerView.adapter = SucesoCardAdapter(sucesos, context, anotable)
         recyclerView.addItemDecoration(SpacingItemDecoration(context))
     }
 }

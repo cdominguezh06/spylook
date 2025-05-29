@@ -4,19 +4,24 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.entity.Suceso
 import com.cogu.spylook.view.common.fragments.AnotacionesFragment
-import com.cogu.spylook.view.groups.fragments.MiembrosFragment
+import com.cogu.spylook.view.common.sucesos.fragments.SucesoDataFragment
 
-class GroupSliderAdapter(
+class SucesoSliderAdapter(
     fragment: FragmentActivity,
-    private val grupo: Grupo,
+    private val suceso: Suceso,
     private val context: Context?
 ) : FragmentStateAdapter(fragment) {
+    lateinit var anotaciones : AnotacionesFragment
+
+    init {
+        anotaciones = AnotacionesFragment(suceso, context!!)
+    }
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            1 -> AnotacionesFragment(grupo, context!!)
-            else -> MiembrosFragment(grupo)
+            1 -> anotaciones
+            else -> SucesoDataFragment(suceso, context!!)
         }
     }
 
