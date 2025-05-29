@@ -1,33 +1,31 @@
 package com.cogu.spylook.model.utils
 
+import android.app.Activity
 import android.app.DownloadManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import java.io.File
 
 object ApplicationUpdater {
-    private const val APK_MIME_TYPE = "application/vnd.android.package-archive"
     private const val UNKNOWN_APPS_PERMISSION_MSG =
         "Habilita el permiso para instalar aplicaciones desconocidas."
-    private const val DOWNLOAD_COMPLETE_LOG = "Descarga completada. ID: "
 
     private var downloadId: Long = -1
 
-    fun downloadAndInstallAPK(context: Context, url: String, fileName: String, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+    fun downloadAndInstallAPK(
+        context: Context,
+        url: String,
+        fileName: String,
+        unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     ) {
         if (!context.packageManager.canRequestPackageInstalls()) {
-            handleUnknownAppSourcesPermission(context, unknownAppsPermissionLauncher)
+            handleUnknownAppSourcesPermission(context, url, fileName, unknownAppsPermissionLauncher)
             return
         }
 
@@ -49,7 +47,12 @@ object ApplicationUpdater {
         Log.d("GithubController", "Solicitud de descarga realizada. ID de descarga: $downloadId")
     }
 
-    private fun handleUnknownAppSourcesPermission(context: Context, unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>) {
+    private fun handleUnknownAppSourcesPermission(
+        context: Context,
+        url: String,
+        fileName: String,
+        unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+    ) {
         val intent = Intent(
             Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
             ("package:" + context.packageName).toUri()
@@ -57,19 +60,5 @@ object ApplicationUpdater {
         Toast.makeText(context, UNKNOWN_APPS_PERMISSION_MSG, Toast.LENGTH_LONG).show()
         unknownAppsPermissionLauncher.launch(intent)
 
-    }
-
-    private fun installAPK(context: Context, uri: Uri) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, APK_MIME_TYPE)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        try {
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("GithubController", "Error al iniciar la instalación del APK", e)
-            Toast.makeText(context, "No se pudo iniciar la instalación", Toast.LENGTH_SHORT).show()
-        }
     }
 }
