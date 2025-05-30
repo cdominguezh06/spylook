@@ -109,7 +109,8 @@ class NuevoGrupoActivity : AppCompatActivity() {
             onLongClick = {cardItem, context, adapter, holder ->
                 if (cardItem.idAnotable == -1) false
                 AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al miembro ${cardItem.nombre} A.K.A ${cardItem.alias}?")
+                    .setTitle("Retirar miembro")
+                    .setMessage("¿Desea eliminar al miembro ${cardItem.nombre} A.K.A ${cardItem.alias}?")
                     .setPositiveButton("OK") { dialog, _ ->
                         val index = miembros.indexOf(cardItem)
                         recyclerAnimator.dataSource = miembros

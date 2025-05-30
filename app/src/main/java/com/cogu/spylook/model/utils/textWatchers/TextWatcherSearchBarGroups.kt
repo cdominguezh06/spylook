@@ -21,7 +21,9 @@ import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
+import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
 import com.cogu.spylook.view.contacts.ContactoActivity
+import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
@@ -56,6 +58,8 @@ class TextWatcherSearchBarGroups(
         }
         busqueda.ifEmpty {
             recyclerView!!.setAdapter(GrupoCardAdapter(collect, context!!))
+            retriever.contador = 0
+            LongTextScrollerAction.lastScroll = 0.0f
             return@onTextChanged
         }
         collect = collect.filter { c ->
@@ -98,6 +102,8 @@ class TextWatcherSearchBarGroups(
                                 retriever.getSpanIntervalJump(busqueda, cardItem.nombre, startIndex),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
+                            holder.name.post(LongTextScrollerAction(holder.name, startIndex, busqueda))
+
                         }
                         spannable.toString()
                     }
@@ -109,7 +115,7 @@ class TextWatcherSearchBarGroups(
                 }
                 if (cardItem.clickable) {
                     holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
-                        val intent = Intent(context, ContactoActivity::class.java)
+                        val intent = Intent(context, GrupoActivity::class.java)
                         intent.putExtra("id", cardItem.idAnotable)
                         context!!.startActivity(intent)
                     })

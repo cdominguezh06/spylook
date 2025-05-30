@@ -69,4 +69,5 @@ class AnotacionesFragment(private val anotable: Anotable, val contexto : Context
             recyclerView.addItemDecoration(SpacingItemDecoration(contexto))
         }
     }
+
 }

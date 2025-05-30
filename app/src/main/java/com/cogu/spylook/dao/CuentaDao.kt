@@ -1,6 +1,7 @@
 package com.cogu.spylook.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -59,6 +60,9 @@ interface CuentaDao {
 
     @Insert
     suspend fun insertarRelaciones(relaciones: List<CuentaContactoCrossRef>)
+
+    @Delete
+    suspend fun deleteMiembroDeCuenta(crossRef: CuentaContactoCrossRef)
 
     @Query("DELETE FROM cuenta_contacto_cross_ref WHERE idCuenta = :idAnotable")
     suspend fun eliminarRelacionesPorCuenta(idAnotable: Int)

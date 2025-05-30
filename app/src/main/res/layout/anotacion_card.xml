@@ -21,6 +21,13 @@
             android:layout_marginTop="10dp"
             android:fontFamily="@font/bruno_ace"
             android:text="DD-MM-YYY"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:rotation="0"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -31,7 +38,14 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="3dp"
             android:fontFamily="@font/bruno_ace"
-            android:text="Titulo (22chars max)"
+            android:text="Titulo"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:rotation="0"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
             android:textColor="#FFFFFF"
             android:textSize="24sp" />
     </LinearLayout>

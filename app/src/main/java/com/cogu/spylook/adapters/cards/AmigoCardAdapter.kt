@@ -51,7 +51,9 @@ open class AmigoCardAdapter(
         mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         holder.mostknownalias.text = cardItem.alias
+        holder.mostknownalias.isSelected = true
         if (cardItem.idAnotable != -1) {
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
@@ -82,13 +84,22 @@ open class AmigoCardAdapter(
                 val popupApodo = popupView.findViewById<TextView>(R.id.textViewPopUp2)
                 val popupBoton = popupView.findViewById<Button>(R.id.buttonEliminar)
                 popupNombre.text = cardItem.nombre
+                popupNombre.isSelected = true
                 popupApodo.text = cardItem.alias
+                popupApodo.isSelected = true
                 popupBoton.setOnClickListener { v ->
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                     val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
                     runBlocking {
-                        val amistad = ContactoAmistadCrossRef(idContacto = contacto.idAnotable, idAmigo = cardItem.idAnotable)
-                        dao.deleteAmistad(amistad)
+                        val amistad = dao.getContactosPorAmigo(contacto.idAnotable).find {
+                            it.idContacto == cardItem.idAnotable
+                        }
+                        val amistadReversa = dao.getAmistadesPorContacto(contacto.idAnotable).find {
+                            it.idAmigo == cardItem.idAnotable
+                        }
+                        if (amistad != null) dao.deleteAmistad(amistad)
+                        if (amistadReversa != null) dao.deleteAmistad(amistadReversa)
+
                         val index = cardItemList.indexOf(cardItem)
                         recyclerAnimator.deleteItemWithAnimation(
                             holder.itemView,
@@ -158,7 +169,7 @@ open class AmigoCardAdapter(
                 }
                 onClickFunction = ::onClick
                 val busquedaContactoCardAdapter =
-                    object : BusquedaContactoCardAdapter(lista, context) {
+                    object : BusquedaContactoCardAdapter(lista) {
                         override fun onClick(cardItem: ContactoCardItem) {
                             onClickFunction(cardItem)
                         }

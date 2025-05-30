@@ -18,12 +18,13 @@ import androidx.lifecycle.lifecycleScope
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class NuevoContactoActivity : AppCompatActivity() {
+class NuevoContactoActivity() : AppCompatActivity() {
 
     private lateinit var nameEditText: EditText
     private lateinit var nickEditText: EditText
@@ -33,7 +34,7 @@ class NuevoContactoActivity : AppCompatActivity() {
     private lateinit var countryEditText: EditText
     private lateinit var nextButton: Button
     private lateinit var database: AppDatabase
-
+    var toEdit: Contacto? = null
     companion object {
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     }
@@ -65,6 +66,19 @@ class NuevoContactoActivity : AppCompatActivity() {
         stateEditText = findViewById(R.id.editTextEstado)
         countryEditText = findViewById(R.id.editTextPais)
         nextButton = findViewById(R.id.buttonSiguiente)
+        lifecycleScope.launch {
+            if(intent.getIntExtra("idEdit", -1)!=-1){
+                toEdit = AppDatabase.getInstance(this@NuevoContactoActivity)!!.contactoDAO()!!.findContactoById(intent.getIntExtra("idEdit", -1))
+            }
+            toEdit?.let {
+                nameEditText.setText(toEdit?.nombre)
+                nickEditText.setText(toEdit?.alias)
+                birthdayEditText.setText(DateConverters.toCustomString(toEdit?.fechaNacimiento!!,DATE_FORMATTER))
+                cityEditText.setText(toEdit?.ciudad)
+                stateEditText.setText(toEdit?.estado)
+                countryEditText.setText(toEdit?.pais)
+            }
+        }
 
         val mainView: View = findViewById(R.id.main)
         ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
@@ -75,9 +89,30 @@ class NuevoContactoActivity : AppCompatActivity() {
     }
 
     private fun setupNextButtonClickListener() {
-        nextButton.setOnClickListener {l: View? ->
+        nextButton.setOnClickListener { l: View? ->
             l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             val contact = createContactFromInput()
+            toEdit?.let {
+                database = AppDatabase.getInstance(this@NuevoContactoActivity)!!
+                AlertDialog.Builder(this@NuevoContactoActivity)
+                    .setTitle("Sobreescribir contacto")
+                    .setMessage("¿Desea sobreescribir el contacto actual?")
+                    .setPositiveButton("Confirmar") { dialog, _ ->
+                        val contacto = createContactFromInput()
+                        contacto.colorFoto = it.colorFoto
+                        lifecycleScope.launch {
+                            contacto.idAnotable = toEdit!!.idAnotable
+                            database.contactoDAO()!!.updateContactoWithAnotable(contacto)
+                            dialog.dismiss()
+                            finish()
+                        }
+                    }
+                    .setNegativeButton("Cancelar") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                return@setOnClickListener
+            }
             lifecycleScope.launch {
                 database = AppDatabase.getInstance(this@NuevoContactoActivity)!!
                 database.contactoDAO()!!.findContactoByName(contact.nombre)?.let {

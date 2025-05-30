@@ -45,7 +45,9 @@ open class ContactoCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         holder.mostknownalias.text = cardItem.alias
+        holder.mostknownalias.isSelected = true
         if (cardItem.idAnotable != -1) {
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
@@ -76,7 +78,9 @@ open class ContactoCardAdapter(
                 val popupApodo = popupView.findViewById<TextView>(R.id.textViewPopUp2)
                 val popupBoton = popupView.findViewById<Button>(R.id.buttonEliminar)
                 popupNombre.text = cardItem.nombre
+                popupNombre.isSelected = true
                 popupApodo.text = cardItem.alias
+                popupApodo.isSelected = true
                 popupBoton.setOnClickListener { v ->
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                     AlertDialog.Builder(context)

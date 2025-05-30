@@ -32,7 +32,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/bruno_ace"
-                android:text="Titulo (22chars max)"
+                android:text="Titulo"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scrollHorizontally="true"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp" />
 
@@ -56,6 +62,12 @@
                 android:layout_marginBottom="4dp"
                 android:fontFamily="@font/bruno_ace"
                 android:text="XX implicados"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scrollHorizontally="true"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
         </LinearLayout>

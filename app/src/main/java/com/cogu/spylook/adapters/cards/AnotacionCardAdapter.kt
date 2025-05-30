@@ -34,7 +34,9 @@ class AnotacionCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.titulo.text = cardItem.titulo
+        holder.titulo.isSelected = true
         holder.fecha.text = cardItem.fecha
+        holder.fecha.isSelected = true
         holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
             l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             if (position == 0) {
@@ -55,6 +57,7 @@ class AnotacionCardAdapter(
                 .inflate(R.layout.mostrar_anotacion, null)
         val titulo = mostrarAnotacion.findViewById<TextView>(R.id.textViewTitulo)
         titulo.text = cardItemList[position].titulo
+        titulo.isSelected = true
         val fecha = mostrarAnotacion.findViewById<TextView>(R.id.textViewFecha)
         fecha.text = cardItemList[position].fecha
         val descripcion = mostrarAnotacion.findViewById<TextView>(R.id.textViewDescription)

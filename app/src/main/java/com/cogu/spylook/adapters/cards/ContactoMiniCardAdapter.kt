@@ -30,6 +30,7 @@ open class ContactoMiniCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.alias.text = cardItem.alias
+        holder.alias.isSelected = true
         if (cardItem.idAnotable != -1) {
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)

@@ -41,6 +41,15 @@ interface SucesoDAO {
     }
 
     @Transaction
+    suspend fun updateSucesoAnotable(suceso: Suceso) {
+        updateAnotable(suceso)
+        update(suceso)
+    }
+
+    @Update
+    suspend fun updateAnotable(anotable: Anotable)
+
+    @Transaction
     suspend fun deleteSucesoAnotable(idAnotable: Int) {
         delete(idAnotable)
         deleteAnotable(idAnotable)

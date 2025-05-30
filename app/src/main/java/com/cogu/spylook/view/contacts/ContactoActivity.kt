@@ -1,10 +1,12 @@
 package com.cogu.spylook.view.contacts
 
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Slide
 import android.view.Window
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,13 +19,9 @@ import com.cogu.spylook.adapters.slider.ContactSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.view.common.fragments.SucesosFragment
-import com.cogu.spylook.view.contacts.fragments.AmigosFragment
-import com.cogu.spylook.view.contacts.fragments.ContactGroupsFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ContactoActivity : AppCompatActivity() {
 
@@ -31,7 +29,7 @@ class ContactoActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var title: TextView
     private lateinit var contactoDAO: ContactoDAO
-
+    private lateinit var linearLayoutImagenEditar : LinearLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -62,9 +60,16 @@ class ContactoActivity : AppCompatActivity() {
 
     private fun setupUI() {
         title = findViewById(R.id.contactoTitle)
+        title.isSelected = true
         viewPager = findViewById(R.id.pager)
         tabLayout = findViewById(R.id.tabLayout)
-
+        linearLayoutImagenEditar = findViewById<LinearLayout>(R.id.linearLayoutEditar)
+        linearLayoutImagenEditar.setOnClickListener {
+            val intent = Intent(this@ContactoActivity, NuevoContactoActivity::class.java)
+            val activity = this@ContactoActivity
+            intent.putExtra("idEdit", activity.intent.getIntExtra("id", -1))
+            startActivity(intent)
+        }
         lifecycleScope.launch {
             val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
             setupContactDetails(contact)
@@ -97,7 +102,13 @@ class ContactoActivity : AppCompatActivity() {
         super.onResume()
         lifecycleScope.launch {
             val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
+            title.text = contact.nombre
+            val currentPosition = viewPager.currentItem
             setupViewPager(contact)
+            viewPager.post {
+                viewPager.setCurrentItem(currentPosition, false)
+            }
+
         }
 
     }

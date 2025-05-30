@@ -29,6 +29,7 @@ import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarGruposDeContacto
 import com.cogu.spylook.view.contacts.ContactoActivity
 import com.cogu.spylook.view.contacts.fragments.ContactGroupsFragment
+import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -56,12 +57,14 @@ open class GruposDeContactoCardAdapter(
         mapper = Mappers.getMapper(GrupoToCardItem::class.java)
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
-        holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         if (cardItem.idAnotable != -1) {
             runBlocking {
                 val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!
                     .getRelacionesByGrupo(cardItem.idAnotable).size + 1
                 holder.numeroMiembros.text = "${miembros} miembros"
+                holder.numeroMiembros.isSelected = true
+                holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
             }
             holder.careto.setImageResource(R.drawable.group_icon)
             holder.itemView.setOnTouchListener { v, event ->
@@ -242,7 +245,7 @@ open class GruposDeContactoCardAdapter(
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                val intent = Intent(context, ContactoActivity::class.java)
+                val intent = Intent(context, GrupoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
                 context.startActivity(intent)
             })

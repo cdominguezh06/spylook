@@ -48,6 +48,7 @@ open class SucesoCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.titulo.text = cardItem.nombre
+        holder.titulo.isSelected = true
         holder.fecha.text = cardItem.fecha.toString()
         holder.imagen.setImageResource(R.drawable.suceso_icon)
         if (cardItem.idAnotable != -1) {
@@ -147,6 +148,7 @@ open class SucesoCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, SucesoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
+                intent.putExtra("idOrigen", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
         }

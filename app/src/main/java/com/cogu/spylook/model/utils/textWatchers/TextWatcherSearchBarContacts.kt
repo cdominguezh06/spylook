@@ -8,9 +8,12 @@ import android.graphics.Shader
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import android.widget.Scroller
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -23,6 +26,7 @@ import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
+import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
 import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
@@ -49,6 +53,7 @@ class TextWatcherSearchBarContacts(
         val busqueda = text.getText().toString().lowercase(
             Locale.getDefault()
         ).replace(" ", "")
+
         runBlocking {
             collect = db.contactoDAO()!!
                 .getContactos()
@@ -58,6 +63,7 @@ class TextWatcherSearchBarContacts(
         busqueda.ifEmpty {
             recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
             retriever.contador = 0
+            LongTextScrollerAction.lastScroll = 0.0f
             return@onTextChanged
         }
         collect = collect.filter { c ->
@@ -76,7 +82,6 @@ class TextWatcherSearchBarContacts(
                     cardItem.alias = cardItem.alias.let {
                         val spannable = SpannableString(it)
                         var startIndex = retriever.getStartIndex(busqueda, cardItem.alias)
-
                         if (startIndex >= 0) {
                             val shader = LinearGradient(
                                 0f, 0f, holder.mostknownalias.textSize * 2, 0f,
@@ -96,9 +101,12 @@ class TextWatcherSearchBarContacts(
                                 retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
+
+                            holder.mostknownalias.post(LongTextScrollerAction(holder.mostknownalias, startIndex, busqueda))
                         }
                         spannable.toString()
                     }
+
                 }
                 if (cardItem.idAnotable != -1) {
                     holder.careto.setImageResource(R.drawable.contact_icon)

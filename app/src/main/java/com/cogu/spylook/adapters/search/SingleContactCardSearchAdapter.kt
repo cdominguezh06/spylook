@@ -38,7 +38,9 @@ class SingleContactCardSearchAdapter(
         mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         holder.mostknownalias.text = cardItem.alias
+        holder.mostknownalias.isSelected = true
         if (cardItem.idAnotable != -1) {
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
@@ -62,7 +64,7 @@ class SingleContactCardSearchAdapter(
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
                 val busquedaContactoCardAdapter =
-                    object : BusquedaContactoCardAdapter(lista, context) {
+                    object : BusquedaContactoCardAdapter(lista) {
                         override fun onClick(cardItem: ContactoCardItem) {
                             onClick(cardItem,dialog,this@SingleContactCardSearchAdapter)
                         }

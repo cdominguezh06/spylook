@@ -13,7 +13,6 @@ import com.cogu.spylook.model.cards.ContactoCardItem
 
 abstract class BusquedaContactoCardAdapter (
     var cardItemList: List<ContactoCardItem>,
-    private val context: Context,
 ) : RecyclerView.Adapter<BusquedaContactoCardAdapter.CardViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
@@ -26,7 +25,9 @@ abstract class BusquedaContactoCardAdapter (
 
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         holder.mostknownalias.text = cardItem.alias
+        holder.mostknownalias.isSelected = true
         if(cardItem.idAnotable !=-1){
             holder.careto.setImageResource(R.drawable.contact_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)

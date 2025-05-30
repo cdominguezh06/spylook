@@ -21,6 +21,7 @@ import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.CuentaCardItem
 import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.accounts.CuentaActivity
 import com.cogu.spylook.view.accounts.NuevaCuentaActivity
@@ -49,9 +50,11 @@ class CuentaCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.nombre.text = cardItem.nombre
+        holder.nombre.isSelected = true
         holder.link.text = cardItem.link
         holder.link.isSelected = true
         holder.redSocial.text = cardItem.redSocial
+        holder.redSocial.isSelected = true
         holder.imagen.setImageResource(R.drawable.account_icon)
         if (cardItem.idAnotable != -1) {
             holder.imagen.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
@@ -104,28 +107,58 @@ class CuentaCardAdapter(
                 val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
                 buttonEliminar.setOnClickListener {view: View? ->
                     view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    AlertDialog.Builder(context)
-                        .setTitle("Eliminar cuenta")
-                        .setMessage("Desea eliminar por completo la cuenta \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
-                        .setPositiveButton("Continuar") { dialog, which ->
-                            val dao = AppDatabase.getInstance(context)!!.cuentaDAO()!!
-                            runBlocking {
-                                dao.deleteCuentaAnotable(cardItem.idAnotable)
-                                val index = cardItemList.indexOf(cardItem)
-                                recyclerAnimator.deleteItemWithAnimation(
-                                    holder.itemView,
-                                    index,
-                                    onEmptyCallback = {
-                                        cardItemList.add(CuentaCardItem.DEFAULT_FOR_ADD)
-                                    },
-                                    afterDeleteCallBack = {
-                                        popupWindow.dismiss()
-                                    })
-                            }
-                        }.setNegativeButton("Cancelar") { dialog, which ->
-                            dialog.dismiss()
-                            popupWindow.dismiss()
-                        }.show()
+                    runBlocking {
+                        val cuenta = AppDatabase.getInstance(context)!!
+                            .cuentaDAO()!!.findCuentaById(cardItem.idAnotable)!!
+                        if (cuenta.idPropietario == anotableOrigen.idAnotable){
+                            AlertDialog.Builder(context)
+                                .setTitle("Eliminar cuenta")
+                                .setMessage("Desea eliminar por completo la cuenta \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
+                                .setPositiveButton("Continuar") { dialog, which ->
+                                    val dao = AppDatabase.getInstance(context)!!.cuentaDAO()!!
+                                    runBlocking {
+                                        dao.deleteCuentaAnotable(cardItem.idAnotable)
+                                        val index = cardItemList.indexOf(cardItem)
+                                        recyclerAnimator.deleteItemWithAnimation(
+                                            holder.itemView,
+                                            index,
+                                            onEmptyCallback = {
+                                                cardItemList.add(CuentaCardItem.DEFAULT_FOR_ADD)
+                                            },
+                                            afterDeleteCallBack = {
+                                                popupWindow.dismiss()
+                                            })
+                                    }
+                                }.setNegativeButton("Cancelar") { dialog, which ->
+                                    dialog.dismiss()
+                                    popupWindow.dismiss()
+                                }.show()
+                        }else{
+                            AlertDialog.Builder(context)
+                                .setTitle("Eliminar relacion")
+                                .setMessage("Desea quitar al usuario \"${anotableOrigen.nombre}\" de la cuenta \"${cardItem.nombre}\"?")
+                                .setPositiveButton("Continuar") { dialog, which ->
+                                    val dao = AppDatabase.getInstance(context)!!.cuentaDAO()!!
+                                    runBlocking {
+                                        val ref = CuentaContactoCrossRef(idCuenta = cardItem.idAnotable, idContacto = anotableOrigen.idAnotable)
+                                        dao.deleteMiembroDeCuenta(ref)
+                                        val index = cardItemList.indexOf(cardItem)
+                                        recyclerAnimator.deleteItemWithAnimation(
+                                            holder.itemView,
+                                            index,
+                                            onEmptyCallback = {
+                                                cardItemList.add(CuentaCardItem.DEFAULT_FOR_ADD)
+                                            },
+                                            afterDeleteCallBack = {
+                                                popupWindow.dismiss()
+                                            })
+                                    }
+                                }.setNegativeButton("Cancelar") { dialog, which ->
+                                    dialog.dismiss()
+                                    popupWindow.dismiss()
+                                }.show()
+                        }
+                    }
                 }
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int

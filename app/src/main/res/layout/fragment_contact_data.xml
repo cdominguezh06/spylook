@@ -31,6 +31,7 @@
                 android:layout_height="100dp"
                 android:outlineAmbientShadowColor="#00FFFFFF"
                 android:outlineSpotShadowColor="#00FFFFFF"
+                android:padding="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -38,7 +39,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/rainbow_box"
-                    android:orientation="vertical">
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
                     <TextView
                         android:id="@+id/nickTitle"
@@ -50,7 +53,7 @@
                         android:text="Conocido como"
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/nickContent"
@@ -78,7 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/rainbow_box"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
                     <TextView
                         android:id="@+id/edadTitle"
@@ -86,6 +90,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/adlam_display"
                         android:gravity="center"
+                        android:padding="8dp"
                         android:paddingBottom="8dp"
                         android:text="Edad"
                         android:textAppearance="?attr/textAppearanceHeadline6"

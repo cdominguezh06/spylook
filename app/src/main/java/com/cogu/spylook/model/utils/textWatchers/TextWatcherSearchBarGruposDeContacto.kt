@@ -28,6 +28,7 @@ import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.entity.Grupo
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
+import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
@@ -72,6 +73,8 @@ class TextWatcherSearchBarGruposDeContacto(
         }
         busqueda.ifEmpty {
             recyclerView!!.setAdapter(GrupoCardAdapter(collect, context!!))
+            retriever.contador = 0
+            LongTextScrollerAction.lastScroll = 0.0f
             return@onTextChanged
         }
         collect = collect.filter { c ->
@@ -109,6 +112,8 @@ class TextWatcherSearchBarGruposDeContacto(
                                 retriever.getSpanIntervalJump(busqueda, cardItem.nombre, startIndex),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
+                            holder.name.post(LongTextScrollerAction(holder.name, startIndex, busqueda))
+
                         }
                         spannable.toString()
                     }

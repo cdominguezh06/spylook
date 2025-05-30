@@ -51,9 +51,11 @@ class Contacto(
     companion object {
         private fun calcularEdad(fechaNacimiento: LocalDate?): Int {
             return if (fechaNacimiento != null) {
-                if (LocalDate.now().isAfter(
-                        fechaNacimiento.withYear(LocalDate.now().year)
-                            .withDayOfMonth(fechaNacimiento.dayOfMonth-1)
+                if (LocalDate.now()
+                    .isAfter(
+                        fechaNacimiento
+                            .withYear(LocalDate.now().year)
+                            .minusDays(1)
                     )
                 ) {
                     LocalDate.now().year - fechaNacimiento.year

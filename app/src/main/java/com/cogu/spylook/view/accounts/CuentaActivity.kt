@@ -14,11 +14,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.CuentaSliderAdapter
-import com.cogu.spylook.adapters.slider.SucesoSliderAdapter
 import com.cogu.spylook.dao.CuentaDao
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.entity.Cuenta
-import com.cogu.spylook.model.entity.Suceso
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -40,6 +38,7 @@ class CuentaActivity : AppCompatActivity() {
         }
         cuentaDAO = AppDatabase.Companion.getInstance(this)!!.cuentaDAO()!!
         title = findViewById(R.id.sucesoTitle)
+        title.isSelected = true
         viewPager = findViewById(R.id.pager)
         tabLayout = findViewById(R.id.tabLayout)
 
@@ -73,5 +72,19 @@ class CuentaActivity : AppCompatActivity() {
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
         window.enterTransition = Slide()
         window.exitTransition = Slide()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            val cuenta = cuentaDAO.findCuentaById(intent.getIntExtra("id", 0))
+            title.text = cuenta!!.nombre
+            val currentPosition = viewPager.currentItem
+            setupViewPager(cuenta)
+            viewPager.post {
+                viewPager.setCurrentItem(currentPosition, false)
+            }
+
+        }
     }
 }

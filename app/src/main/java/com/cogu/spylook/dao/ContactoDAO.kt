@@ -15,6 +15,9 @@ interface ContactoDAO {
     @Insert
     suspend fun addAnotable(anotable: Anotable): Long
 
+    @Update
+    suspend fun updateAnotable(anotable: Anotable)
+
     @Insert
     suspend fun addContacto(contacto: Contacto)
 
@@ -28,6 +31,18 @@ interface ContactoDAO {
         )
         contacto.idAnotable = idAnotable.toInt()
         addContacto(contacto)
+    }
+
+
+    @Transaction
+    suspend fun updateContactoWithAnotable(contacto: Contacto) {
+        updateAnotable(
+            Anotable(
+                idAnotable = contacto.idAnotable,
+                nombre = contacto.nombre
+            )
+        )
+        updateContacto(contacto)
     }
 
     @Update

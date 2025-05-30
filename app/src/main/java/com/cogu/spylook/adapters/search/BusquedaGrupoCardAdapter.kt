@@ -30,6 +30,7 @@ abstract class BusquedaGrupoCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         if (cardItem.idAnotable != -1) {
             runBlocking {
                 val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!

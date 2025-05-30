@@ -21,6 +21,10 @@ object DateConverters {
         return date.format(dateFormatter)
     }
 
+    fun toCustomString(date: LocalDate, dateFormatter: DateTimeFormatter): String {
+        return date.format(dateFormatter)
+    }
+
     @JvmStatic
     @TypeConverter
     fun fromDateTimeString(value: String): LocalDateTime {

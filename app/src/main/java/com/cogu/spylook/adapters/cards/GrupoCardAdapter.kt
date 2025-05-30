@@ -46,11 +46,13 @@ open class GrupoCardAdapter(
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
+        holder.name.isSelected = true
         if (cardItem.idAnotable != -1) {
             runBlocking {
                 val miembros = AppDatabase.getInstance(context)!!.grupoDAO()!!
                     .getRelacionesByGrupo(cardItem.idAnotable).size + 1
                 holder.numeroMiembros.text = "${miembros} miembros"
+                holder.numeroMiembros.isSelected = true
             }
             holder.careto.setImageResource(R.drawable.group_icon)
             holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)

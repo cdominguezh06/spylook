@@ -20,12 +20,14 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.SingleContactCardSearchAdapter
 import com.cogu.spylook.adapters.search.MultipleContactsCardSearchAdapter
 import com.cogu.spylook.database.AppDatabase
+import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.entity.Suceso
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import kotlinx.coroutines.launch
+import org.mapstruct.factory.Mappers
 
 class NuevoSucesoActivity : AppCompatActivity() {
 
@@ -39,8 +41,10 @@ class NuevoSucesoActivity : AppCompatActivity() {
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
+    var toEdit: Suceso? = null
     var causante = mutableListOf<ContactoCardItem>()
     var implicados = mutableListOf<ContactoCardItem>()
+    var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
@@ -63,95 +67,115 @@ class NuevoSucesoActivity : AppCompatActivity() {
             addTextChangedListener(DateTextWatcher(this))
         }
         textLugarSuceso = findViewById<EditText>(R.id.editTextLugar)
-
-        val card = ContactoCardItem.DEFAULT_FOR_SEARCH
-        causante.add(card)
-        implicados.add(card)
-        var adapter = SingleContactCardSearchAdapter(
-            causante,
-            this,
-            onClick = { cardItem, dialog, adapter ->
-                causante.clear()
-                causante.add(cardItem)
-                adapter.notifyItemRangeChanged(0, 1)
-                dialog.dismiss()
-            },
-            onLongClick = { cardItem, context, adapter, holder ->
-                if (cardItem.idAnotable == -1) false
-                AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al causante?")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        recyclerAnimator.adapter = adapter
-                        recyclerAnimator.dataSource = causante
-                        recyclerAnimator.deleteItemWithAnimation(
-                            holder.itemView,
-                            0,
-                            onEmptyCallback = {
-                                causante.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
-                            },
-                            afterDeleteCallBack = {
-                                adapter.notifyItemRangeChanged(0, 1)
-                                dialog.dismiss()
-                            })
-                    }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-                true
+        lifecycleScope.launch {
+            if(intent.getIntExtra("idEdit", -1)!=-1){
+                toEdit = AppDatabase.getInstance(this@NuevoSucesoActivity)!!.sucesoDAO()!!.findSucesoById(intent.getIntExtra("idEdit", -1))
             }
-        )
-        recyclerCausante.layoutManager = LinearLayoutManager(this)
-        recyclerCausante.adapter = adapter
-        recyclerAnimator = RecyclerViewAnimator(recyclerCausante, causante, adapter)
-        recyclerImplicados.layoutManager = LinearLayoutManager(this)
-        var adapterMiembros = MultipleContactsCardSearchAdapter(
-            implicados,
-            this,
-            filter = {
-                val lista = mutableListOf<ContactoCardItem>()
-                lista.apply {
-                    addAll(causante.filter { it.idAnotable != -1 })
-                    addAll(implicados.filter { it.idAnotable != -1 })
+            toEdit?.let {
+                textNombreSuceso.setText(toEdit?.nombre)
+                textDescripcionSuceso.setText(toEdit?.descripcion)
+                textFechaSuceso.setText(toEdit?.fecha!!)
+                textLugarSuceso.setText(toEdit?.lugar)
+                val contactoDao = AppDatabase.getInstance(this@NuevoSucesoActivity)!!
+                    .contactoDAO()!!
+                val causanteEdit = mapper.toCardItem(contactoDao.findContactoById(toEdit?.idCausante!!))
+                val implicadosEdit = AppDatabase.getInstance(this@NuevoSucesoActivity)!!
+                    .sucesoDAO()!!.getRelacionesBySuceso(toEdit?.idAnotable!!).map {
+                        mapper.toCardItem(contactoDao.findContactoById(it.idContacto))
+                    }
+                causante.add(causanteEdit)
+                implicados.addAll(implicadosEdit)
+            }
+            val card = ContactoCardItem.DEFAULT_FOR_SEARCH
+            causante.ifEmpty {causante.add(card)}
+            implicados.ifEmpty {implicados.add(card)}
+            var adapter = SingleContactCardSearchAdapter(
+                causante,
+                this@NuevoSucesoActivity,
+                onClick = { cardItem, dialog, adapter ->
+                    causante.clear()
+                    causante.add(cardItem)
+                    adapter.notifyItemRangeChanged(0, 1)
+                    dialog.dismiss()
+                },
+                onLongClick = { cardItem, context, adapter, holder ->
+                    if (cardItem.idAnotable == -1) false
+                    AlertDialog.Builder(context)
+                        .setTitle("¿Desea eliminar al causante?")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            recyclerAnimator.adapter = adapter
+                            recyclerAnimator.dataSource = causante
+                            recyclerAnimator.deleteItemWithAnimation(
+                                holder.itemView,
+                                0,
+                                onEmptyCallback = {
+                                    causante.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
+                                },
+                                afterDeleteCallBack = {
+                                    adapter.notifyItemRangeChanged(0, 1)
+                                    dialog.dismiss()
+                                })
+                        }
+                        .setNegativeButton("Cancelar") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                    true
                 }
-            },
-            onClick = { cardItem, dialog, adapter ->
-                val buscarCard =
-                    implicados[implicados.size - 1]
-                implicados.removeAt(implicados.size - 1)
-                implicados.add(cardItem)
-                implicados.add(buscarCard)
-                adapter.notifyDataSetChanged()
-                dialog.dismiss()
-            },
-            onLongClick = { cardItem, context, adapter, holder ->
-                if (cardItem.idAnotable == -1) false
-                AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al implicado ${cardItem.nombre} A.K.A ${cardItem.alias}?")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        val index = implicados.indexOf(cardItem)
-                        recyclerAnimator.dataSource = implicados
-                        recyclerAnimator.adapter = adapter
-                        recyclerAnimator.deleteItemWithAnimation(
-                            holder.itemView,
-                            index,
-                            onEmptyCallback = {
-                                implicados.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
-                            },
-                            afterDeleteCallBack = {
-                                adapter.notifyItemRangeChanged(index, 1)
-                                dialog.dismiss()
-                            })
+            )
+            recyclerCausante.layoutManager = LinearLayoutManager(this@NuevoSucesoActivity)
+            recyclerCausante.adapter = adapter
+            recyclerAnimator = RecyclerViewAnimator(recyclerCausante, causante, adapter)
+            recyclerImplicados.layoutManager = LinearLayoutManager(this@NuevoSucesoActivity)
+            var adapterMiembros = MultipleContactsCardSearchAdapter(
+                implicados,
+                this@NuevoSucesoActivity,
+                filter = {
+                    val lista = mutableListOf<ContactoCardItem>()
+                    lista.apply {
+                        addAll(causante.filter { it.idAnotable != -1 })
+                        addAll(implicados.filter { it.idAnotable != -1 })
+                    }
+                },
+                onClick = { cardItem, dialog, adapter ->
+                    val buscarCard =
+                        implicados[implicados.size - 1]
+                    implicados.removeAt(implicados.size - 1)
+                    implicados.add(cardItem)
+                    implicados.add(buscarCard)
+                    adapter.notifyDataSetChanged()
+                    dialog.dismiss()
+                },
+                onLongClick = { cardItem, context, adapter, holder ->
+                    if (cardItem.idAnotable == -1) false
+                    AlertDialog.Builder(context)
+                        .setTitle("¿Desea eliminar al implicado ${cardItem.nombre} A.K.A ${cardItem.alias}?")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            val index = implicados.indexOf(cardItem)
+                            recyclerAnimator.dataSource = implicados
+                            recyclerAnimator.adapter = adapter
+                            recyclerAnimator.deleteItemWithAnimation(
+                                holder.itemView,
+                                index,
+                                onEmptyCallback = {
+                                    implicados.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
+                                },
+                                afterDeleteCallBack = {
+                                    adapter.notifyItemRangeChanged(index, 1)
+                                    dialog.dismiss()
+                                })
 
-                    }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-                true
-            }
-        )
-        recyclerImplicados.adapter = adapterMiembros
+                        }
+                        .setNegativeButton("Cancelar") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                    true
+                }
+            )
+            recyclerImplicados.adapter = adapterMiembros
+        }
+
         boton = findViewById<Button>(R.id.buttonSiguiente)
 
         boton.setOnClickListener { l: View? ->
@@ -191,27 +215,49 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 colorFoto = color,
                 idCausante = causante.first().idAnotable
             )
+            toEdit?.let {
+                AlertDialog.Builder(this@NuevoSucesoActivity)
+                    .setTitle("Sobreescribir suceso")
+                    .setMessage("¿Desea sobreescribir el suceso actual?")
+                    .setPositiveButton("Confirmar") { dialog, _ ->
+                        suceso.idAnotable = toEdit?.idAnotable!!
+                        lifecycleScope.launch {
+                            suceso.colorFoto = toEdit?.colorFoto!!
+                            db.sucesoDAO()!!.updateSucesoAnotable(suceso)
+                            db.sucesoDAO()!!.eliminarRelacionesPorSuceso(suceso.idAnotable)
+                            insertarRelaciones(suceso.idAnotable)
+                            dialog.dismiss()
+                            finish()
+                        }
+                    }
+                    .setNegativeButton("Cancelar") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                return@setOnClickListener
+            }
             lifecycleScope.launch {
                 val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(suceso).toInt()
-                val relaciones = implicados
-                    .filter { it.idAnotable != -1 }
-                    .map { miembro ->
-                        ContactoSucesoCrossRef(
-                            idSuceso = sucesoId,
-                            idContacto = miembro.idAnotable
-                        )
-                    }
-
-
-                relaciones.ifEmpty {
-                    finish()
-                    return@launch
-                }
-
-                db.sucesoDAO()!!.insertarRelaciones(relaciones)
+                insertarRelaciones(sucesoId)
                 finish()
             }
 
         }
+    }
+
+    suspend fun insertarRelaciones(sucesoId: Int){
+        val relaciones = implicados
+            .filter { it.idAnotable != -1 }
+            .map { miembro ->
+                ContactoSucesoCrossRef(
+                    idSuceso = sucesoId,
+                    idContacto = miembro.idAnotable
+                )
+            }
+        relaciones.ifEmpty {
+            finish()
+            return
+        }
+        db.sucesoDAO()!!.insertarRelaciones(relaciones)
     }
 }

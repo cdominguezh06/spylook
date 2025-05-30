@@ -26,7 +26,6 @@ class GrupoActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var title: TextView
     private lateinit var grupoDAO: GrupoDAO
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -57,6 +56,7 @@ class GrupoActivity : AppCompatActivity() {
 
     private fun setupUI() {
         title = findViewById(R.id.contactoTitle)
+        title.isSelected = true
         viewPager = findViewById(R.id.pager)
         tabLayout = findViewById(R.id.tabLayout)
 
@@ -71,6 +71,7 @@ class GrupoActivity : AppCompatActivity() {
         title.text = grupo.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.group_icon)
+        image.setColorFilter(grupo.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
     }
 
     private fun setupViewPager(grupo: Grupo) {

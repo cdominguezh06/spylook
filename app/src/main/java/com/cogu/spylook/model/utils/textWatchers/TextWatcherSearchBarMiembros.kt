@@ -20,6 +20,8 @@ import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
+import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
+import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.util.Locale
@@ -37,6 +39,9 @@ class TextWatcherSearchBarMiembros(
         Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private val db: AppDatabase
     private lateinit var baseAdapter : BusquedaContactoCardAdapter
+    private lateinit var collect: MutableList<ContactoCardItem>
+    private val retriever = StringWithSpacesIndexRetriever()
+
     init {
         this.db = AppDatabase.getInstance(context!!)!!
         baseAdapter = recyclerView?.adapter as BusquedaContactoCardAdapter
@@ -46,9 +51,11 @@ class TextWatcherSearchBarMiembros(
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        var collect = mutableListOf<ContactoCardItem>()
         var contactos = listOf<Contacto>()
         val filter = onExclude.invoke()
+        val busqueda = text.getText().toString().lowercase(
+            Locale.getDefault()
+        ).replace(" ", "")
         runBlocking {
             contactos =
                 db.contactoDAO()!!.getContactos();
@@ -60,17 +67,17 @@ class TextWatcherSearchBarMiembros(
             collect.ifEmpty { collect.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST) }
         }
 
-        val busqueda = text.getText().toString().lowercase(
-            Locale.getDefault()
-        ).ifEmpty {
+       busqueda.ifEmpty {
             baseAdapter.cardItemList = collect
             baseAdapter.notifyItemRangeChanged(0, collect.size)
             recyclerView?.adapter = baseAdapter
+            retriever.contador = 0
+            LongTextScrollerAction.lastScroll = 0.0f
             return@onTextChanged
         }
 
         collect = collect.filter {
-            it.alias.lowercase(Locale.getDefault()).contains(busqueda)
+            it.alias.replace(" ","").lowercase(Locale.getDefault()).contains(busqueda)
         }
             .filter { it.idAnotable > 0 }
             .toMutableList()
@@ -82,14 +89,14 @@ class TextWatcherSearchBarMiembros(
             recyclerView?.adapter = baseAdapter
             return@onTextChanged
         }
-        val newAdapter = object : BusquedaContactoCardAdapter(collect, context!!) {
+        val newAdapter = object : BusquedaContactoCardAdapter(collect) {
             override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
                 val cardItem = cardItemList[position]
                 holder.name.text = cardItem.nombre
                 holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
                     cardItem.alias = cardItem.alias.let {
                         val spannable = SpannableString(it)
-                        val startIndex = it.lowercase(Locale.getDefault()).indexOf(busqueda)
+                        val startIndex = retriever.getStartIndex(busqueda, cardItem.alias)
                         if (startIndex >= 0) {
                             val shader = LinearGradient(
                                 0f, 0f, holder.mostknownalias.textSize * 2, 0f,
@@ -105,9 +112,10 @@ class TextWatcherSearchBarMiembros(
                             setSpan(
                                 ForegroundShaderSpan(shader),
                                 startIndex,
-                                startIndex + busqueda.length,
+                                retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
+                            holder.mostknownalias.post(LongTextScrollerAction(holder.mostknownalias, startIndex, busqueda))
                         }
                         spannable.toString()
                     }
