@@ -27,16 +27,16 @@ object DateConverters {
 
     @JvmStatic
     @TypeConverter
+    fun toDateTimeString(dateTime: LocalDateTime): String {
+        return dateTime.format(dateTimeFormatter)
+    }
+
+    @JvmStatic
+    @TypeConverter
     fun fromDateTimeString(value: String): LocalDateTime {
-        if(value.contains("|")){
+        if (value.contains("|")) {
             return LocalDateTime.parse(value, dateTimeFormatter)
         }
         return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     }
-
-@JvmStatic
-@TypeConverter
-fun toDateTimeString(dateTime: LocalDateTime): String {
-    return dateTime.format(dateTimeFormatter)
-}
 }

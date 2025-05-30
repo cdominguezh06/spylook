@@ -21,15 +21,12 @@ class RainbowTextViewDecorator(
             val gradientDrawable =
                 AppCompatResources.getDrawable(context, drawableResourceId) as GradientDrawable?
 
-            // Get the gradient colors
             var gradientColors = gradientDrawable!!.getColors()
             if (gradientColors == null) {
-                // Fallback colors if the drawable doesn't define them
                 gradientColors =
                     intArrayOf(-0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0xff01)
             }
 
-            // Apply the gradient as a shader to the text
             val linearGradient = LinearGradient(
                 0f, 0f, textView.width.toFloat(), textView.textSize,
                 gradientColors,
@@ -37,7 +34,7 @@ class RainbowTextViewDecorator(
                 Shader.TileMode.CLAMP
             )
             textView.paint.setShader(linearGradient)
-            textView.invalidate() // Redraw the TextView with the gradient
+            textView.invalidate()
         })
     }
 }

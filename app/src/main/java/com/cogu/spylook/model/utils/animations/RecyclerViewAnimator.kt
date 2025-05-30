@@ -37,31 +37,4 @@ class RecyclerViewAnimator(
         Handler(Looper.getMainLooper()).postDelayed({ afterDeleteCallBack() }, animation.duration)
     }
 
-    /**
-     * Anima la eliminación de todos los elementos con un efecto secuencial.
-     *
-     * @param onEmptyCallback Acción opcional a ejecutar cuando se eliminen todos los elementos.
-     */
-    fun deleteAllWithAnimation(onEmptyCallback: () -> Unit = {}) {
-        val handler = Handler(Looper.getMainLooper())
-        var stopHandler = false
-
-        val runnable = object : Runnable {
-            override fun run() {
-                if (dataSource.isEmpty()) {
-                    stopHandler = true
-                    onEmptyCallback()
-                }
-                if (!stopHandler) {
-                    recyclerView.findViewHolderForAdapterPosition(0)?.itemView?.let { rowView ->
-                        deleteItemWithAnimation(rowView, 0)
-                    }
-                    handler.postDelayed(this, 250) // Retardo entre eliminación de elementos
-                } else {
-                    handler.removeCallbacksAndMessages(null)
-                }
-            }
-        }
-        handler.post(runnable)
-    }
 }

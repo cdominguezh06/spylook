@@ -25,7 +25,7 @@ object ApplicationUpdater {
         unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     ) {
         if (!context.packageManager.canRequestPackageInstalls()) {
-            handleUnknownAppSourcesPermission(context, url, fileName, unknownAppsPermissionLauncher)
+            handleUnknownAppSourcesPermission(context, unknownAppsPermissionLauncher)
             return
         }
 
@@ -49,8 +49,6 @@ object ApplicationUpdater {
 
     private fun handleUnknownAppSourcesPermission(
         context: Context,
-        url: String,
-        fileName: String,
         unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     ) {
         val intent = Intent(

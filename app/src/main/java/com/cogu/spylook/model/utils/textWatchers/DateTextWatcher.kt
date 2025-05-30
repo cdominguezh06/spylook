@@ -39,18 +39,14 @@ class DateTextWatcher(private val editText: EditText) : TextWatcher {
 
                 year = max(1970.0, min(year.toDouble(), LocalDate.now().year.toDouble())).toInt()
                 if (year == LocalDate.now().year) {
-                    mon =
-                        max(1.0, min(mon.toDouble(), LocalDate.now().monthValue.toDouble())).toInt()
+                    mon = max(1.0, min(mon.toDouble(), LocalDate.now().monthValue.toDouble())).toInt()
                 } else {
                     mon = max(1.0, min(mon.toDouble(), 12.0)).toInt()
                 }
                 cal.set(Calendar.YEAR, year)
                 cal.set(Calendar.MONTH, mon - 1)
                 if (mon == LocalDate.now().monthValue && year == LocalDate.now().year) {
-                    day = max(
-                        1.0,
-                        min(day.toDouble(), LocalDate.now().dayOfMonth.toDouble())
-                    ).toInt()
+                    day = max(1.0, min(day.toDouble(), LocalDate.now().dayOfMonth.toDouble())).toInt()
                 }else{
                     day = max(
                         1.0,
