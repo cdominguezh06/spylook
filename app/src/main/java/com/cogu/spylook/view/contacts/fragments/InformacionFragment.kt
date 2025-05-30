@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -17,6 +18,7 @@ import com.cogu.spylook.model.entity.Anotacion
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.converters.DateConverters
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.time.LocalDateTime
@@ -66,7 +68,7 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
     private fun initializeRecyclerView(fragment: View) {
         recyclerView = fragment.findViewById(ID_RECYCLER_VIEW)
         val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
-        runBlocking {
+        lifecycleScope.launch {
             val anotaciones = db!!.getAnotacionesDeAnotable(contacto.idAnotable)
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)

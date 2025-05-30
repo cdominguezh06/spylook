@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.entity.Suceso
 import com.cogu.spylook.model.relations.ContactosGrupos
 import com.cogu.spylook.model.relations.GruposContactos
 
@@ -34,6 +35,15 @@ interface GrupoDAO {
         grupo.idAnotable = idAnotable.toInt()
        return addGrupo(grupo)
     }
+
+    @Transaction
+    suspend fun updateGrupoAnotable(grupo: Grupo) {
+        updateAnotable(grupo)
+        updateGrupo(grupo)
+    }
+
+    @Update
+    suspend fun updateAnotable(anotable: Anotable)
     @Update
     suspend fun updateGrupo(grupo: Grupo)
 

@@ -1,6 +1,7 @@
 package com.cogu.spylook.view.contacts
 
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Slide
 import android.view.HapticFeedbackConstants
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +35,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
     private lateinit var stateEditText: EditText
     private lateinit var countryEditText: EditText
     private lateinit var nextButton: Button
+    private lateinit var imagen : ImageView
     private lateinit var database: AppDatabase
     var toEdit: Contacto? = null
     companion object {
@@ -66,6 +69,8 @@ class NuevoContactoActivity() : AppCompatActivity() {
         stateEditText = findViewById(R.id.editTextEstado)
         countryEditText = findViewById(R.id.editTextPais)
         nextButton = findViewById(R.id.buttonSiguiente)
+        imagen = findViewById<ImageView>(R.id.imageView3)
+
         lifecycleScope.launch {
             if(intent.getIntExtra("idEdit", -1)!=-1){
                 toEdit = AppDatabase.getInstance(this@NuevoContactoActivity)!!.contactoDAO()!!.findContactoById(intent.getIntExtra("idEdit", -1))
@@ -77,6 +82,8 @@ class NuevoContactoActivity() : AppCompatActivity() {
                 cityEditText.setText(toEdit?.ciudad)
                 stateEditText.setText(toEdit?.estado)
                 countryEditText.setText(toEdit?.pais)
+                imagen.setImageResource(R.drawable.contact_icon)
+                imagen.setColorFilter(toEdit?.colorFoto!!, PorterDuff.Mode.MULTIPLY)
             }
         }
 

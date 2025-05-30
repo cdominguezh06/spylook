@@ -2,6 +2,7 @@ package com.cogu.spylook.view.accounts
 
 import android.app.AlertDialog
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Slide
 import android.view.HapticFeedbackConstants
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,12 +22,16 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.SingleContactCardSearchAdapter
 import com.cogu.spylook.adapters.search.MultipleContactsCardSearchAdapter
 import com.cogu.spylook.database.AppDatabase
+import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
+import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.entity.Cuenta
 import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
-import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
+import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
 import kotlinx.coroutines.launch
+import org.mapstruct.factory.Mappers
+import kotlin.collections.ifEmpty
 
 class NuevaCuentaActivity : AppCompatActivity() {
 
@@ -36,10 +42,13 @@ class NuevaCuentaActivity : AppCompatActivity() {
     private lateinit var textRedSocialCuenta: EditText
     private lateinit var boton: Button
     private lateinit var db: AppDatabase
+    private lateinit var imagen: ImageView
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
+    var toEdit: Cuenta? = null
     var propietario = mutableListOf<ContactoCardItem>()
     var usuarios = mutableListOf<ContactoCardItem>()
+    var mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
@@ -59,95 +68,122 @@ class NuevaCuentaActivity : AppCompatActivity() {
         textNombreCuenta = findViewById<EditText>(R.id.editTextNombreCuenta)
         textLinkCuenta = findViewById<EditText>(R.id.editTextLink)
         textRedSocialCuenta = findViewById<EditText>(R.id.editTextRedSocial)
-
-        val card = ContactoCardItem.DEFAULT_FOR_SEARCH
-        propietario.add(card)
-        usuarios.add(card)
-        var adapter = SingleContactCardSearchAdapter(
-            propietario,
-            this,
-            onClick = { cardItem, dialog, adapter ->
-                propietario.clear()
-                propietario.add(cardItem)
-                adapter.notifyItemRangeChanged(0, 1)
-                dialog.dismiss()
-            },
-            onLongClick = { cardItem, context, adapter, holder ->
-                if (cardItem.idAnotable == -1) false
-                AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al propietario de la cuenta?")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        recyclerAnimator.adapter = adapter
-                        recyclerAnimator.dataSource = propietario
-                        recyclerAnimator.deleteItemWithAnimation(
-                            holder.itemView,
-                            0,
-                            onEmptyCallback = {
-                                propietario.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
-                            },
-                            afterDeleteCallBack = {
-                                adapter.notifyItemRangeChanged(0, 1)
-                                dialog.dismiss()
-                            })
-                    }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-                true
+        imagen = findViewById<ImageView>(R.id.imagenCuenta)
+        lifecycleScope.launch {
+            if(intent.getIntExtra("idEdit", -1)!=-1){
+                toEdit = AppDatabase.getInstance(this@NuevaCuentaActivity)!!.cuentaDAO()!!.findCuentaById(intent.getIntExtra("idEdit", -1))
             }
-        )
-        recyclerPropietario.layoutManager = LinearLayoutManager(this)
-        recyclerPropietario.adapter = adapter
-        recyclerAnimator = RecyclerViewAnimator(recyclerPropietario, propietario, adapter)
-        recyclerUsuarios.layoutManager = LinearLayoutManager(this)
-        var adapterMiembros = MultipleContactsCardSearchAdapter(
-            usuarios,
-            this,
-            filter = {
-                val lista = mutableListOf<ContactoCardItem>()
-                lista.apply {
-                    addAll(propietario.filter { it.idAnotable != -1 })
-                    addAll(usuarios.filter { it.idAnotable != -1 })
+            toEdit?.let {
+                textNombreCuenta.setText(toEdit?.nombre)
+                textLinkCuenta.setText(toEdit?.link)
+                textRedSocialCuenta.setText(toEdit?.redSocial!!)
+                imagen.setImageResource(R.drawable.suceso_icon)
+                imagen.setColorFilter(toEdit?.colorFoto!!, PorterDuff.Mode.MULTIPLY)
+                val contactoDao = AppDatabase
+                    .getInstance(this@NuevaCuentaActivity)!!
+                    .contactoDAO()!!
+                val propietarioEdit = mapper.toCardItem(contactoDao.findContactoById(toEdit?.idPropietario!!))
+                val usuariosEdit = AppDatabase.getInstance(this@NuevaCuentaActivity)!!
+                    .cuentaDAO()!!
+                    .findContactosByCuenta(toEdit?.idAnotable!!)
+                    .map {
+                        mapper.toCardItem(contactoDao.findContactoById(it.idContacto))
+                    }
+                propietario.add(propietarioEdit)
+                usuarios.addAll(usuariosEdit)
+            }
+            val card = ContactoCardItem.DEFAULT_FOR_SEARCH
+            propietario.ifEmpty {
+                propietario.add(card)
+            }
+            usuarios.add(card)
+            var adapter = SingleContactCardSearchAdapter(
+                propietario,
+                this@NuevaCuentaActivity,
+                onClick = { cardItem, dialog, adapter ->
+                    propietario.clear()
+                    propietario.add(cardItem)
+                    adapter.notifyItemRangeChanged(0, 1)
+                    dialog.dismiss()
+                },
+                onLongClick = { cardItem, context, adapter, holder ->
+                    if (cardItem.idAnotable == -1) false
+                    AlertDialog.Builder(context)
+                        .setTitle("¿Desea eliminar al propietario de la cuenta?")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            recyclerAnimator.adapter = adapter
+                            recyclerAnimator.dataSource = propietario
+                            recyclerAnimator.deleteItemWithAnimation(
+                                holder.itemView,
+                                0,
+                                onEmptyCallback = {
+                                    propietario.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
+                                },
+                                afterDeleteCallBack = {
+                                    adapter.notifyItemRangeChanged(0, 1)
+                                    dialog.dismiss()
+                                })
+                        }
+                        .setNegativeButton("Cancelar") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                    true
                 }
-            },
-            onClick = { cardItem, dialog, adapter ->
-                val buscarCard =
-                    usuarios[usuarios.size - 1]
-                usuarios.removeAt(usuarios.size - 1)
-                usuarios.add(cardItem)
-                usuarios.add(buscarCard)
-                adapter.notifyDataSetChanged()
-                dialog.dismiss()
-            },
-            onLongClick = { cardItem, context, adapter, holder ->
-                if (cardItem.idAnotable == -1) false
-                AlertDialog.Builder(context)
-                    .setTitle("¿Desea eliminar al usuario ${cardItem.nombre} A.K.A ${cardItem.alias}?")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        val index = usuarios.indexOf(cardItem)
-                        recyclerAnimator.dataSource = usuarios
-                        recyclerAnimator.adapter = adapter
-                        recyclerAnimator.deleteItemWithAnimation(
-                            holder.itemView,
-                            index,
-                            onEmptyCallback = {
-                                usuarios.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
-                            },
-                            afterDeleteCallBack = {
-                                adapter.notifyItemRangeChanged(index, 1)
-                                dialog.dismiss()
-                            })
+            )
+            recyclerPropietario.layoutManager = LinearLayoutManager(this@NuevaCuentaActivity)
+            recyclerPropietario.adapter = adapter
+            recyclerAnimator = RecyclerViewAnimator(recyclerPropietario, propietario, adapter)
+            recyclerUsuarios.layoutManager = LinearLayoutManager(this@NuevaCuentaActivity)
+            var adapterMiembros = MultipleContactsCardSearchAdapter(
+                usuarios,
+                this@NuevaCuentaActivity,
+                filter = {
+                    val lista = mutableListOf<ContactoCardItem>()
+                    lista.apply {
+                        addAll(propietario.filter { it.idAnotable != -1 })
+                        addAll(usuarios.filter { it.idAnotable != -1 })
+                    }
+                },
+                onClick = { cardItem, dialog, adapter ->
+                    val buscarCard =
+                        usuarios[usuarios.size - 1]
+                    usuarios.removeAt(usuarios.size - 1)
+                    usuarios.add(cardItem)
+                    usuarios.add(buscarCard)
+                    adapter.notifyDataSetChanged()
+                    dialog.dismiss()
+                },
+                onLongClick = { cardItem, context, adapter, holder ->
+                    if (cardItem.idAnotable == -1) false
+                    AlertDialog.Builder(context)
+                        .setTitle("¿Desea eliminar al usuario ${cardItem.nombre} A.K.A ${cardItem.alias}?")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            val index = usuarios.indexOf(cardItem)
+                            recyclerAnimator.dataSource = usuarios
+                            recyclerAnimator.adapter = adapter
+                            recyclerAnimator.deleteItemWithAnimation(
+                                holder.itemView,
+                                index,
+                                onEmptyCallback = {
+                                    usuarios.add(ContactoCardItem.DEFAULT_FOR_SEARCH)
+                                },
+                                afterDeleteCallBack = {
+                                    adapter.notifyItemRangeChanged(index, 1)
+                                    dialog.dismiss()
+                                })
 
-                    }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-                true
-            }
-        )
-        recyclerUsuarios.adapter = adapterMiembros
+                        }
+                        .setNegativeButton("Cancelar") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                    true
+                }
+            )
+            recyclerUsuarios.adapter = adapterMiembros
+        }
+
         boton = findViewById<Button>(R.id.buttonSiguiente)
 
         boton.setOnClickListener { l: View? ->
@@ -195,27 +231,49 @@ class NuevaCuentaActivity : AppCompatActivity() {
                 colorFoto = color,
                 idPropietario = propietario.first().idAnotable
             )
+            toEdit?.let {
+                AlertDialog.Builder(this@NuevaCuentaActivity)
+                    .setTitle("Sobreescribir cuenta")
+                    .setMessage("¿Desea sobreescribir la cuenta actual?")
+                    .setPositiveButton("Confirmar") { dialog, _ ->
+                        cuenta.idAnotable = toEdit?.idAnotable!!
+                        lifecycleScope.launch {
+                            cuenta.colorFoto = toEdit?.colorFoto!!
+                            db.cuentaDAO()!!.updateCuentaAnotable(cuenta)
+                            db.cuentaDAO()!!.eliminarRelacionesPorCuenta(cuenta.idAnotable)
+                            insertarRelaciones(cuenta.idAnotable)
+                            dialog.dismiss()
+                            finish()
+                        }
+                    }
+                    .setNegativeButton("Cancelar") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                return@setOnClickListener
+            }
             lifecycleScope.launch {
                 val cuentaId = db.cuentaDAO()!!.addCuentaWithAnotable(cuenta).toInt()
-                val relaciones = usuarios
-                    .filter { it.idAnotable != -1 }
-                    .map { miembro ->
-                        CuentaContactoCrossRef(
-                            idCuenta = cuentaId,
-                            idContacto = miembro.idAnotable
-                        )
-                    }
-
-
-                relaciones.ifEmpty {
-                    finish()
-                    return@launch
-                }
-
-                db.cuentaDAO()!!.insertarRelaciones(relaciones)
+                insertarRelaciones(cuentaId)
                 finish()
             }
 
         }
+    }
+
+    suspend fun insertarRelaciones(cuentaId: Int){
+        val relaciones = usuarios
+            .filter { it.idAnotable != -1 }
+            .map { miembro ->
+                CuentaContactoCrossRef(
+                    idCuenta = cuentaId,
+                    idContacto = miembro.idAnotable
+                )
+            }
+        relaciones.ifEmpty {
+            finish()
+            return
+        }
+        db.cuentaDAO()!!.insertarRelaciones(relaciones)
     }
 }

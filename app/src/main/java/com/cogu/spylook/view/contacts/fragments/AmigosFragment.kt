@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -16,6 +17,7 @@ import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -36,7 +38,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
         return rootView
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView) = runBlocking {
+    private fun setupRecyclerView(recyclerView: RecyclerView) = lifecycleScope.launch {
         val contactoDAO = getContactoDAO()
         amigos = fetchAmigos(contactoDAO)
         initializeRecyclerView(recyclerView, amigos)

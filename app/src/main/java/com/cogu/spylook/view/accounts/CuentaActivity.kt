@@ -1,10 +1,12 @@
 package com.cogu.spylook.view.accounts
 
+import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Slide
 import android.view.Window
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +19,8 @@ import com.cogu.spylook.adapters.slider.CuentaSliderAdapter
 import com.cogu.spylook.dao.CuentaDao
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.entity.Cuenta
+import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
+import com.cogu.spylook.view.sucesos.SucesoActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -26,6 +30,7 @@ class CuentaActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var title: TextView
     private lateinit var cuentaDAO: CuentaDao
+    private lateinit var linearLayoutImagenEditar : LinearLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -42,6 +47,14 @@ class CuentaActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.pager)
         tabLayout = findViewById(R.id.tabLayout)
 
+        linearLayoutImagenEditar = findViewById<LinearLayout>(R.id.linearLayoutEditar)
+        linearLayoutImagenEditar.setOnClickListener {
+            val intent = Intent(this@CuentaActivity, NuevaCuentaActivity::class.java)
+            val activity = this@CuentaActivity
+            intent.putExtra("idEdit", activity.intent.getIntExtra("id", -1))
+            intent.putExtra("id", activity.intent.getIntExtra("idOrigen", -1))
+            startActivity(intent)
+        }
         lifecycleScope.launch {
             val cuenta = cuentaDAO.findCuentaById(intent.getIntExtra("id", 0))
             setupCuentaDetails(cuenta!!)
@@ -52,7 +65,7 @@ class CuentaActivity : AppCompatActivity() {
     private fun setupCuentaDetails(cuenta: Cuenta) {
         title.text = cuenta.nombre
         val image: ImageView = findViewById(R.id.imageView3)
-        image.setImageResource(R.drawable.suceso_icon)
+        image.setImageResource(R.drawable.account_icon)
         image.setColorFilter(cuenta.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 

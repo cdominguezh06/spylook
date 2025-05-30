@@ -182,6 +182,7 @@ class CuentaCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, CuentaActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
+                intent.putExtra("idOrigen", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
         }

@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.Cuenta
 import com.cogu.spylook.model.entity.CuentaContactoCrossRef
@@ -37,6 +38,18 @@ interface CuentaDao {
         insert(cuenta)
         return idAnotable
     }
+
+    @Transaction
+    suspend fun updateCuentaAnotable(cuenta: Cuenta) {
+        updateAnotable(cuenta)
+        update(cuenta)
+    }
+
+    @Update
+    suspend fun updateAnotable(anotable: Anotable)
+
+    @Update
+    suspend fun update(cuenta: Cuenta)
 
     @Transaction
     @Query("SELECT * FROM cuentas WHERE idAnotable = :idCuenta")

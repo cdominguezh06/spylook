@@ -2,6 +2,7 @@ package com.cogu.spylook.view.sucesos
 
 import android.app.AlertDialog
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.transition.Slide
 import android.view.HapticFeedbackConstants
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -38,13 +40,14 @@ class NuevoSucesoActivity : AppCompatActivity() {
     private lateinit var textFechaSuceso: EditText
     private lateinit var textLugarSuceso: EditText
     private lateinit var boton: Button
+    private lateinit var imagen: ImageView
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
     var toEdit: Suceso? = null
     var causante = mutableListOf<ContactoCardItem>()
     var implicados = mutableListOf<ContactoCardItem>()
-    var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
+    var mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
@@ -67,6 +70,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
             addTextChangedListener(DateTextWatcher(this))
         }
         textLugarSuceso = findViewById<EditText>(R.id.editTextLugar)
+        imagen = findViewById<ImageView>(R.id.imageView3)
         lifecycleScope.launch {
             if(intent.getIntExtra("idEdit", -1)!=-1){
                 toEdit = AppDatabase.getInstance(this@NuevoSucesoActivity)!!.sucesoDAO()!!.findSucesoById(intent.getIntExtra("idEdit", -1))
@@ -76,6 +80,8 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 textDescripcionSuceso.setText(toEdit?.descripcion)
                 textFechaSuceso.setText(toEdit?.fecha!!)
                 textLugarSuceso.setText(toEdit?.lugar)
+                imagen.setImageResource(R.drawable.suceso_icon)
+                imagen.setColorFilter(toEdit?.colorFoto!!, PorterDuff.Mode.MULTIPLY)
                 val contactoDao = AppDatabase.getInstance(this@NuevoSucesoActivity)!!
                     .contactoDAO()!!
                 val causanteEdit = mapper.toCardItem(contactoDao.findContactoById(toEdit?.idCausante!!))
