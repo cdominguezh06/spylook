@@ -8,15 +8,14 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import com.cogu.spylook.R
-import com.cogu.spylook.model.unimplemented.TextViewDecorator
 
 class RainbowTextViewDecorator(
     private val context: Context,
     private val textView: TextView
-) : TextViewDecorator {
+) {
     private val drawableResourceId: Int = R.drawable.rainbow_gradient
 
-    override fun apply() {
+    fun apply() {
         textView.getViewTreeObserver().addOnGlobalLayoutListener(OnGlobalLayoutListener {
             val gradientDrawable =
                 AppCompatResources.getDrawable(context, drawableResourceId) as GradientDrawable?
