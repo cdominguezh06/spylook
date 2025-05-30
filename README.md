@@ -219,16 +219,325 @@ spylook/
     ```
     - **animations/RecyclerViewAnimator.kt**: Animación al eliminar un elemento de un RecyclerView, aceptando funciones anónimas (lambda) como parámetro para definir el comportamiento
       después del borrado y cuando la lista queda vacía tras el borrado
+      ```kotlin
+         // Eliminar del dataSource inmediatamente
+         if (dataSource.size == 1) {
+             onEmptyCallback()
+         }
+         dataSource.removeAt(position)
+
+         // Actualizar el adaptador inmediatamente
+         adapter.notifyItemRemoved(position)
+
+         // Crear y configurar la animación
+         val animation = AnimationUtils.loadAnimation(rowView.context, android.R.anim.slide_out_right).apply {
+             duration = 300
+         }
+         rowView.startAnimation(animation)
+         // Esperar a que termine la animación antes de interactuar con el RecyclerView
+         Handler(Looper.getMainLooper()).postDelayed({ afterDeleteCallBack() }, animation.duration)
+      ```
     - **converters/DateConverters.kt**: Singleton para generar conversores de fechas LocalDate o LocalDateTime a String, siguiendo un regex específico
+      ```kotlin
+         private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+         private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy | HH:mm:ss")
+
+         @JvmStatic
+         @TypeConverter
+         fun fromString(value: String): LocalDate {
+             return LocalDate.parse(value, dateFormatter)
+         }
+
+         @JvmStatic
+         @TypeConverter
+         fun toString(date: LocalDate): String {
+             return date.format(dateFormatter)
+         }
+
+         fun toCustomString(date: LocalDate, dateFormatter: DateTimeFormatter): String {
+             return date.format(dateFormatter)
+         }
+
+         @JvmStatic
+         @TypeConverter
+         fun toDateTimeString(dateTime: LocalDateTime): String {
+             return dateTime.format(dateTimeFormatter)
+         }
+      ```
     - **decorators/**: Objetos que alteran la apariencia de elementos de la UI:
       - **RainbowTextViewDecorator.kt**: A la hora de realizar una búsqueda, resalta la parte coincidente del texto con un gradiente de arcoíris
+        ```kotlin
+        private val drawableResourceId: Int = R.drawable.rainbow_gradient
+
+        override fun apply() {
+            textView.getViewTreeObserver().addOnGlobalLayoutListener(OnGlobalLayoutListener {
+                val gradientDrawable =
+                    AppCompatResources.getDrawable(context, drawableResourceId) as GradientDrawable?
+        
+                var gradientColors = gradientDrawable!!.getColors()
+                if (gradientColors == null) {
+                    gradientColors =
+                        intArrayOf(-0x10000, -0x100, -0xff0100, -0xff0001, -0xffff01, -0xff01)
+                }
+
+                val linearGradient = LinearGradient(
+                    0f, 0f, textView.width.toFloat(), textView.textSize,
+                    gradientColors,
+                    null,
+                    Shader.TileMode.CLAMP
+                )
+        
+                textView.paint.setShader(linearGradient)
+                textView.invalidate()
+           })
+        }
+        ```
       - **SpacingItemDecoration.kt**: Añade una pequeña separación entre elementos de un RecyclerView
+        ```kotlin
+        class SpacingItemDecoration(private val context: Context) : ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                val vertical = context.getResources().getDimensionPixelSize(R.dimen.spacing_vertical)
+                val horizontal = context.getResources().getDimensionPixelSize(R.dimen.spacing_horizontal)
+                outRect.set(horizontal, vertical, horizontal, vertical)
+            }
+        }
+        ```
     - **textWatchers/**: Aqui hay objetos que analizan constantemente los cambios de texto de un EditText con distintas finalizades
-      - **actions/**: Acciones a aplicar por un TextWatcher sobre un elemento de la UI para alterar su estilo vía código Kotlin
+      - **actions/**: Acciones Runnable a aplicar por un TextWatcher sobre un elemento de la UI para alterar su estilo vía código Kotlin
         -**LongTextScrollerAction.kt**: Comprueba si el texto de la búsqueda no cabe en los límites de su respectivo TextView para desplazarlo hasta poder ver la coincidencia
+        ```kotlin
+        override fun invoke() {
+            val lineWidth =
+                 text.paint.measureText(text.text.toString())
+            val viewWidth = text.width
+            val endLine = text.layout.getLineForOffset(lastScroll.toInt() + viewWidth)
+            // Obtener el índice del último carácter visible en la última línea visible
+            val visibleText = text.layout.getOffsetForHorizontal(
+                endLine.coerceAtMost(text.layout.lineCount - 1), // Validar línea máxima
+                lastScroll + viewWidth                      // Última posición horizontal visible
+            ).coerceAtMost(text.text.length)
+
+            val endCharPosition = visibleText.coerceAtMost(text.text.length)
+            val startCharPosition = visibleText.coerceAtLeast(0)
+            val actualLastCharPosition =
+                text.paint.measureText(text.text.toString(), 0, startIndex + busqueda.length - 1)
+            if (lineWidth > viewWidth) {
+
+                // Configuramos el TextView para manejar el desplazamiento
+                text.setHorizontallyScrolling(true)
+                text.isHorizontalScrollBarEnabled = false
+                text.isSingleLine = true
+                text.ellipsize = null // Desactivar truncamiento
+                text.textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START // Alineación desde el inicio
+
+                // Creando y asignando Scroller
+                val scroller = Scroller(text.context)
+                text.setScroller(scroller)
+
+                if (actualLastCharPosition < startCharPosition || actualLastCharPosition > endCharPosition) {
+                    scroller.startScroll(lastScroll.toInt(), 0, (actualLastCharPosition -lastScroll).toInt(), 0)
+                    lastScroll = text.x
+                }
+                text.invalidate()
+
+           } else {
+               text.isSelected = true
+               text.isFocusable = true
+               text.isFocusableInTouchMode = true
+               text.ellipsize = TextUtils.TruncateAt.MARQUEE
+               text.isHorizontalScrollBarEnabled = false
+               text.setHorizontallyScrolling(false)
+               text.scrollTo(0, 0)
+           }
+        }
+        ```
       - **DateTextWatcher.kt**: Comprueba el valor introducido en el EditText asignado y delimita un valor mínimo (01/01/1970) y un valor máximo (LocalDate.now())
+        ```kotlin
+        private var current = ""
+        private val ddmmyyyy = "DDMMYYYY"
+        private val cal: Calendar = Calendar.getInstance()
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            if (s.toString() != current) {
+                var clean = s.toString().replace("[^\\d]".toRegex(), "")
+                val cleanC = current.replace("[^\\d]".toRegex(), "")
+
+                val cl = clean.length
+                var sel = cl
+                var i = 2
+                while (i <= cl && i < 6) {
+                    sel++
+                    i += 2
+                }
+                if (clean == cleanC) sel--
+
+                if (clean.length < 8) {
+                    clean = clean + ddmmyyyy.substring(clean.length)
+                } else {
+                    var day = clean.substring(0, 2).toInt()
+                    var mon = clean.substring(2, 4).toInt()
+                    var year = clean.substring(4, 8).toInt()
+
+                    year = max(1970.0, min(year.toDouble(), LocalDate.now().year.toDouble())).toInt()
+                    if (year == LocalDate.now().year) {
+                        mon = max(1.0, min(mon.toDouble(), LocalDate.now().monthValue.toDouble())).toInt()
+                    } else {
+                        mon = max(1.0, min(mon.toDouble(), 12.0)).toInt()
+                    }
+                    cal.set(Calendar.YEAR, year)
+                    cal.set(Calendar.MONTH, mon - 1)
+                    if (mon == LocalDate.now().monthValue && year == LocalDate.now().year) {
+                        day = max(1.0, min(day.toDouble(), LocalDate.now().dayOfMonth.toDouble())).toInt()
+                    }else{
+                        day = max(1.0, min(day.toDouble(), cal.getActualMaximum(Calendar.DAY_OF_MONTH).toDouble())).toInt()
+                    }
+                    clean = String.format(Locale.getDefault(), "%02d%02d%04d", day, mon, year)
+               }
+               clean = String.format(
+                   "%s/%s/%s", clean.substring(0, 2),
+                   clean.substring(2, 4),
+                   clean.substring(4, 8)
+               )
+
+               current = clean
+               editText.setText(current)
+               editText.setSelection(min(sel.toDouble(), current.length.toDouble()).toInt())
+            }
+        }
+        ```
       - **TextWatcherSearchBar%.kt**: Estos archivos asignan un comportamiento distinto a la barra de búsqueda según el resultado deseado
+        ```kotlin
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+           val busqueda = text.getText().toString().lowercase(
+               Locale.getDefault()
+           ).replace(" ", "")
+
+           runBlocking {
+               collect = db.contactoDAO()!!
+                   .getContactos()
+                   .map { c -> mapper.toCardItem(c) }
+                   .toMutableList()
+           }
+           busqueda.ifEmpty {
+               recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
+               retriever.contador = 0
+               LongTextScrollerAction.lastScroll = 0.0f
+               return@onTextChanged
+           }
+           collect = collect.filter { c ->
+               c.alias.replace(" ", "").lowercase(Locale.getDefault()).contains(busqueda)
+           }.toMutableList()
+           collect.ifEmpty {
+               collect.add(ContactoCardItem.DEFAULT_FOR_NO_RESULTS)
+               recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
+               return@onTextChanged
+           }
+           val newAdapter = object : ContactoCardAdapter(collect, context!!) {
+               override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+                   val cardItem = cardItemList[position]
+                   holder.name.text = cardItem.nombre
+                   holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
+                       cardItem.alias = cardItem.alias.let {
+                           val spannable = SpannableString(it)
+                           var startIndex = retriever.getStartIndex(busqueda, cardItem.alias)
+                           if (startIndex >= 0) {
+                               val shader = LinearGradient(
+                                   0f, 0f, holder.mostknownalias.textSize * 2, 0f,
+                                   intArrayOf(
+                                       context!!.getColor(R.color.red),
+                                       context.getColor(R.color.yellow),
+                                       context.getColor(R.color.green),
+
+                                       ),
+                                   floatArrayOf(0f, 0.5f, 1f),
+                                   Shader.TileMode.MIRROR
+                               )
+
+                               setSpan(
+                                   ForegroundShaderSpan(shader),
+                                   startIndex,
+                                   retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
+                                   Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                               )
+
+                               holder.mostknownalias.post(LongTextScrollerAction(holder.mostknownalias, startIndex, busqueda))
+                           }
+                           spannable.toString()
+                       }
+
+                   }
+                   if (cardItem.idAnotable != -1) {
+                       holder.careto.setImageResource(R.drawable.contact_icon)
+                       holder.careto.setColorFilter(
+                           cardItem.colorFoto,
+                           PorterDuff.Mode.MULTIPLY
+                       )
+                   } else {
+                       holder.careto.setImageResource(R.drawable.notfound)
+                   }
+                   if (cardItem.clickable) {
+                       holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
+                           val intent = Intent(context, ContactoActivity::class.java)
+                           intent.putExtra("id", cardItem.idAnotable)
+                           context!!.startActivity(intent)
+                       })
+                  }
+               }
+           }
+           recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+           recyclerView.setAdapter(newAdapter)
+        }
     - **ApplicationUpdater.kt**: Singleton que genera la notificación de descarga y la petición de permisos de instalación de orígenes desconocidos
+      ```kotlin
+      fun downloadAndInstallAPK(
+          context: Context,
+          url: String,
+          fileName: String,
+          unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+      ) {
+          if (!context.packageManager.canRequestPackageInstalls()) {
+              handleUnknownAppSourcesPermission(context, unknownAppsPermissionLauncher)
+              return
+          }
+
+          Log.d("GithubController", "URI de descarga: ${url.toUri()}")
+          val request = DownloadManager.Request(url.toUri())
+              .setTitle("Actualizacion de SpyLook")
+              .setDescription("Espere mientras se descarga la actualización.")
+              .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+              .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, fileName)
+              .setAllowedNetworkTypes(
+                  DownloadManager.Request.NETWORK_WIFI or
+                          DownloadManager.Request.NETWORK_MOBILE
+              )
+              .setAllowedOverMetered(true)
+              .setAllowedOverRoaming(true)
+
+          val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+          downloadId = downloadManager.enqueue(request)
+          Log.d("GithubController", "Solicitud de descarga realizada. ID de descarga: $downloadId")
+       }
+
+       private fun handleUnknownAppSourcesPermission(
+           context: Context,
+           unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
+       ) {
+           val intent = Intent(
+               Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+               ("package:" + context.packageName).toUri()
+           )
+           Toast.makeText(context, UNKNOWN_APPS_PERMISSION_MSG, Toast.LENGTH_LONG).show()
+           unknownAppsPermissionLauncher.launch(intent)
+
+      }
+      ```
     - **ForegroundShaderSpan.kt**: Aplica el shader de texto arcoíris al Spannable al que entra como parámetro
     - **StringWithSpacesIndexRetriever.kt**: Permite que la búsqueda se pueda realizar sin escribir espacios manteniendo el shader de arcoíris bien aplicado
    
