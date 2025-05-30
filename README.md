@@ -24,9 +24,10 @@ spylook/
       ├── groups/     # Vistas relativas al CRUD de grupos
       └── sucesos/    # Vistas relativas al CRUD de sucesos
 ```
-### Descripción de carpetas clave
 
-- **adapters/**
+## Descripción de carpetas clave
+
+### **adapters/**
   ```
     adapters/
   ├── cards/
@@ -63,16 +64,16 @@ spylook/
     Estos adaptadores se aplican a un ViewPager para asignar el comportamiento del TabLayout de una activity, definiendo sus pestañas y el fragmento que se inflará
     en cada una
 
-  ---
-- **controller/**  
+
+### **controller/**  
   ```
   controller/
   └── GithubController.kt
   ```
   Controlador para la integración con GitHub (gestión de releases, actualizaciones, etc).
 
-  ---
-- **dao/**  
+
+### **dao/**  
   ```
   dao/
   ├── AnotacionDAO.kt
@@ -119,8 +120,8 @@ spylook/
              })
      }
   ```
-  ---
-- **database/**  
+
+### **database/**  
   ```
   database/
   └── AppDatabase.kt
@@ -130,8 +131,8 @@ spylook/
   En ella nos encontramos una instancia de cada DAO declarado, la declaración de todas las entidades que serán convertidas en tablas y una versión de la base de datos.
   Esta versión ha de cambiarse cada vez que modificamos el esquema de la base de datos (modificando entidades) para que Room rehaga la base de datos y no acceda a un esquema antiguo, provocando un fallo en el proceso
 
-  ---
-- **mappers/**  
+
+### **mappers/**  
   ```
   mappers/
   ├── AnotacionToCardItem.kt
@@ -143,8 +144,8 @@ spylook/
   ```
   Mappers creados con *[MapStruct](https://mvnrepository.com/artifact/org.mapstruct/mapstruct/1.5.3.Final)* para convertir fácilmente entidades en tarjetas para mostrar en un RecyclerView
 
-  ---
-- **model/**  
+
+### **model/**  
   ```
   model/
   ├── cards/
@@ -617,8 +618,8 @@ spylook/
       }
       ```
    
-  ---
-- **view/**  
+
+### **view/**  
   - **accounts/**
     ```
     view/accounts/
@@ -663,11 +664,10 @@ spylook/
     ```
     Activities y fragments para el CRUD de sucesos/eventos.
 
----
 
-### Activities y vistas principales
+## Activities y vistas principales
 
-- **Grupos**
+### **Grupos**
   - `NuevoGrupoActivity.kt`: Permite crear un nuevo grupo, seleccionando a su creador y a sus miembros. El grupo debe tener por lo menos un creador y un miembro, además de un nombre
   - `GrupoActivity.kt`: Muestra el TabLayout de grupos con un `GroupSliderAdapter.kt` aplicado para definir el Fragment asociado a cada pestaña.
      - **Fragments**:
@@ -675,7 +675,7 @@ spylook/
          a los cuales les asigna un `ContactoCardAdapter.kt` para acceder rápidamente a la información de cada miembro al pulsar sobre ellos.
          Si se mantiene pulsado sobre el miembro se permite eliminar al contacto permanentemente bajo previo aviso
 
-- **Contactos**  
+### **Contactos**  
   - `NuevoContactoActivity.kt`: Permite crear un nuevo contacto, asignandole nombre, alias más conocido, fecha de nacimiento, localidad, estado o provincia y país.
     El campo de fecha de nacimiento tiene el singleton de `DateTextWatcher.kt` asignado para asegurar que la fecha de nacimiento está comprendida entre el
     1 de enero de 1970 y el dia de hoy
@@ -692,7 +692,7 @@ spylook/
        - `InformacionFragment.kt`: Muestra los datos del contacto y un RecyclerView con las anotaciones asociadas a este. Las anotaciones en cualquier caso pueden ser
          editadas o eliminadas desde el pop up que aparece en pantalla al pulsar sobre ellas
 
-- **Sucesos**
+### **Sucesos**
   - `NuevoSucesoActivity.kt`: Permite crear un nuevo suceso, detallando su título, descripción, fecha, causante e implicados
     Los implicados son opcionales, un suceso solo necesita un causante para ser creado
     El campo de descripción se ajusta de forma dinámica a la longitud del texto, cambiando su cantidad de líneas y ampliando la altura del campo
@@ -735,7 +735,7 @@ spylook/
      Implementado en `ContactSliderAdapter.kt`
    - `SucesosFragment.kt`: Fragment genérico para que contactos y grupos puedan disponer rápidamente de un fragmento donde asociar y eliminar sucesos.
      Implementado en `ContactSliderAdapter.kt`
-      
+
 ## Base de datos
 
 La base de datos es una base de datos local SQLite manejada con la biblioteca de persistencia Android Room, que actúa como una capa de abstracción sobre SQLite y permite manejar
@@ -750,7 +750,9 @@ Ejs:
 - Se podría implementar que un suceso sea provocado por otro suceso, algo así como un *efecto Mariposa*
 - Se podría implementar una característica que permita asociar a una cuenta un grupo como creador/propietario, de esta forma
   se podría hacer referencia a un conjunto de personas (creador y miembros del grupo) como dueños de esta en vez de simplemente tener un unico   dueño
+
 ---
+
 ## Cosas aprendidas durante el desarrollo / curiosidades
 
 ### Acceso a atributos de objetos
