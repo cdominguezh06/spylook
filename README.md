@@ -741,3 +741,73 @@ spylook/
 La base de datos es una base de datos local SQLite manejada con la biblioteca de persistencia Android Room, que actúa como una capa de abstracción sobre SQLite y permite manejar
 todo el CRUD de los elementos mediante DAOs generados en tiempo de compilación a partir de interfaces
 
+El diagrama E/R sería algo tal que así:
+![spylook](https://github.com/user-attachments/assets/577a5aae-b1bd-43af-b1c6-8b6dc79209eb)
+
+Como se puede ver en la imagen, todos los elementos a excepción de Anotación forman una jerarquía total exclusiva con Anotable, dotando a la
+aplicación de una flexibilidad muy amplia. Aunque el diagrama pueda parecer caótico y con alta tendencia a provocar fallos, la flexibilidad que otorga este diseño permite una interconexión entre los datos muy alta.
+Ejs: 
+- Se podría implementar que un suceso sea provocado por otro suceso, algo así como un *efecto Mariposa*
+- Se podría implementar una característica que permita asociar a una cuenta un grupo como creador/propietario, de esta forma
+  se podría hacer referencia a un conjunto de personas (creador y miembros del grupo) como dueños de esta en vez de simplemente tener un unico   dueño
+---
+## Cosas aprendidas durante el desarrollo / curiosidades
+
+### Acceso a atributos de objetos
+Según el propio *linter* integrado en Android Studio, en Kotlin no se accede a las propiedades de un objeto mediante el getter, sino accediendo
+a la propiedad expuesta directamente (sin modificador de acceso)
+Por este motivo se puede encontrar a lo largo del código muchas asignaciones de atributos sin acceder a getters/setters o anotaciones
+como `@JvmField` sobre los atributos, que le indican al compilador de Kotlin que no genere getters/setters para ese atributo y lo exponga
+
+### Tuberías y programacion funcional en Kotlin
+En Kotlin, al ser un lenguaje interoperable con Java, se puede hacer uso de los Streams y todo lo que esto conlleva. No obstante, Kotlin
+cuenta con funciones propias de programación funcional que aportan una flexibilidad muy alta a la hora de programar
+
+Este es el caso de funciones como por ejemplo `isEmpty{}`, que permite en muchos casos reemplazar por completo a estructuras if-else
+```kotlin
+val nombre = "Carlos"
+var saludo : String = ""
+saludo.isEmpty{
+   saludo = "Hola ${nombre}, ¿qué tal?"
+}
+```
+
+Otra de las funciones que más potencial tienen es `.apply{}`. Este método se puede usar desde cualquier objeto y devuelve el mismo objeto después de aplicar el contenido de la función anónima en su interior, a la cual pasa el objeto como parámetro
+De esta forma podemos ampliar cadenas de tuberías con acciones que de otra forma no sería posible, como por ejemplo:
+```kotlin
+var lista = listOf(1,2)
+lista.filter{ it != 1}
+  .toMutableList()
+  .apply{
+    add(3)
+    add(4)}
+  .forEach{ print("${it} ") } //Resultado: 2 3 4
+```
+
+### Uso de Optional y tipos no-nulos
+En Kotlin, aunque se pueda usar la clase Optional igual que en Java, se opta por utilizar la verificación de valores nulos (null safety)
+propia del sistema de tipos de Kotlin.
+
+Todos los valores son por defecto no-nulos, es decir, se requiere asignar un valor al momento de la declaración y este nunca puede ser nulo
+Mediante el uso de palabras clave como "lateinit" delante del nombre de la variable permiten separar declaración de inicialización solo en objetos (los tipos primitivos no son compatibles con esta palabra clave)
+
+```kotlin
+private lateinit var inicializacionSeparada : String
+```
+
+En caso de que queramos que un objeto sea nulo se le asigna una interrogación al tipo, que se tiene que declarar explicitamente
+
+```kotlin
+var nula : String? = null
+var nula2: String?
+```
+
+Esto introduce un nuevo requerimiento a la hora de usar la variable, asegurarse de que al momento de acceder a la variable no es nula
+Se puede hacer de dos formas:
+
+```kotlin
+var nula : String? = "Hola mundo"
+
+print(nula?.length) //Con ? se imprime la longitud solo si la variable no es nula
+print(nula!!.charAt(0)) //Con !! se fuerza a la JVM a asumir que la variable no es nula nunca, pudiendo resultar en un NullPointerException
+```
