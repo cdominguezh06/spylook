@@ -265,11 +265,11 @@ spylook/
          }
       ```
     - **decorators/**: Objetos que alteran la apariencia de elementos de la UI:
-      - **RainbowTextViewDecorator.kt**: A la hora de realizar una búsqueda, resalta la parte coincidente del texto con un gradiente de arcoíris
+      - **RainbowTextViewDecorator.kt**: Convierte el texto de un TextView para que sea de color arcoíris
         ```kotlin
         private val drawableResourceId: Int = R.drawable.rainbow_gradient
 
-        override fun apply() {
+        fun apply() {
             textView.getViewTreeObserver().addOnGlobalLayoutListener(OnGlobalLayoutListener {
                 val gradientDrawable =
                     AppCompatResources.getDrawable(context, drawableResourceId) as GradientDrawable?
@@ -539,7 +539,83 @@ spylook/
       }
       ```
     - **ForegroundShaderSpan.kt**: Aplica el shader de texto arcoíris al Spannable al que entra como parámetro
+      ```kotlin
+      //La clase
+      class ForegroundShaderSpan(private val shader: Shader) : CharacterStyle(), UpdateAppearance {
+          override fun updateDrawState(tp: TextPaint) {
+              tp.shader = shader
+          }
+      }
+      //En un TextWatcher
+
+      cardItem.alias = cardItem.alias.let {
+          val spannable = SpannableString(it)
+          var startIndex = retriever.getStartIndex(busqueda, cardItem.alias)
+          if (startIndex >= 0) {
+              val shader = LinearGradient(
+                  0f, 0f, holder.mostknownalias.textSize * 2, 0f,
+                  intArrayOf(
+                      context!!.getColor(R.color.red),
+                      context.getColor(R.color.yellow),
+                      context.getColor(R.color.green),
+                  ),
+                  floatArrayOf(0f, 0.5f, 1f),
+                  Shader.TileMode.MIRROR
+              )
+
+              setSpan(
+                 ForegroundShaderSpan(shader),
+                 startIndex,
+                 retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
+                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+              )
+
+              holder.mostknownalias.post(LongTextScrollerAction(holder.mostknownalias, startIndex, busqueda))
+          }
+          spannable.toString()
+      }
+      ```
     - **StringWithSpacesIndexRetriever.kt**: Permite que la búsqueda se pueda realizar sin escribir espacios manteniendo el shader de arcoíris bien aplicado
+      ```kotlin
+      class StringWithSpacesIndexRetriever {
+
+          var contador = 0
+          var ultimaBusquedaLength = 0
+          private var indicesDeEspacios = listOf<Int>()
+          fun getSpanIntervalJump(busqueda: String, texto: String, startIndex: Int): Int {
+              contador = 0
+              val indexUltimaLetra = busqueda.length - 1
+              indicesDeEspacios = indicesDeEspacios.filter { it > startIndex }
+              indicesDeEspacios.forEach {
+                  if (indexUltimaLetra+contador > 0 && startIndex+indexUltimaLetra+contador >= it) {
+                      contador += 1
+                  }
+              }
+              if (contador < 0) {
+                  contador = 0
+              }
+              ultimaBusquedaLength = busqueda.length
+              var fin = startIndex + busqueda.length + contador
+              if (fin > texto.length) {
+                  fin = texto.length
+                  contador -= 1
+              }
+              return fin
+          }
+
+          fun getStartIndex(busqueda: String, texto: String): Int {
+              contador = 0
+              val indexUltimaLetra = texto.replace(" ", "").lowercase().indexOf(busqueda)
+              indicesDeEspacios = texto.mapIndexedNotNull { index, c -> index.takeIf { c == ' ' } }
+              indicesDeEspacios.forEach {
+                  if (indexUltimaLetra+contador >= it) {
+                      contador += 1
+                  }
+              }
+              return indexUltimaLetra+contador
+          }
+      }
+      ```
    
   ---
 - **view/**  
@@ -550,7 +626,7 @@ spylook/
     ├── NuevaCuentaActivity.kt
     └── fragments/
     ```
-    Activities y fragments para cuentas y gestión de usuario.
+    Activities y fragments para el CRUD de cuentas
 
   - **common/**
     ```
@@ -558,7 +634,7 @@ spylook/
     ├── MainActivity.kt
     └── fragments/
     ```
-    Activity principal (`MainActivity.kt`) y fragments comunes.
+    Activity principal (`MainActivity.kt`) y fragments comunes que pueden reutilizarse en un futuro.
 
   - **contacts/**
     ```
@@ -567,7 +643,7 @@ spylook/
     ├── NuevoContactoActivity.kt
     └── fragments/
     ```
-    Activities y fragments para contactos.
+    Activities y fragments para el CRUD de contactos.
 
   - **groups/**
     ```
@@ -576,7 +652,7 @@ spylook/
     ├── NuevoGrupoActivity.kt
     └── fragments/
     ```
-    Activities y fragments para grupos.
+    Activities y fragments para el CRUD grupos.
 
   - **sucesos/**
     ```
@@ -585,44 +661,153 @@ spylook/
     ├── SucesoActivity.kt
     └── fragments/
     ```
-    Activities y fragments para sucesos/eventos.
+    Activities y fragments para el CRUD de sucesos/eventos.
 
 ---
 
 ### Activities y vistas principales
 
-- **MainActivity**  
-  Es la pantalla principal de la aplicación. Desde aquí se navega hacia los distintos apartados de la agenda (personas, grupos, sucesos, etc). Gestiona la barra de búsqueda y la navegación principal.
-
 - **Grupos**
-  - `GrupoActivity.kt`: Muestra la información detallada de un grupo, listando sus miembros y permitiendo acciones sobre ellos.
-  - `NuevoGrupoActivity.kt`: Permite crear un nuevo grupo, seleccionar miembros y asignarles atributos.
+  - `NuevoGrupoActivity.kt`: Permite crear un nuevo grupo, seleccionando a su creador y a sus miembros. El grupo debe tener por lo menos un creador y un miembro, además de un nombre
+  - `GrupoActivity.kt`: Muestra el TabLayout de grupos con un `GroupSliderAdapter.kt` aplicado para definir el Fragment asociado a cada pestaña.
+     - **Fragments**:
+       - `MiembrosFragment.kt`: Muestra al creador y a los miembros de un grupo en dos RecyclerView (uno para el creador, otro para los miembros)
+         a los cuales les asigna un `ContactoCardAdapter.kt` para acceder rápidamente a la información de cada miembro al pulsar sobre ellos.
+         Si se mantiene pulsado sobre el miembro se permite eliminar al contacto permanentemente bajo previo aviso
 
-- **Personas / Contactos**  
-  *(No se pudo listar el contenido exacto, pero generalmente aquí están las Activities para ver y editar personas, y listados de contactos.)*
+- **Contactos**  
+  - `NuevoContactoActivity.kt`: Permite crear un nuevo contacto, asignandole nombre, alias más conocido, fecha de nacimiento, localidad, estado o provincia y país.
+    El campo de fecha de nacimiento tiene el singleton de `DateTextWatcher.kt` asignado para asegurar que la fecha de nacimiento está comprendida entre el
+    1 de enero de 1970 y el dia de hoy
+    La fecha de nacimiento es después almacenada en formato LocalDate, puesto que a la hora de instanciar un objeto de la entidad `Contacto.kt` se llama a un método estático
+    de la clase para calcular la edad. El cálculo de la edad se basa en comprobar si el día de hoy es mayor que su fecha de cumpleaños reemplazando su año por el año actual
+    y restándole un dia, de esta forma el dia del cumpleaños de un contacto su edad aumentará automáticamente
+  - `ContactoActivity.kt`: Muestra el TabLayout de grupos con un `ContactSliderAdapter.kt` aplicado para definir el Fragment asociado a cada pestaña.
+     - **Fragments**:
+       - `AmigosFragment.kt`: Muestra una lista de los amigos asociados al contacto y les aplica un `AmigoCardAdapter.kt` el cual permite abrir una `ContactoActivity.kt`
+         en base al amigo pulsado y eliminar la amistad al mantener pulsada la tarjeta del amigo
+       - `ContactGroupsFragment.kt`: Muestra la lista de grupos que ha creado o a los que pertenece el contacto. Le aplica un `GruposDeContactoCardAdapter.kt` para
+         acceder a `GrupoActivity.kt` al pulsar sobre un grupo y eliminar la relación con el grupo al mantener pulsado
+         En el caso de que el usuario sea
+       - `InformacionFragment.kt`: Muestra los datos del contacto y un RecyclerView con las anotaciones asociadas a este. Las anotaciones en cualquier caso pueden ser
+         editadas o eliminadas desde el pop up que aparece en pantalla al pulsar sobre ellas
 
 - **Sucesos**
-  *(También se gestionan desde activities en la carpeta sucesos, encargados de mostrar y crear sucesos relacionados con personas o grupos.)*
+  - `NuevoSucesoActivity.kt`: Permite crear un nuevo suceso, detallando su título, descripción, fecha, causante e implicados
+    Los implicados son opcionales, un suceso solo necesita un causante para ser creado
+    El campo de descripción se ajusta de forma dinámica a la longitud del texto, cambiando su cantidad de líneas y ampliando la altura del campo
+    La activity permite hacer scroll sobre su totalidad, exceptuando la parte superior con el nombre del suceso, si el contenido no cabe en la pantalla
+  - `SucesoActivity.kt`: Muestra el TabLayout de grupos con un `SucesoSliderAdapter.kt` aplicado para definir el Fragment asociado a cada pestaña.
+     - **Fragments**:
+       - `ImplicadosFragment.kt`: Muestra una lista de los contactos implicados en el suceso (sin contar al causante) y les aplica un `ContactoCardAdapter.kt`
+         el cual permite abrir una `ContactoActivity.kt` en base al implicado pulsado y eliminar al contacto permanentemente bajo previo aviso al mantener pulsado
+         El fragmento permite hacer scroll sobre su totalidad si el contenido no cabe en la pantalla
+       - `SucesoDataFragment.kt`: Muestra los datos relativos a un suceso y al causante del mismo. El campo de descripción se ajusta dinámicamente al tamaño de la descripción,
+         separando el texto en varias líneas de la misma forma que lo hacía en `NuevoSucesoActivity.kt`. El fragmento permite hacer scroll sobre su totalidad si el contenido no cabe en
+         la pantalla
+- **Accounts**
+  - `NuevaCuentaActivity.kt`: Permite crear una nueva cuenta con nick, link, nombre de la red social, propietario y usuarios
+    Al igual que los sucesos, solo es necesario un propietario, los usuarios son opcionales y sirven para llevar un registro de cuantas personas tienen
+    acceso a esa cuenta
+    La activity permite hacer scroll sobre su totalidad, exceptuando la parte superior con el nombre de la cuenta, si el contenido no cabe en la pantalla
+  - `CuentaActivity.kt`: Muestra el TabLayout de grupos con un `CuentaSliderAdapter.kt` aplicado para definir el Fragment asociado a cada pestaña.
+     - **Fragments**:
+       - `UsuariosCuentaFragment.kt`: Muestra los usuarios con acceso a la cuenta (sin contar al creador) en un RecyclerView con un `ContactoCardAdapter.kt`
+         que permite abrir una `ContactoActivity.kt` en base al usuario pulsado y eliminar al contacto permanentemente bajo previo aviso al mantener pulsado
+         El fragmento permite hacer scroll sobre su totalidad si el contenido no cabe en la pantalla
+       - `CuentaDataFragment.kt`: Muestra los datos relativos a una cuenta y al propietario de la misma. El campo de link permite hacer click sobre él y abrir el enlace en la app
+         correspondiente o, en su defecto, en el navegador. El fragmento permite hacer scroll sobre su totalidad si el contenido no cabe en la pantalla
+-**Common**
+  - `MainActivity.kt`: Es la pantalla principal de la aplicación. Contamos con una barra de búsqueda en la parte superior de la pantalla, un botón con el texto *Nuevo* justo debajo y un
+  RecyclerView donde se cargan las tarjetas. Por defecto al iniciar la app se muestran los usuarios, pero en la parte inferior de la pantalla hay un pequeño menú con dos opciones:
+  Contactos y Grupos. Al pulsar en una de estas el RecyclerView se actualiza, cambiando el tipo de tarjetas que se muestran en el RecyclerView por el adecuado para cada entidad y se
+  devuelve una respuesta háptica para simular la pulsación de un botón físico (cualquier elemento interactuable de la UI devuelve una respuesta háptica similar)
 
-- **Accounts y Common**
-  - Carpeta `accounts`: Aquí suelen estar las vistas y lógica para la gestión de cuentas de usuario (login, registro, perfil, etc).
-  - Carpeta `common`: Contiene componentes reutilizables, fragments y vistas comunes a varias partes de la app.
+  Al pulsar en alguno de los elementos nos llevará a su respectiva activity de datos, pero si pulsamos en *Nuevo* nos llevará a crear un nuevo elemento del tipo seleccionado
 
-### Base de datos
+  -**Fragments**:
+   - `AnotacionesFragment.kt`: Fragment genérico para que cualquier elemento anotable pueda disponer rápidamente de un fragmento donde añadir, modificar y eliminar anotaciones.
+     Una vez se pulsa sobre una anotación se infla un pop up desde el que podemos leer el titulo de la anotación, ver la fecha en la que se creó, leer el contenido de la anotación
+     en un cuadro de texto adaptable similar al de `SucesoDataFragment.kt` con la diferencia de que este cuadro es scrolleable en vez de estirarse hasta mantener visible todo el texto
+     Esta vista cuenta con un botón de *Cerrar* para cerrar el mensaje, *Borrar* para borrar la anotación y *Editar* para editar el mensaje en un nuevo pop up similar a este
+     Implementado en `GroupSliderAdapter.kt`, `CuentaSliderAdapter.kt` y `SucesoSliderAdapter.kt`
+   - `CuentasFragment.kt`: Fragment genérico para que contactos y grupos puedan disponer rápidamente de un fragmento donde asociar y eliminar cuentas.
+     Implementado en `ContactSliderAdapter.kt`
+   - `SucesosFragment.kt`: Fragment genérico para que contactos y grupos puedan disponer rápidamente de un fragmento donde asociar y eliminar sucesos.
+     Implementado en `ContactSliderAdapter.kt`
+      
+## Base de datos
 
-La base de datos está organizada en los siguientes paquetes:
+La base de datos es una base de datos local SQLite manejada con la biblioteca de persistencia Android Room, que actúa como una capa de abstracción sobre SQLite y permite manejar
+todo el CRUD de los elementos mediante DAOs generados en tiempo de compilación a partir de interfaces
 
-- **database**: Aquí se define la base de datos principal y su configuración (probablemente usando Room).
-- **dao**: Contiene los objetos de acceso a datos (DAOs), que encapsulan las operaciones CRUD sobre las entidades principales: personas, grupos, sucesos, etc.
-- **model**: Define las entidades de la base de datos, como Persona, Grupo, Suceso y otras relacionadas.
+El diagrama E/R sería algo tal que así:
+![spylook](https://github.com/user-attachments/assets/577a5aae-b1bd-43af-b1c6-8b6dc79209eb)
 
-Esto permite mantener los datos almacenados localmente y consultarlos de forma eficiente desde las distintas actividades.
+Como se puede ver en la imagen, todos los elementos a excepción de Anotación forman una jerarquía total exclusiva con Anotable, dotando a la
+aplicación de una flexibilidad muy amplia. Aunque el diagrama pueda parecer caótico y con alta tendencia a provocar fallos, la flexibilidad que otorga este diseño permite una interconexión entre los datos muy alta.
+Ejs: 
+- Se podría implementar que un suceso sea provocado por otro suceso, algo así como un *efecto Mariposa*
+- Se podría implementar una característica que permita asociar a una cuenta un grupo como creador/propietario, de esta forma
+  se podría hacer referencia a un conjunto de personas (creador y miembros del grupo) como dueños de esta en vez de simplemente tener un unico   dueño
+---
+## Cosas aprendidas durante el desarrollo / curiosidades
 
-### Barra de búsqueda
+### Acceso a atributos de objetos
+Según el propio *linter* integrado en Android Studio, en Kotlin no se accede a las propiedades de un objeto mediante el getter, sino accediendo
+a la propiedad expuesta directamente (sin modificador de acceso)
+Por este motivo se puede encontrar a lo largo del código muchas asignaciones de atributos sin acceder a getters/setters o anotaciones
+como `@JvmField` sobre los atributos, que le indican al compilador de Kotlin que no genere getters/setters para ese atributo y lo exponga
 
-La barra de búsqueda está integrada en la pantalla principal (`MainActivity`) y probablemente también en otras vistas de listado. Permite buscar personas, grupos o sucesos de forma rápida, filtrando los resultados mientras el usuario escribe.
+### Tuberías y programacion funcional en Kotlin
+En Kotlin, al ser un lenguaje interoperable con Java, se puede hacer uso de los Streams y todo lo que esto conlleva. No obstante, Kotlin
+cuenta con funciones propias de programación funcional que aportan una flexibilidad muy alta a la hora de programar
 
-### Otros componentes relevantes
+Este es el caso de funciones como por ejemplo `isEmpty{}`, que permite en muchos casos reemplazar por completo a estructuras if-else
+```kotlin
+val nombre = "Carlos"
+var saludo : String = ""
+saludo.isEmpty{
+   saludo = "Hola ${nombre}, ¿qué tal?"
+}
+```
 
-- **adapters**: Aquí se encuentran los Adapter de RecyclerView para mostrar listados de personas, grupos o sucesos.
-- **controller y mappers**: Encargados de la lógica de negocio y de transformar datos entre la base de datos y la interfaz.
+Otra de las funciones que más potencial tienen es `.apply{}`. Este método se puede usar desde cualquier objeto y devuelve el mismo objeto después de aplicar el contenido de la función anónima en su interior, a la cual pasa el objeto como parámetro
+De esta forma podemos ampliar cadenas de tuberías con acciones que de otra forma no sería posible, como por ejemplo:
+```kotlin
+var lista = listOf(1,2)
+lista.filter{ it != 1}
+  .toMutableList()
+  .apply{
+    add(3)
+    add(4)}
+  .forEach{ print("${it} ") } //Resultado: 2 3 4
+```
+
+### Uso de Optional y tipos no-nulos
+En Kotlin, aunque se pueda usar la clase Optional igual que en Java, se opta por utilizar la verificación de valores nulos (null safety)
+propia del sistema de tipos de Kotlin.
+
+Todos los valores son por defecto no-nulos, es decir, se requiere asignar un valor al momento de la declaración y este nunca puede ser nulo
+Mediante el uso de palabras clave como "lateinit" delante del nombre de la variable permiten separar declaración de inicialización solo en objetos (los tipos primitivos no son compatibles con esta palabra clave)
+
+```kotlin
+private lateinit var inicializacionSeparada : String
+```
+
+En caso de que queramos que un objeto sea nulo se le asigna una interrogación al tipo, que se tiene que declarar explicitamente
+
+```kotlin
+var nula : String? = null
+var nula2: String?
+```
+
+Esto introduce un nuevo requerimiento a la hora de usar la variable, asegurarse de que al momento de acceder a la variable no es nula
+Se puede hacer de dos formas:
+
+```kotlin
+var nula : String? = "Hola mundo"
+
+print(nula?.length) //Con ? se imprime la longitud solo si la variable no es nula
+print(nula!!.charAt(0)) //Con !! se fuerza a la JVM a asumir que la variable no es nula nunca, pudiendo resultar en un NullPointerException
+```
