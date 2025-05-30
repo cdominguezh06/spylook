@@ -63,6 +63,7 @@ spylook/
     Estos adaptadores se aplican a un ViewPager para asignar el comportamiento del TabLayout de una activity, definiendo sus pestañas y el fragmento que se inflará
     en cada una
 
+  ---
 - **controller/**  
   ```
   controller/
@@ -70,6 +71,7 @@ spylook/
   ```
   Controlador para la integración con GitHub (gestión de releases, actualizaciones, etc).
 
+  ---
 - **dao/**  
   ```
   dao/
@@ -93,10 +95,31 @@ spylook/
 
   En SpyLook se hace uso principalmente de `lifecycleScope.launch` para lanzar corrutinas y acceder a la base de datos. De esta forma se genera una corrutina ligada al ciclo de vida de la Activity o Fragment
   donde se haya creado (si la Activity se cierra la corrutina también) y permite acceder a la base de datos sin bloquear el hilo principal
-
+  ```kotlin
+     lifecycleScope.launch {
+         val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
+         setupContactDetails(contact)
+         setupViewPager(contact)
+     }
+  ```
   Sin embargo, en contextos ajenos a una Activity, como puede ser un adapter de RecyclerView, no se puede hacer uso de `lifecycleScope.launch`, por lo que se recurre al método `runBlocking`
   que genera una corrutina bloqueante, aunque todavía no ha demostrado ser perjudicial para el rendimiento de la app
-  
+  ```kotlin
+     runBlocking {
+         dao.deleteContactoWithAnotableById(cardItem.idAnotable)
+         val index = cardItemList.indexOf(cardItem)
+         recyclerAnimator.deleteItemWithAnimation(
+             holder.itemView,
+             index,
+             onEmptyCallback = {
+                 cardItemList.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST)
+             },
+             afterDeleteCallBack = {
+                 popupWindow.dismiss()
+             })
+     }
+  ```
+  ---
 - **database/**  
   ```
   database/
@@ -107,6 +130,7 @@ spylook/
   En ella nos encontramos una instancia de cada DAO declarado, la declaración de todas las entidades que serán convertidas en tablas y una versión de la base de datos.
   Esta versión ha de cambiarse cada vez que modificamos el esquema de la base de datos (modificando entidades) para que Room rehaga la base de datos y no acceda a un esquema antiguo, provocando un fallo en el proceso
 
+  ---
 - **mappers/**  
   ```
   mappers/
@@ -118,20 +142,18 @@ spylook/
   └── SucesoToCardItem.kt
   ```
   Mappers creados con *[MapStruct](https://mvnrepository.com/artifact/org.mapstruct/mapstruct/1.5.3.Final)* para convertir fácilmente entidades en tarjetas para mostrar en un RecyclerView
+
+  ---
 - **model/**  
   ```
   model/
   ├── cards/
-  │    ├── Anotable.kt
-  │    ├── Anotacion.kt
-  │    ├── Contacto.kt
-  │    ├── ContactoAmistadCrossRef.kt
-  │    ├── ContactoGrupoCrossRef.kt
-  │    ├── ContactoSucesoCrossRef.kt
-  │    ├── Cuenta.kt
-  │    ├── CuentaContactoCrossRef.kt
-  │    ├── Grupo.kt
-  │    └── Suceso.kt
+  │    ├── AnotacionCardItem.kt
+  │    ├── ContactoCardItem.kt
+  │    ├── ContactoMiniCard.kt
+  │    ├── CuentaCardItem.kt
+  │    ├── GrupoCardItem.kt
+  │    └── SucesoCardItem.kt
   ├── entity/
   │    ├── Anotable.kt
   │    ├── Anotacion.kt
@@ -159,21 +181,58 @@ spylook/
   │    ├── GruposContactos.kt
   │    └── SucesosContactos.kt
   └── utils/
-       ├── ApplicationUpdater.kt
-       ├── ForegroundShaderSpan.kt
-       ├── StringWithSpacesIndexRetriever.kt
        ├── animations/
        ├── converters/
        ├── decorators/
-       └── textWatchers/
+       ├── textWatchers/
+       ├── ApplicationUpdater.kt
+       ├── ForegroundShaderSpan.kt
+       └── StringWithSpacesIndexRetriever.kt
   ```
   En este paquete se encuentran la mayoría de clases de la aplicación
-  - **cards/**: Modelos de tarjeta (estructura de datos para mostrar información compacta).
+  
+  - **cards/**: Clases para cada tipo de tarjeta que se pueda mostrar en un RecyclerView
   - **entity/**: Entidades Room, relaciones entre entidades y crossrefs para relaciones N:M.
-  - **github/**: Modelos para integración con la API de GitHub.
-  - **relations/**: Clases para relaciones y consultas complejas entre entidades.
+  - **github/**: Modelos para integración con la API de GitHub y tomar información de cada release de la aplicación
+  - **relations/**: Clases para relaciones entre entidades.
   - **utils/**: Utilidades generales (actualización, decoradores, animaciones, etc), con subcarpetas especializadas.
-
+    ```
+    utils/
+       ├── animations/
+       │    └── RecyclerViewAnimator.kt
+       ├── converters/
+       │    └── DateConverters.kt
+       ├── decorators/
+       │    ├── RainbowTextViewDecorator.kt
+       │    └── SpacingItemDecoration.kt
+       ├── textWatchers/
+       │    ├── actions/
+       │    │    └── LongTextScrollerAction.kt
+       │    ├── DateTextWatcher.kt
+       │    ├── TextWatcherSearchBarContacts.kt
+       │    ├── TextWatcherSearchBarGroups.kt
+       │    ├── TextWatcherSearchBarGruposDeContacto.kt
+       │    └── TextWatcherSearchBarMiembros.kt
+       ├── ApplicationUpdater.kt
+       ├── ForegroundShaderSpan.kt
+       └── StringWithSpacesIndexRetriever
+    ```
+    - **animations/RecyclerViewAnimator.kt**: Animación al eliminar un elemento de un RecyclerView, aceptando funciones anónimas (lambda) como parámetro para definir el comportamiento
+      después del borrado y cuando la lista queda vacía tras el borrado
+    - **converters/DateConverters.kt**: Singleton para generar conversores de fechas LocalDate o LocalDateTime a String, siguiendo un regex específico
+    - **decorators/**: Objetos que alteran la apariencia de elementos de la UI:
+      - **RainbowTextViewDecorator.kt**: A la hora de realizar una búsqueda, resalta la parte coincidente del texto con un gradiente de arcoíris
+      - **SpacingItemDecoration.kt**: Añade una pequeña separación entre elementos de un RecyclerView
+    - **textWatchers/**: Aqui hay objetos que analizan constantemente los cambios de texto de un EditText con distintas finalizades
+      - **actions/**: Acciones a aplicar por un TextWatcher sobre un elemento de la UI para alterar su estilo vía código Kotlin
+        -**LongTextScrollerAction.kt**: Comprueba si el texto de la búsqueda no cabe en los límites de su respectivo TextView para desplazarlo hasta poder ver la coincidencia
+      - **DateTextWatcher.kt**: Comprueba el valor introducido en el EditText asignado y delimita un valor mínimo (01/01/1970) y un valor máximo (LocalDate.now())
+      - **TextWatcherSearchBar%.kt**: Estos archivos asignan un comportamiento distinto a la barra de búsqueda según el resultado deseado
+    - **ApplicationUpdater.kt**: Singleton que genera la notificación de descarga y la petición de permisos de instalación de orígenes desconocidos
+    - **ForegroundShaderSpan.kt**: Aplica el shader de texto arcoíris al Spannable al que entra como parámetro
+    - **StringWithSpacesIndexRetriever.kt**: Permite que la búsqueda se pueda realizar sin escribir espacios manteniendo el shader de arcoíris bien aplicado
+   
+  ---
 - **view/**  
   - **accounts/**
     ```
