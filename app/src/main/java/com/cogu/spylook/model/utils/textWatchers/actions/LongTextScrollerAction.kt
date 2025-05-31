@@ -8,7 +8,8 @@ import android.widget.TextView
 class LongTextScrollerAction(
     var text: TextView,
     var startIndex: Int,
-    var busqueda: String
+    var busqueda: String,
+    var onFitOnScreen : () -> Unit
 ) : () -> Unit {
     companion object{
         var lastScroll = 0.0f
@@ -60,7 +61,9 @@ class LongTextScrollerAction(
             text.isHorizontalScrollBarEnabled = false
             text.setHorizontallyScrolling(false)
             text.scrollTo(0, 0)
-
+            lastDistance = 0f
+            lastScroll = 0f
+            onFitOnScreen.invoke()
         }
     }
 }

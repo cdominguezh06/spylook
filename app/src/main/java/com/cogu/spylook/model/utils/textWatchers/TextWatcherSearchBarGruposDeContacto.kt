@@ -47,6 +47,8 @@ class TextWatcherSearchBarGruposDeContacto(
     private val db: AppDatabase
     private lateinit var collect: MutableList<GrupoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
+    private val fitting: MutableList<GrupoCardItem> = mutableListOf()
+
     init {
         this.db = AppDatabase.getInstance(context!!)!!
     }
@@ -66,8 +68,9 @@ class TextWatcherSearchBarGruposDeContacto(
             val exclude = db.grupoDAO()!!.findGruposByCreador(contacto.idAnotable)
                 .toMutableList()
                 .apply {
-                    addAll(db.grupoDAO()!!.findGruposByMiembro(contacto.idAnotable)
-                        .map { db.grupoDAO()!!.findGrupoById(it.idGrupo)!! })
+                    addAll(
+                        db.grupoDAO()!!.findGruposByMiembro(contacto.idAnotable)
+                            .map { db.grupoDAO()!!.findGrupoById(it.idGrupo)!! })
                 }
                 .map { mapper.toCardItem(it) }
             collect = collect.filter { !exclude.contains(it) }.toMutableList()
@@ -91,18 +94,25 @@ class TextWatcherSearchBarGruposDeContacto(
         val newAdapter = object : BusquedaGrupoCardAdapter(collect, context!!) {
             override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
                 val cardItem = cardItemList[position]
-                holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+                holder.careto.setColorFilter(
+                    cardItem.colorFoto,
+                    android.graphics.PorterDuff.Mode.MULTIPLY
+                )
                 holder.name.apply {
-                    setHorizontallyScrolling(true)
-                    isHorizontalScrollBarEnabled = false
-                    isSingleLine = true
-                    ellipsize = null // Desactivar truncamiento
-                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
-                    val scroller = Scroller(context)
-                    setScroller(scroller)
-                    scroller.startScroll(LongTextScrollerAction.lastScroll.toInt(), 0,
-                        LongTextScrollerAction.lastDistance.toInt(), 0)
-                    invalidate()
+                    if (!fitting.contains(cardItem)) {
+                        setHorizontallyScrolling(true)
+                        isHorizontalScrollBarEnabled = false
+                        isSingleLine = true
+                        ellipsize = null // Desactivar truncamiento
+                        textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                        val scroller = Scroller(context)
+                        setScroller(scroller)
+                        scroller.startScroll(
+                            LongTextScrollerAction.lastScroll.toInt(), 0,
+                            LongTextScrollerAction.lastDistance.toInt(), 0
+                        )
+                        invalidate()
+                    }
                 }
                 holder.name.text = SpannableString(cardItem.nombre).apply {
                     cardItem.nombre = cardItem.nombre.let {
@@ -123,10 +133,24 @@ class TextWatcherSearchBarGruposDeContacto(
                             setSpan(
                                 ForegroundShaderSpan(shader),
                                 startIndex,
-                                retriever.getSpanIntervalJump(busqueda, cardItem.nombre, startIndex),
+                                retriever.getSpanIntervalJump(
+                                    busqueda,
+                                    cardItem.nombre,
+                                    startIndex
+                                ),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
-                            holder.name.post(LongTextScrollerAction(holder.name, startIndex, busqueda))
+                            holder.name.post(
+                                LongTextScrollerAction(
+                                    holder.name,
+                                    startIndex,
+                                    busqueda,
+                                    onFitOnScreen = {
+                                        if (!fitting.contains(cardItem)) {
+                                            fitting.add(cardItem)
+                                        }
+                                    })
+                            )
 
                         }
                         spannable.toString()

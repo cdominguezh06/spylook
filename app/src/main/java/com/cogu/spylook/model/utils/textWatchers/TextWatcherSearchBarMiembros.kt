@@ -43,6 +43,7 @@ class TextWatcherSearchBarMiembros(
     private lateinit var baseAdapter: BusquedaContactoCardAdapter
     private lateinit var collect: MutableList<ContactoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
+    private val fitting : MutableList<ContactoCardItem> = mutableListOf()
 
     init {
         this.db = AppDatabase.getInstance(context!!)!!
@@ -97,16 +98,20 @@ class TextWatcherSearchBarMiembros(
                 val cardItem = cardItemList[position]
                 holder.name.text = cardItem.nombre
                 holder.mostknownalias.apply {
-                    setHorizontallyScrolling(true)
-                    isHorizontalScrollBarEnabled = false
-                    isSingleLine = true
-                    ellipsize = null // Desactivar truncamiento
-                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
-                    val scroller = Scroller(context)
-                    setScroller(scroller)
-                    scroller.startScroll(LongTextScrollerAction.lastScroll.toInt(), 0,
-                        LongTextScrollerAction.lastDistance.toInt(), 0)
-                    invalidate()
+                    if(!fitting.contains(cardItem)) {
+                        setHorizontallyScrolling(true)
+                        isHorizontalScrollBarEnabled = false
+                        isSingleLine = true
+                        ellipsize = null // Desactivar truncamiento
+                        textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                        val scroller = Scroller(context)
+                        setScroller(scroller)
+                        scroller.startScroll(
+                            LongTextScrollerAction.lastScroll.toInt(), 0,
+                            LongTextScrollerAction.lastDistance.toInt(), 0
+                        )
+                        invalidate()
+                    }
                 }
                 holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
                     cardItem.alias = cardItem.alias.let {
@@ -134,7 +139,12 @@ class TextWatcherSearchBarMiembros(
                                 LongTextScrollerAction(
                                     holder.mostknownalias,
                                     startIndex,
-                                    busqueda
+                                    busqueda,
+                                    onFitOnScreen = {
+                                        if(!fitting.contains(cardItem)){
+                                            fitting.add(cardItem)
+                                        }
+                                    }
                                 )
                             )
                         }

@@ -43,6 +43,8 @@ class TextWatcherSearchBarContacts(
     private val db: AppDatabase
     private lateinit var collect: MutableList<ContactoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
+    private val fitting : MutableList<ContactoCardItem> = mutableListOf()
+
     init {
         this.db = AppDatabase.getInstance(context!!)!!
     }
@@ -81,16 +83,20 @@ class TextWatcherSearchBarContacts(
                 val cardItem = cardItemList[position]
                 holder.name.text = cardItem.nombre
                 holder.mostknownalias.apply {
-                    setHorizontallyScrolling(true)
-                    isHorizontalScrollBarEnabled = false
-                    isSingleLine = true
-                    ellipsize = null // Desactivar truncamiento
-                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
-                    val scroller = Scroller(context)
-                    setScroller(scroller)
-                    scroller.startScroll(LongTextScrollerAction.lastScroll.toInt(), 0,
-                        LongTextScrollerAction.lastDistance.toInt(), 0)
-                    invalidate()
+                    if(!fitting.contains(cardItem)){
+                        setHorizontallyScrolling(true)
+                        isHorizontalScrollBarEnabled = false
+                        isSingleLine = true
+                        ellipsize = null // Desactivar truncamiento
+                        textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                        val scroller = Scroller(context)
+                        setScroller(scroller)
+                        scroller.startScroll(
+                            LongTextScrollerAction.lastScroll.toInt(), 0,
+                            LongTextScrollerAction.lastDistance.toInt(), 0
+                        )
+                        invalidate()
+                    }
                 }
                 holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
                     cardItem.alias = cardItem.alias.let {
@@ -114,12 +120,24 @@ class TextWatcherSearchBarContacts(
                                 retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
-                            holder.mostknownalias.post(LongTextScrollerAction(holder.mostknownalias, startIndex, busqueda))
+                            holder.mostknownalias.post(
+                                LongTextScrollerAction(
+                                    holder.mostknownalias,
+                                    startIndex,
+                                    busqueda,
+                                    onFitOnScreen = {
+                                        if(!fitting.contains(cardItem)){
+                                            fitting.add(cardItem)
+                                        }
+                                    }
+                                )
+                            )
                         }
                         spannable.toString()
                     }
 
                 }
+
                 if (cardItem.idAnotable != -1) {
                     holder.careto.setImageResource(R.drawable.contact_icon)
                     holder.careto.setColorFilter(
