@@ -388,14 +388,17 @@ spylook/
                           var anno = clean.substring(4, 8).toInt()
           
                           anno = max(1970.0, min(anno.toDouble(), LocalDate.now().year.toDouble())).toInt()
+          
                           if (anno == LocalDate.now().year) {
                               mes =
                                   max(1.0, min(mes.toDouble(), LocalDate.now().monthValue.toDouble())).toInt()
                           } else {
                               mes = max(1.0, min(mes.toDouble(), 12.0)).toInt()
                           }
+          
                           calendario.set(Calendar.YEAR, anno)
                           calendario.set(Calendar.MONTH, mes - 1)
+          
                           if (mes == LocalDate.now().monthValue && anno == LocalDate.now().year) {
                               dia =
                                   max(1.0, min(dia.toDouble(), LocalDate.now().dayOfMonth.toDouble())).toInt()
@@ -416,8 +419,10 @@ spylook/
                           clean.substring(2, 4),
                           clean.substring(4, 8)
                       )
+          
                       current = clean
                       editText.setText(current)
+          
                       if (count > 0 && before == 0) {
                           if(start > lastNumberIndex){
                               editText.setSelection(min(selection.toDouble(), current.length.toDouble()).toInt())
@@ -426,6 +431,7 @@ spylook/
                       }else{
                           editText.setSelection(start)
                       }
+          
                       lastNumberIndex = s.toString().lastIndexOf(
                           current.replace("\\D".toRegex(), "")[current.replace("\\D".toRegex(), "").length - 1])
 
