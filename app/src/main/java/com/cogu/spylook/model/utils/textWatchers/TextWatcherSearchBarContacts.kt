@@ -52,113 +52,113 @@ class TextWatcherSearchBarContacts(
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
     }
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        val busqueda = text.getText().toString().lowercase(
-            Locale.getDefault()
-        ).replace(" ", "")
+override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+    val busqueda = text.getText().toString().lowercase(
+        Locale.getDefault()
+    ).replace(" ", "")
 
-        runBlocking {
-            collect = db.contactoDAO()!!
-                .getContactos()
-                .map { c -> mapper.toCardItem(c) }
-                .toMutableList()
-        }
-        busqueda.ifEmpty {
-            recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
-            retriever.contador = 0
-            LongTextScrollerAction.lastScroll = 0.0f
-            LongTextScrollerAction.lastDistance = 0.0f
-            return@onTextChanged
-        }
-        collect = collect.filter { c ->
-            c.alias.replace(" ", "").lowercase(Locale.getDefault()).contains(busqueda)
-        }.toMutableList()
-        collect.ifEmpty {
-            collect.add(ContactoCardItem.DEFAULT_FOR_NO_RESULTS)
-            recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
-            return@onTextChanged
-        }
-        val newAdapter = object : ContactoCardAdapter(collect, context!!) {
-            override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-                val cardItem = cardItemList[position]
-                holder.name.text = cardItem.nombre
-                holder.mostknownalias.apply {
-                    if(!fitting.contains(cardItem)){
-                        setHorizontallyScrolling(true)
-                        isHorizontalScrollBarEnabled = false
-                        isSingleLine = true
-                        ellipsize = null // Desactivar truncamiento
-                        textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
-                        val scroller = Scroller(context)
-                        setScroller(scroller)
-                        scroller.startScroll(
-                            LongTextScrollerAction.lastScroll.toInt(), 0,
-                            LongTextScrollerAction.lastDistance.toInt(), 0
-                        )
-                        invalidate()
-                    }
-                }
-                holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
-                    cardItem.alias = cardItem.alias.let {
-                        val spannable = SpannableString(it)
-                        var startIndex = retriever.getStartIndex(busqueda, cardItem.alias)
-                        if (startIndex >= 0) {
-                            val shader = LinearGradient(
-                                0f, 0f, holder.mostknownalias.textSize * 2, 0f,
-                                intArrayOf(
-                                    context!!.getColor(R.color.red),
-                                    context.getColor(R.color.yellow),
-                                    context.getColor(R.color.green),
-
-                                    ),
-                                floatArrayOf(0f, 0.5f, 1f),
-                                Shader.TileMode.MIRROR
-                            )
-                            setSpan(
-                                ForegroundShaderSpan(shader),
-                                startIndex,
-                                retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                            )
-                            holder.mostknownalias.post(
-                                LongTextScrollerAction(
-                                    holder.mostknownalias,
-                                    startIndex,
-                                    busqueda,
-                                    onFitOnScreen = {
-                                        if(!fitting.contains(cardItem)){
-                                            fitting.add(cardItem)
-                                        }
-                                    }
-                                )
-                            )
-                        }
-                        spannable.toString()
-                    }
-
-                }
-
-                if (cardItem.idAnotable != -1) {
-                    holder.careto.setImageResource(R.drawable.contact_icon)
-                    holder.careto.setColorFilter(
-                        cardItem.colorFoto,
-                        PorterDuff.Mode.MULTIPLY
+    runBlocking {
+        collect = db.contactoDAO()!!
+            .getContactos()
+            .map { c -> mapper.toCardItem(c) }
+            .toMutableList()
+    }
+    busqueda.ifEmpty {
+        recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
+        retriever.contador = 0
+        LongTextScrollerAction.lastScroll = 0.0f
+        LongTextScrollerAction.lastDistance = 0.0f
+        return@onTextChanged
+    }
+    collect = collect.filter { c ->
+        c.alias.replace(" ", "").lowercase(Locale.getDefault()).contains(busqueda)
+    }.toMutableList()
+    collect.ifEmpty {
+        collect.add(ContactoCardItem.DEFAULT_FOR_NO_RESULTS)
+        recyclerView!!.setAdapter(ContactoCardAdapter(collect, context!!))
+        return@onTextChanged
+    }
+    val newAdapter = object : ContactoCardAdapter(collect, context!!) {
+        override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
+            val cardItem = cardItemList[position]
+            holder.name.text = cardItem.nombre
+            holder.mostknownalias.apply {
+                if(!fitting.contains(cardItem)){
+                    setHorizontallyScrolling(true)
+                    isHorizontalScrollBarEnabled = false
+                    isSingleLine = true
+                    ellipsize = null // Desactivar truncamiento
+                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                    val scroller = Scroller(context)
+                    setScroller(scroller)
+                    scroller.startScroll(
+                        LongTextScrollerAction.lastScroll.toInt(), 0,
+                        LongTextScrollerAction.lastDistance.toInt(), 0
                     )
-                } else {
-                    holder.careto.setImageResource(R.drawable.notfound)
-                }
-                if (cardItem.clickable) {
-                    holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
-                        val intent = Intent(context, ContactoActivity::class.java)
-                        intent.putExtra("id", cardItem.idAnotable)
-                        context!!.startActivity(intent)
-                    })
+                    invalidate()
                 }
             }
+            holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
+                cardItem.alias = cardItem.alias.let {
+                    val spannable = SpannableString(it)
+                    var startIndex = retriever.getStartIndex(busqueda, cardItem.alias)
+                    if (startIndex >= 0) {
+                        val shader = LinearGradient(
+                            0f, 0f, holder.mostknownalias.textSize * 2, 0f,
+                            intArrayOf(
+                                context!!.getColor(R.color.red),
+                                context.getColor(R.color.yellow),
+                                context.getColor(R.color.green),
+
+                                ),
+                            floatArrayOf(0f, 0.5f, 1f),
+                            Shader.TileMode.MIRROR
+                        )
+                        setSpan(
+                            ForegroundShaderSpan(shader),
+                            startIndex,
+                            retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        holder.mostknownalias.post(
+                            LongTextScrollerAction(
+                                holder.mostknownalias,
+                                startIndex,
+                                busqueda,
+                                onFitOnScreen = {
+                                    if(!fitting.contains(cardItem)){
+                                        fitting.add(cardItem)
+                                    }
+                                }
+                            )
+                        )
+                    }
+                    spannable.toString()
+                }
+
+            }
+
+            if (cardItem.idAnotable != -1) {
+                holder.careto.setImageResource(R.drawable.contact_icon)
+                holder.careto.setColorFilter(
+                    cardItem.colorFoto,
+                    PorterDuff.Mode.MULTIPLY
+                )
+            } else {
+                holder.careto.setImageResource(R.drawable.notfound)
+            }
+            if (cardItem.clickable) {
+                holder.itemView.setOnClickListener(View.OnClickListener { l: View? ->
+                    val intent = Intent(context, ContactoActivity::class.java)
+                    intent.putExtra("id", cardItem.idAnotable)
+                    context!!.startActivity(intent)
+                })
+            }
         }
-        recyclerView!!.setLayoutManager(LinearLayoutManager(context))
-        recyclerView.setAdapter(newAdapter)
     }
+    recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+    recyclerView.setAdapter(newAdapter)
+}
 
     override fun afterTextChanged(s: Editable?) {
     }
