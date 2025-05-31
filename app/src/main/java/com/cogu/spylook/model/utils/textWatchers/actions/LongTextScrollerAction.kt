@@ -19,13 +19,6 @@ class LongTextScrollerAction(
         val lineWidth =
             text.paint.measureText(text.text.toString())
         val viewWidth = text.width
-        val endLine = text.layout.getLineForOffset(lastScroll.toInt() + viewWidth)
-
-        // Obtener el índice del último carácter visible en la última línea visible
-        val visibleText = text.layout.getOffsetForHorizontal(
-            endLine.coerceAtMost(text.layout.lineCount - 1), // Validar línea máxima
-            lastScroll + viewWidth                      // Última posición horizontal visible
-        ).coerceAtMost(text.text.length)
 
         val actualLastCharPosition = text.paint.measureText(
             text.text.toString(),
@@ -40,7 +33,6 @@ class LongTextScrollerAction(
             text.ellipsize = null // Desactivar truncamiento
             text.textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START // Alineación desde el inicio
 
-            // Creando y asignando Scroller
             val scroller = Scroller(text.context)
             text.setScroller(scroller)
 
