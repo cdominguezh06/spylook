@@ -11,6 +11,8 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import android.widget.Scroller
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -38,7 +40,7 @@ class TextWatcherSearchBarMiembros(
     private val mapper: ContactoToCardItem =
         Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private val db: AppDatabase
-    private lateinit var baseAdapter : BusquedaContactoCardAdapter
+    private lateinit var baseAdapter: BusquedaContactoCardAdapter
     private lateinit var collect: MutableList<ContactoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
 
@@ -67,17 +69,18 @@ class TextWatcherSearchBarMiembros(
             collect.ifEmpty { collect.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST) }
         }
 
-       busqueda.ifEmpty {
+        busqueda.ifEmpty {
             baseAdapter.cardItemList = collect
             baseAdapter.notifyItemRangeChanged(0, collect.size)
             recyclerView?.adapter = baseAdapter
             retriever.contador = 0
             LongTextScrollerAction.lastScroll = 0.0f
+            LongTextScrollerAction.lastDistance = 0.0f
             return@onTextChanged
         }
 
         collect = collect.filter {
-            it.alias.replace(" ","").lowercase(Locale.getDefault()).contains(busqueda)
+            it.alias.replace(" ", "").lowercase(Locale.getDefault()).contains(busqueda)
         }
             .filter { it.idAnotable > 0 }
             .toMutableList()
@@ -93,6 +96,18 @@ class TextWatcherSearchBarMiembros(
             override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
                 val cardItem = cardItemList[position]
                 holder.name.text = cardItem.nombre
+                holder.mostknownalias.apply {
+                    setHorizontallyScrolling(true)
+                    isHorizontalScrollBarEnabled = false
+                    isSingleLine = true
+                    ellipsize = null // Desactivar truncamiento
+                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                    val scroller = Scroller(context)
+                    setScroller(scroller)
+                    scroller.startScroll(LongTextScrollerAction.lastScroll.toInt(), 0,
+                        LongTextScrollerAction.lastDistance.toInt(), 0)
+                    invalidate()
+                }
                 holder.mostknownalias.text = SpannableString(cardItem.alias).apply {
                     cardItem.alias = cardItem.alias.let {
                         val spannable = SpannableString(it)
@@ -115,7 +130,13 @@ class TextWatcherSearchBarMiembros(
                                 retriever.getSpanIntervalJump(busqueda, cardItem.alias, startIndex),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
-                            holder.mostknownalias.post(LongTextScrollerAction(holder.mostknownalias, startIndex, busqueda))
+                            holder.mostknownalias.post(
+                                LongTextScrollerAction(
+                                    holder.mostknownalias,
+                                    startIndex,
+                                    busqueda
+                                )
+                            )
                         }
                         spannable.toString()
                     }

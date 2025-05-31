@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.PopupWindow
+import android.widget.Scroller
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -75,6 +76,7 @@ class TextWatcherSearchBarGruposDeContacto(
             recyclerView!!.setAdapter(GrupoCardAdapter(collect, context!!))
             retriever.contador = 0
             LongTextScrollerAction.lastScroll = 0.0f
+            LongTextScrollerAction.lastDistance = 0.0f
             return@onTextChanged
         }
         collect = collect.filter { c ->
@@ -90,6 +92,18 @@ class TextWatcherSearchBarGruposDeContacto(
             override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
                 val cardItem = cardItemList[position]
                 holder.careto.setColorFilter(cardItem.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+                holder.name.apply {
+                    setHorizontallyScrolling(true)
+                    isHorizontalScrollBarEnabled = false
+                    isSingleLine = true
+                    ellipsize = null // Desactivar truncamiento
+                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                    val scroller = Scroller(context)
+                    setScroller(scroller)
+                    scroller.startScroll(LongTextScrollerAction.lastScroll.toInt(), 0,
+                        LongTextScrollerAction.lastDistance.toInt(), 0)
+                    invalidate()
+                }
                 holder.name.text = SpannableString(cardItem.nombre).apply {
                     cardItem.nombre = cardItem.nombre.let {
                         val spannable = SpannableString(it)

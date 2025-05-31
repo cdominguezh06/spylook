@@ -12,6 +12,8 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.Scroller
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
@@ -60,6 +62,7 @@ class TextWatcherSearchBarGroups(
             recyclerView!!.setAdapter(GrupoCardAdapter(collect, context!!))
             retriever.contador = 0
             LongTextScrollerAction.lastScroll = 0.0f
+            LongTextScrollerAction.lastDistance = 0.0f
             return@onTextChanged
         }
         collect = collect.filter { c ->
@@ -79,6 +82,18 @@ class TextWatcherSearchBarGroups(
                     holder.numeroMiembros.text = "${miembros} miembros"
                 }
                 holder.careto.setColorFilter(cardItem.colorFoto, PorterDuff.Mode.MULTIPLY)
+                holder.name.apply {
+                    setHorizontallyScrolling(true)
+                    isHorizontalScrollBarEnabled = false
+                    isSingleLine = true
+                    ellipsize = null // Desactivar truncamiento
+                    textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+                    val scroller = Scroller(context)
+                    setScroller(scroller)
+                    scroller.startScroll(LongTextScrollerAction.lastScroll.toInt(), 0,
+                        LongTextScrollerAction.lastDistance.toInt(), 0)
+                    invalidate()
+                }
                 holder.name.text = SpannableString(cardItem.nombre).apply {
                     cardItem.nombre = cardItem.nombre.let {
                         val spannable = SpannableString(it)

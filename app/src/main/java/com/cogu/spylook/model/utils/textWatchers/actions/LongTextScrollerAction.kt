@@ -1,6 +1,7 @@
 package com.cogu.spylook.model.utils.textWatchers.actions
 
 import android.text.TextUtils
+import android.view.View
 import android.widget.Scroller
 import android.widget.TextView
 
@@ -11,6 +12,7 @@ class LongTextScrollerAction(
 ) : () -> Unit {
     companion object{
         var lastScroll = 0.0f
+        var lastDistance = 0.0f
     }
     override fun invoke() {
         val lineWidth =
@@ -24,12 +26,12 @@ class LongTextScrollerAction(
             lastScroll + viewWidth                      // Última posición horizontal visible
         ).coerceAtMost(text.text.length)
 
-        val endCharPosition = visibleText.coerceAtMost(text.text.length)
-        val startCharPosition = visibleText.coerceAtLeast(0)
-        val actualLastCharPosition =
-            text.paint.measureText(text.text.toString(), 0, startIndex + busqueda.length - 1)
+        val actualLastCharPosition = text.paint.measureText(
+            text.text.toString(),
+            0,
+            startIndex + busqueda.length
+        )
         if (lineWidth > viewWidth) {
-
             // Configuramos el TextView para manejar el desplazamiento
             text.setHorizontallyScrolling(true)
             text.isHorizontalScrollBarEnabled = false
@@ -41,11 +43,14 @@ class LongTextScrollerAction(
             val scroller = Scroller(text.context)
             text.setScroller(scroller)
 
-            if (actualLastCharPosition < startCharPosition || actualLastCharPosition > endCharPosition) {
-                scroller.startScroll(lastScroll.toInt(), 0, (actualLastCharPosition -lastScroll).toInt(), 0)
-                lastScroll = text.x
-            }
+            val desiredCenter = actualLastCharPosition - (viewWidth / 2f)
+            val finalCenter = desiredCenter.coerceAtLeast(0f)
+            val distance = finalCenter - lastScroll
+            scroller.startScroll(lastScroll.toInt(), 0, distance.toInt(), 0)
+            lastScroll = finalCenter
+            lastDistance = distance
             text.invalidate()
+
 
         } else {
             text.isSelected = true
