@@ -1,6 +1,7 @@
 [![Carlos | Coguu](https://img.shields.io/badge/Carlos-Coguu-blue)](https://github.com/cdominguezh06)
 [![Latest release](https://img.shields.io/github/v/release/cdominguezh06/spylook?display_name=tag&color=green)](https://github.com/cdominguezh06/spylook/releases)
-[![Web Repository](https://img.shields.io/badge/Web-Repository-red)](https://github.com/cdominguezh06/spylook-web)
+[![Web Repository](https://img.shields.io/badge/Web-Repository-black?logo=angular&labelColor=red)](https://github.com/cdominguezh06/spylook-web)
+[![Made With Kotlin](https://img.shields.io/badge/Made%20With-Kotlin%20-%20purple?logo=kotlin&labelColor=white)](https://kotlinlang.org)
 
 # SpyLook 👀
 
