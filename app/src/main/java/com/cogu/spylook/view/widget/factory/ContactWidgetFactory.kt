@@ -7,14 +7,12 @@ import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.createBitmap
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.view.common.MainActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 

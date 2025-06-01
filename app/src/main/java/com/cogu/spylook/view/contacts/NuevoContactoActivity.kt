@@ -1,5 +1,8 @@
 package com.cogu.spylook.view.contacts
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -22,6 +25,7 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.entity.Contacto
 import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
+import com.cogu.spylook.view.widget.CustomProvider
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -129,6 +133,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
                     return@launch
                 }
                 database.contactoDAO()!!.addContactoWithAnotable(contact)
+                notifyWidgetUpdate()
                 finish()
             }
         }
@@ -152,5 +157,14 @@ class NuevoContactoActivity() : AppCompatActivity() {
             pais = country,
             colorFoto = color
         )
+    }
+
+    private fun notifyWidgetUpdate() {
+        val intent = Intent(this, CustomProvider::class.java)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        val ids = AppWidgetManager.getInstance(this)
+            .getAppWidgetIds(ComponentName(this, CustomProvider::class.java))
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        sendBroadcast(intent)
     }
 }

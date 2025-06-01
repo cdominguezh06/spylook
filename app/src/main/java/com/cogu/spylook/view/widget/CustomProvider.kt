@@ -23,6 +23,7 @@ class CustomProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.contact_widget_layout)
             views.setPendingIntentTemplate(R.id.widget_contacts_list, pendingIntent)
             val intentService = Intent(context, ContactWidgetService::class.java)
+            appWidgetManager.notifyAppWidgetViewDataChanged(intArrayOf(appWidgetId), R.id.widget_contacts_list)
             views.setRemoteAdapter(R.id.widget_contacts_list, intentService)
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
