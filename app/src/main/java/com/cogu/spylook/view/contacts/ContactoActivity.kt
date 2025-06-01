@@ -79,7 +79,7 @@ class ContactoActivity : AppCompatActivity() {
             MainActivity.addRecentContact(Mappers.getMapper(ContactoToCardItem::class.java).toCardItem(contact), this@ContactoActivity)
             setupContactDetails(contact)
             setupViewPager(contact)
-            NotificationHelper.showContactNotification(this@ContactoActivity, contact, contact.alias)
+            NotificationHelper.lastContact = contact
         }
     }
 
@@ -115,6 +115,15 @@ class ContactoActivity : AppCompatActivity() {
                 viewPager.setCurrentItem(currentPosition, false)
             }
 
+        }
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NotificationHelper.cancel(this)
+        NotificationHelper.lastContact?.let {
+            NotificationHelper.showOpenContactNotification(this, it)
         }
 
     }

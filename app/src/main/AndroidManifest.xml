@@ -40,17 +40,17 @@
             android:name=".view.contacts.NuevoContactoActivity"
             android:exported="false" />
         <activity
-            android:name=".view.contacts.ContactoActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.common.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".view.contacts.ContactoActivity"
+            android:parentActivityName=".view.common.MainActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -78,7 +78,6 @@
         <service
             android:name=".view.widget.services.ContactWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
-        <receiver android:name=".view.notification.receiver.NotificationActionReceiver" />
     </application>
 
 </manifest>

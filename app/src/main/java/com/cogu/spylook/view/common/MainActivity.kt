@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 import androidx.core.graphics.createBitmap
 import com.cogu.spylook.view.contacts.ContactoActivity
+import com.cogu.spylook.view.notification.NotificationHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,16 +75,18 @@ class MainActivity : AppCompatActivity() {
     private var grupos = mutableListOf<GrupoCardItem>()
     private lateinit var unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     private lateinit var toExecute: suspend CoroutineScope.() -> Unit
-    companion object{
-        val masRecientes : MutableList<ContactoCardItem> = mutableListOf()
+
+    companion object {
+        val masRecientes: MutableList<ContactoCardItem> = mutableListOf()
 
         fun addRecentContact(contact: ContactoCardItem, context: Context) {
             if (masRecientes.size > 3) {
                 masRecientes.removeAt(0)
             }
             masRecientes.add(contact)
-            val shorcuts = masRecientes.map{ c ->
-                val image = AppCompatResources.getDrawable(context, R.drawable.contact_icon)?.mutate()
+            val shorcuts = masRecientes.map { c ->
+                val image =
+                    AppCompatResources.getDrawable(context, R.drawable.contact_icon)?.mutate()
                 image?.setTint(c.colorFoto)
                 image?.setTintMode(PorterDuff.Mode.MULTIPLY)
                 val bitmap = createBitmap(100, 100)
@@ -103,6 +106,7 @@ class MainActivity : AppCompatActivity() {
             context.getSystemService(ShortcutManager::class.java).dynamicShortcuts = shorcuts
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -120,8 +124,12 @@ class MainActivity : AppCompatActivity() {
         }
         githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
                 requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 100)
             }
         }
@@ -150,115 +158,115 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(block = toExecute)
     }
 
-        private fun setupWindowTransitions() {
-            window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
-            window.enterTransition = transitionEffect.apply {
-                slideEdge = Gravity.BOTTOM
-            }
-            window.exitTransition = null
-
+    private fun setupWindowTransitions() {
+        window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+        window.enterTransition = transitionEffect.apply {
+            slideEdge = Gravity.BOTTOM
         }
+        window.exitTransition = null
 
-        private fun applyWindowInsets() {
-            ViewCompat.setOnApplyWindowInsetsListener(
-                findViewById(R.id.main)
-            ) { view, insets ->
-                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                view.setPadding(
-                    systemBars.left,
-                    systemBars.top,
-                    systemBars.right,
-                    systemBars.bottom
-                )
-                insets
-            }
-        }
+    }
 
-        private fun setupButtons() {
-            findViewById<Button>(R.id.button).setOnClickListener { l: View? ->
-                l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                val options = ActivityOptions.makeSceneTransitionAnimation(this)
-                startActivity(intent, options.toBundle())
-            }
-
-            findViewById<ImageView>(R.id.imageViewGrupos).setOnClickListener { l: View? ->
-                l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                toExecute = {
-                    setupSearchBar(
-                        TextWatcherSearchBarGroups(
-                            searchEditText,
-                            recyclerView,
-                            this@MainActivity
-                        )
-                    )
-                    loadGroups()
-                    adapter = GrupoCardAdapter(grupos, this@MainActivity)
-                    intent = Intent(this@MainActivity, NuevoGrupoActivity::class.java)
-                    setupRecyclerView()
-                }
-                lifecycleScope.launch(block = toExecute)
-            }
-
-            findViewById<ImageView>(R.id.imageViewUsuarios).setOnClickListener { l: View? ->
-                l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                toExecute = {
-                    setupSearchBar(
-                        TextWatcherSearchBarContacts(
-                            searchEditText,
-                            recyclerView,
-                            this@MainActivity
-                        )
-                    )
-                    loadContacts()
-                    adapter = ContactoCardAdapter(contactos, this@MainActivity)
-                    intent = Intent(this@MainActivity, NuevoContactoActivity::class.java)
-                    setupRecyclerView()
-                }
-                lifecycleScope.launch(block = toExecute)
-            }
-        }
-
-        private fun setupRecyclerView() {
-            recyclerView = findViewById(R.id.recycler)
-            recyclerView.layoutManager = LinearLayoutManager(this)
-            recyclerView.adapter = adapter
-            if (recyclerView.itemDecorationCount == 0) {
-                recyclerView.addItemDecoration(SpacingItemDecoration(this))
-            }
-        }
-
-        private fun setupSearchBar(watcher: TextWatcher) {
-            searchEditText.addTextChangedListener(
-                watcher
+    private fun applyWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(
+            findViewById(R.id.main)
+        ) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
             )
+            insets
+        }
+    }
+
+    private fun setupButtons() {
+        findViewById<Button>(R.id.button).setOnClickListener { l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            val options = ActivityOptions.makeSceneTransitionAnimation(this)
+            startActivity(intent, options.toBundle())
         }
 
-        private fun applyRainbowDecorators() {
-            listOf(
-                findViewById<TextView>(R.id.textGrupos),
-                findViewById<TextView>(R.id.textUsuarios),
-            ).forEach { textView ->
-                RainbowTextViewDecorator(this, textView).apply()
+        findViewById<ImageView>(R.id.imageViewGrupos).setOnClickListener { l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            toExecute = {
+                setupSearchBar(
+                    TextWatcherSearchBarGroups(
+                        searchEditText,
+                        recyclerView,
+                        this@MainActivity
+                    )
+                )
+                loadGroups()
+                adapter = GrupoCardAdapter(grupos, this@MainActivity)
+                intent = Intent(this@MainActivity, NuevoGrupoActivity::class.java)
+                setupRecyclerView()
             }
-        }
-
-        private suspend fun loadContacts() {
-            contactos = database.contactoDAO()!!.getContactos()
-                .map { contactoMapper.toCardItem(it) }.toMutableList()
-            contactos.ifEmpty { contactos.add(ContactoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
-        }
-
-        private suspend fun loadGroups() {
-            grupos = database.grupoDAO()!!.getGrupos()
-                .map { grupoMapper.toCardItem(it) }.toMutableList()
-            grupos.ifEmpty { grupos.add(GrupoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
-        }
-
-        override fun onResume() {
-            super.onResume()
-            searchEditText.clearFocus()
-            searchEditText.text.clear()
             lifecycleScope.launch(block = toExecute)
         }
 
+        findViewById<ImageView>(R.id.imageViewUsuarios).setOnClickListener { l: View? ->
+            l?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            toExecute = {
+                setupSearchBar(
+                    TextWatcherSearchBarContacts(
+                        searchEditText,
+                        recyclerView,
+                        this@MainActivity
+                    )
+                )
+                loadContacts()
+                adapter = ContactoCardAdapter(contactos, this@MainActivity)
+                intent = Intent(this@MainActivity, NuevoContactoActivity::class.java)
+                setupRecyclerView()
+            }
+            lifecycleScope.launch(block = toExecute)
+        }
     }
+
+    private fun setupRecyclerView() {
+        recyclerView = findViewById(R.id.recycler)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+        if (recyclerView.itemDecorationCount == 0) {
+            recyclerView.addItemDecoration(SpacingItemDecoration(this))
+        }
+    }
+
+    private fun setupSearchBar(watcher: TextWatcher) {
+        searchEditText.addTextChangedListener(
+            watcher
+        )
+    }
+
+    private fun applyRainbowDecorators() {
+        listOf(
+            findViewById<TextView>(R.id.textGrupos),
+            findViewById<TextView>(R.id.textUsuarios),
+        ).forEach { textView ->
+            RainbowTextViewDecorator(this, textView).apply()
+        }
+    }
+
+    private suspend fun loadContacts() {
+        contactos = database.contactoDAO()!!.getContactos()
+            .map { contactoMapper.toCardItem(it) }.toMutableList()
+        contactos.ifEmpty { contactos.add(ContactoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
+    }
+
+    private suspend fun loadGroups() {
+        grupos = database.grupoDAO()!!.getGrupos()
+            .map { grupoMapper.toCardItem(it) }.toMutableList()
+        grupos.ifEmpty { grupos.add(GrupoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        searchEditText.clearFocus()
+        searchEditText.text.clear()
+        lifecycleScope.launch(block = toExecute)
+    }
+
+}
