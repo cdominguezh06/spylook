@@ -11,18 +11,20 @@ Puedes descargar cualquier versión de la aplicación directamente en formato AP
 
 ```
 spylook/
- ├── adapters/        # Adaptadores para listas y componentes de UI (RecyclerView, etc.)
- ├── controller/      # Controladores para acceso a APIs REST de terceros
- ├── dao/             # Objetos de acceso a datos (DAOs) para la base de datos local de Android Room
- ├── database/        # Definición y configuración de la base de datos de Android Room
- ├── mappers/         # Conversores entre modelos de la base de datos y 'tarjetas' (elementos a mostrar en listas de RecyclerView)
- ├── model/           # Modelos de datos: entidades como Contacto, Grupo, Suceso, etc.
- └── view/            # Activities, fragments y vistas principales organizadas en subcarpetas
-      ├── accounts/   # Vistas relativas al CRUD de cuentas
-      ├── common/     # Vistas y fragments comunes o reutilizables 
-      ├── contacts/   # Vistas relativas al CRUD de contactos
-      ├── groups/     # Vistas relativas al CRUD de grupos
-      └── sucesos/    # Vistas relativas al CRUD de sucesos
+ ├── adapters/             # Adaptadores para listas y componentes de UI (RecyclerView, etc.)
+ ├── controller/           # Controladores para acceso a APIs REST de terceros
+ ├── dao/                  # Objetos de acceso a datos (DAOs) para la base de datos local de Android Room
+ ├── database/             # Definición y configuración de la base de datos de Android Room
+ ├── mappers/              # Conversores entre modelos de la base de datos y 'tarjetas' (elementos a mostrar en listas de RecyclerView)
+ ├── model/                # Modelos de datos: entidades como Contacto, Grupo, Suceso, etc.
+ └── view/                 # Activities, fragments y vistas principales organizadas en subcarpetas
+      ├── accounts/        # Vistas relativas al CRUD de cuentas
+      ├── common/          # Vistas y fragments comunes o reutilizables 
+      ├── contacts/        # Vistas relativas al CRUD de contactos
+      ├── groups/          # Vistas relativas al CRUD de grupos
+      ├── notification/    # Lógica para mostrar una notificacion con accesos rápidos al ultimo contacto abierto
+      ├── sucesos/         # Vistas relativas al CRUD de sucesos
+      └── widget/          # Lógica para el widget de la pantalla de inicio
 ```
 
 ## Descripción de carpetas clave
@@ -713,6 +715,16 @@ spylook/
     ```
     Activities y fragments para el CRUD grupos.
 
+  - **notification/**
+    ```
+    view/notification/
+    ├── receiver/
+    │    └── NotificationActionReceiver.kt
+    └── NotificationHelper.kt
+    ```
+    BroadCastReceiver personalizado para recibir acciones de notificación y un helper
+    (singleton) para crear notificaciones con accesos rápidos al último contacto abierto.
+
   - **sucesos/**
     ```
     view/sucesos/
@@ -721,7 +733,18 @@ spylook/
     └── fragments/
     ```
     Activities y fragments para el CRUD de sucesos/eventos.
-
+  - 
+  - **widget/**
+    ```
+    view/widget/
+    ├── factory/
+    │    └── ContactWidgetFactory.kt
+    ├── services/
+    │    └── ContactWidgetService.kt
+    └── CustomProvider.kt
+    ```
+    Factory de elementos del widget, servicio para actualizar el widget
+    y un proveedor personalizado para el widget de la pantalla de inicio.
 
 ## Activities y vistas principales
 
@@ -855,11 +878,13 @@ Mediante el uso de palabras clave como "lateinit" delante del nombre de la varia
 private lateinit var inicializacionSeparada : String
 ```
 
-En caso de que queramos que un objeto sea nulo se le asigna una interrogación al tipo, que se tiene que declarar explicitamente
+En caso de que queramos que un objeto sea nulo se le asigna una interrogación al tipo, que se tiene que declarar explicitamente.
+En caso de no declarar explicitamente el tipo se asignará por defecto el tipo "Nothing?"
 
 ```kotlin
 var nula : String? = null
 var nula2: String?
+var nula3 = null // local var nula3: Nothing?
 ```
 
 Esto introduce un nuevo requerimiento a la hora de usar la variable, asegurarse de que al momento de acceder a la variable no es nula
