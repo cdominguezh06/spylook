@@ -733,7 +733,7 @@ spylook/
     └── fragments/
     ```
     Activities y fragments para el CRUD de sucesos/eventos.
-  - 
+    
   - **widget/**
     ```
     view/widget/
