@@ -1,11 +1,13 @@
 package com.cogu.spylook.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.entity.Suceso
 
@@ -63,6 +65,10 @@ interface SucesoDAO {
 
     @Query("DELETE FROM contacto_suceso_cross_ref WHERE idSuceso = :idAnotable")
     suspend fun eliminarRelacionesPorSuceso(idAnotable: Int)
+
+
+    @Delete
+    suspend fun deleteImplicadoSuceso(crossRef: ContactoSucesoCrossRef)
 
     @Query("SELECT * FROM contacto_suceso_cross_ref WHERE idContacto = :idAnotable")
     suspend fun findSucesosByImplicado(idAnotable : Int) : List<ContactoSucesoCrossRef>

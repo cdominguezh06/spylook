@@ -18,8 +18,11 @@ import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
+import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.cards.SucesoCardItem
 import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
+import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.sucesos.SucesoActivity
 import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
@@ -32,7 +35,6 @@ open class SucesoCardAdapter(
     private val anotableOrigen: Anotable
 ) : RecyclerView.Adapter<SucesoCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
-    private lateinit var implicados: MutableList<ContactoMiniCard>
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.suceso_card, parent, false)
@@ -47,6 +49,7 @@ open class SucesoCardAdapter(
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
         val cardItem = cardItemList[position]
+        var implicados = mutableListOf<ContactoMiniCard>()
         holder.titulo.text = cardItem.nombre
         holder.titulo.isSelected = true
         holder.fecha.text = cardItem.fecha.toString()
@@ -103,28 +106,52 @@ open class SucesoCardAdapter(
                 val buttonEliminar = popupView.findViewById<TextView>(R.id.buttonEliminar)
                 buttonEliminar.setOnClickListener {view: View? ->
                     view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    AlertDialog.Builder(context)
-                        .setTitle("Eliminar suceso")
-                        .setMessage("Desea eliminar por completo el suceso \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
-                        .setPositiveButton("Continuar") { dialog, which ->
-                            val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
-                            runBlocking {
-                                dao.deleteSucesoAnotable(cardItem.idAnotable)
-                                val index = cardItemList.indexOf(cardItem)
-                                recyclerAnimator.deleteItemWithAnimation(
-                                    holder.itemView,
-                                    index,
-                                    onEmptyCallback = {
-                                        cardItemList.add(SucesoCardItem.DEFAULT_FOR_ADD)
-                                    },
-                                    afterDeleteCallBack = {
-                                        popupWindow.dismiss()
-                                    })
-                            }
-                        }.setNegativeButton("Cancelar") { dialog, which ->
-                            dialog.dismiss()
-                            popupWindow.dismiss()
-                        }.show()
+                    val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
+                    runBlocking {
+                        val suceso = dao.findSucesoById(cardItem.idAnotable)!!
+                        if (anotableOrigen.idAnotable == suceso.idCausante) {
+                            AlertDialog.Builder(context)
+                                .setTitle("Si continúas borrarás completamente el suceso")
+                                .setMessage(
+                                    "\"${anotableOrigen.nombre}\" es el causante de este suceso, eliminar " +
+                                            "el suceso de la lista implica borrarlo permanentemente"
+                                )
+                                .setPositiveButton("Continuar") { dialog, which ->
+                                    runBlocking {
+                                        dao.deleteSucesoAnotable(cardItem.idAnotable)
+                                        val index = cardItemList.indexOf(cardItem)
+                                        recyclerAnimator.deleteItemWithAnimation(
+                                            holder.itemView,
+                                            index,
+                                            onEmptyCallback = {
+                                                cardItemList.add(SucesoCardItem.DEFAULT_FOR_ADD)
+                                            },
+                                            afterDeleteCallBack = {
+                                                popupWindow.dismiss()
+                                            })
+                                    }
+                                }.setNegativeButton("Cancelar") { dialog, which ->
+                                    dialog.dismiss()
+                                    popupWindow.dismiss()
+                                }.show()
+                        }else{
+                            val crossRef = ContactoSucesoCrossRef(
+                                idContacto = anotableOrigen.idAnotable,
+                                idSuceso = cardItem.idAnotable
+                            )
+                            dao.deleteImplicadoSuceso(crossRef)
+                            val index = cardItemList.indexOf(cardItem)
+                            recyclerAnimator.deleteItemWithAnimation(
+                                holder.itemView,
+                                index,
+                                onEmptyCallback = {
+                                    cardItemList.add(SucesoCardItem.DEFAULT_FOR_ADD)
+                                },
+                                afterDeleteCallBack = {
+                                    popupWindow.dismiss()
+                                })
+                        }
+                    }
                 }
                 val x = view!!.getTag(R.id.touch_event_x) as Int
                 val y = view.getTag(R.id.touch_event_y) as Int

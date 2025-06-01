@@ -21,10 +21,7 @@ import org.mapstruct.factory.Mappers
 class SucesosFragment(private val anotable: Anotable, private val context: Context) : Fragment() {
 
     private val mapper: SucesoToCardItem = Mappers.getMapper(SucesoToCardItem::class.java)
-
-    companion object {
-        var sucesos = mutableListOf<SucesoCardItem>()
-    }
+    private var sucesos = mutableListOf<SucesoCardItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
