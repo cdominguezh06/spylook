@@ -48,7 +48,6 @@ class NuevoContactoActivity() : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_agregar_contacto)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         initViews()
         setupNextButtonClickListener()
     }

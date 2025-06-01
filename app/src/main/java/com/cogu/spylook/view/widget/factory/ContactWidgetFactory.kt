@@ -14,6 +14,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
+import com.cogu.spylook.view.common.MainActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
@@ -62,7 +63,6 @@ class ContactWidgetFactory(private val context: Context, private val intent: Int
         views.setTextViewText(R.id.nombre, contact.nombre)
         views.setTextViewText(R.id.alias, contact.alias)
         views.setImageViewBitmap(R.id.imagen, bitmap)
-
         val fillInIntent = Intent()
         fillInIntent.putExtra("id", contact.idAnotable)
         views.setOnClickFillInIntent(R.id.layout_contact_widget_card, fillInIntent)

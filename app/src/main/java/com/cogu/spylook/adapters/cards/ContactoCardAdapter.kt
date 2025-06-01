@@ -122,7 +122,6 @@ open class ContactoCardAdapter(
         }
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
-                MainActivity.addRecentContact(cardItem, context)
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, ContactoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)

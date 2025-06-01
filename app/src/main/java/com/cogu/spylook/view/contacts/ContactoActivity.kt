@@ -18,11 +18,14 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.ContactSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
+import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.view.common.MainActivity
 import com.cogu.spylook.view.notification.NotificationHelper
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
+import org.mapstruct.factory.Mappers
 
 class ContactoActivity : AppCompatActivity() {
 
@@ -73,6 +76,7 @@ class ContactoActivity : AppCompatActivity() {
         }
         lifecycleScope.launch {
             val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
+            MainActivity.addRecentContact(Mappers.getMapper(ContactoToCardItem::class.java).toCardItem(contact), this@ContactoActivity)
             setupContactDetails(contact)
             setupViewPager(contact)
             NotificationHelper.showContactNotification(this@ContactoActivity, contact, contact.alias)
@@ -113,9 +117,5 @@ class ContactoActivity : AppCompatActivity() {
 
         }
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }
