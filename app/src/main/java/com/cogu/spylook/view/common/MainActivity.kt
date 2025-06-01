@@ -2,11 +2,19 @@ package com.cogu.spylook.view.common
 
 import android.app.Activity
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.PorterDuff
+import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Bundle
 import android.text.TextWatcher
 import android.transition.Slide
-import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -20,6 +28,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -45,6 +55,8 @@ import com.cogu.spylook.view.groups.NuevoGrupoActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
+import androidx.core.graphics.createBitmap
+import com.cogu.spylook.view.contacts.ContactoActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -62,6 +74,35 @@ class MainActivity : AppCompatActivity() {
     private var grupos = mutableListOf<GrupoCardItem>()
     private lateinit var unknownAppsPermissionLauncher: ActivityResultLauncher<Intent>
     private lateinit var toExecute: suspend CoroutineScope.() -> Unit
+    companion object{
+        val masRecientes : MutableList<ContactoCardItem> = mutableListOf()
+
+        fun addRecentContact(contact: ContactoCardItem, context: Context) {
+            if (masRecientes.size > 3) {
+                masRecientes.removeAt(0)
+            }
+            masRecientes.add(contact)
+            val shorcuts = masRecientes.map{ c ->
+                val image = AppCompatResources.getDrawable(context, R.drawable.contact_icon)?.mutate()
+                image?.setTint(c.colorFoto)
+                image?.setTintMode(PorterDuff.Mode.MULTIPLY)
+                val bitmap = createBitmap(100, 100)
+                val canvas = Canvas(bitmap)
+                image?.setBounds(0, 0, canvas.width, canvas.height)
+                image?.draw(canvas)
+                ShortcutInfo.Builder(context, c.idAnotable.toString())
+                    .setShortLabel(c.nombre)
+                    .setLongLabel(c.alias)
+                    .setIcon(Icon.createWithBitmap(bitmap))
+                    .setIntent(Intent(context, ContactoActivity::class.java).apply {
+                        putExtra("id", c.idAnotable)
+                        action = Intent.ACTION_VIEW
+                    })
+                    .build()
+            }
+            context.getSystemService(ShortcutManager::class.java).dynamicShortcuts = shorcuts
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
@@ -78,7 +119,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 100)
+            }
+        }
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         applyWindowInsets()

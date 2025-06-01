@@ -19,6 +19,7 @@ import com.cogu.spylook.adapters.slider.ContactSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.view.notification.NotificationHelper
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -74,6 +75,7 @@ class ContactoActivity : AppCompatActivity() {
             val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
             setupContactDetails(contact)
             setupViewPager(contact)
+            NotificationHelper.showContactNotification(this@ContactoActivity, contact, contact.alias)
         }
     }
 
@@ -111,5 +113,9 @@ class ContactoActivity : AppCompatActivity() {
 
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

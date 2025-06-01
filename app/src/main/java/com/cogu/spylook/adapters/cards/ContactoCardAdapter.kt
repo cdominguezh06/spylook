@@ -19,9 +19,12 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter.CardViewHolder
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
+import com.cogu.spylook.view.common.MainActivity
 import com.cogu.spylook.view.contacts.ContactoActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 open class ContactoCardAdapter(
@@ -119,6 +122,7 @@ open class ContactoCardAdapter(
         }
         if (cardItem.clickable) {
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
+                MainActivity.addRecentContact(cardItem, context)
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, ContactoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)

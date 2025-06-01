@@ -18,12 +18,9 @@ import com.cogu.spylook.adapters.slider.GroupSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.GrupoDAO
 import com.cogu.spylook.model.entity.Grupo
-import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
-import com.cogu.spylook.view.sucesos.SucesoActivity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class GrupoActivity : AppCompatActivity() {
 

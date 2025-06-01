@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/layout_contact_widget_card"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/rainbow_border"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false">
+
+    <ImageView
+        android:id="@+id/imagen"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:rotation="0"
+        android:rotationX="0"
+        android:rotationY="0"
+        tools:srcCompat="@drawable/contact_icon" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/nombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:rotation="0"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="Nombre real"
+            android:textAlignment="viewStart"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp">
+            <requestFocus android:focusable="true" android:focusableInTouchMode="true"/>
+        </TextView>
+
+        <TextView
+            android:id="@+id/alias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:rotation="-2"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="Apodo"
+            android:textAlignment="viewStart"
+            android:textColor="#F8F8F8"
+            android:textSize="30sp">
+        <requestFocus android:focusable="true" android:focusableInTouchMode="true"/>
+        </TextView>
+    </LinearLayout>
+
+</LinearLayout>
