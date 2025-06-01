@@ -1,3 +1,7 @@
+[![Carlos | Coguu](https://img.shields.io/badge/Carlos-Coguu-blue)](https://github.com/cdominguezh06)
+[![Latest release](https://img.shields.io/github/v/release/cdominguezh06/spylook?display_name=tag&color=green)](https://github.com/cdominguezh06/spylook/releases)
+[![Web Repository](https://img.shields.io/badge/Web-Repository-red)](https://github.com/cdominguezh06/spylook-web)
+
 # SpyLook 👀
 
 SpyLook es una aplicación Android desarrollada en `Kotlin` y utilizando el sistema de Views en `XML` para apuntar información sobre las personas de tu entorno. Desde sus datos personales hasta sus amistades, grupos, cuentas de *RRSS*, etc
