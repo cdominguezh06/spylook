@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import com.cogu.spylook.R
 import android.widget.RemoteViews
 import androidx.appcompat.content.res.AppCompatResources
@@ -38,13 +40,25 @@ object NotificationHelper {
             .zip(imageViews)
             .forEach { (drawable, imageViewId) ->
                 val icon = AppCompatResources.getDrawable(context, drawable)?.mutate()
-                icon?.setTint(0xFF000000.toInt())
-                icon?.setTintMode(PorterDuff.Mode.SRC_IN)
+                val gradient = AppCompatResources.getDrawable(context, R.drawable.rainbow_gradient)?.mutate()
+                val gradientBitmap = createBitmap(100, 100)
+                val gradientCanvas = Canvas(gradientBitmap)
+                gradient?.setBounds(0, 0, 100, 100)
+                gradient?.draw(gradientCanvas)
                 val iconBitmap = createBitmap(100, 100)
                 val iconCanvas = Canvas(iconBitmap)
                 icon?.setBounds(0, 0, iconCanvas.width, iconCanvas.height)
                 icon?.draw(iconCanvas)
-                customLayout.setImageViewBitmap(imageViewId, iconBitmap)
+                val resultBitmap = createBitmap(100, 100)
+                val resultCanvas = Canvas(resultBitmap)
+                resultCanvas.drawBitmap(iconBitmap, 0f, 0f, null)
+
+                val paint = Paint()
+                paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+                resultCanvas.drawBitmap(gradientBitmap, 0f, 0f, paint)
+                paint.xfermode = null
+
+                customLayout.setImageViewBitmap(imageViewId, resultBitmap)
             }
         val editarPendingIntent = PendingIntent.getBroadcast(
             context,
