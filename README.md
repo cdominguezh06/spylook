@@ -22,7 +22,7 @@ spylook/
       ├── common/          # Vistas y fragments comunes o reutilizables 
       ├── contacts/        # Vistas relativas al CRUD de contactos
       ├── groups/          # Vistas relativas al CRUD de grupos
-      ├── notification/    # Lógica para mostrar una notificacion con accesos rápidos al ultimo contacto abierto
+      ├── notification/    # Lógica para mostrar una notificacion con acceso rápido al ultimo contacto abierto
       ├── sucesos/         # Vistas relativas al CRUD de sucesos
       └── widget/          # Lógica para el widget de la pantalla de inicio
 ```
@@ -718,12 +718,9 @@ spylook/
   - **notification/**
     ```
     view/notification/
-    ├── receiver/
-    │    └── NotificationActionReceiver.kt
     └── NotificationHelper.kt
     ```
-    BroadCastReceiver personalizado para recibir acciones de notificación y un helper
-    (singleton) para crear notificaciones con accesos rápidos al último contacto abierto.
+    Helper (singleton) para crear notificaciones con acceso rápido al último contacto abierto.
 
   - **sucesos/**
     ```
