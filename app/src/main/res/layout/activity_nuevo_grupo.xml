@@ -37,106 +37,105 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="330dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginVertical="32dp"
-        android:outlineAmbientShadowColor="#00FFFFFF"
-        android:outlineSpotShadowColor="#00FFFFFF"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:outlineAmbientShadowColor="#00FFFFFF"
-            android:outlineSpotShadowColor="#00FFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/rainbow_box"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/creadorTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/adlam_display"
-                    android:gravity="center"
-                    android:paddingBottom="8dp"
-                    android:text="Creado por"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:textColor="@color/white"
-                    android:textSize="20sp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerAgregarCreador"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView2"
-        android:layout_width="333dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/rainbow_box"
+            android:layout_height="wrap_content"
+            android:gravity="right"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/miembrosTitle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fontFamily="@font/adlam_display"
-                android:gravity="center"
-                android:paddingHorizontal="10dp"
-                android:paddingBottom="8dp"
-                android:text="Miembros"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                android:textColor="@color/white"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView3"
+                android:layout_width="333dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="32dp"
+                android:outlineAmbientShadowColor="#00FFFFFF"
+                android:outlineSpotShadowColor="#00FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rainbow_box"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/creadorTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/adlam_display"
+                        android:gravity="center"
+                        android:paddingBottom="8dp"
+                        android:text="Creado por"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerAgregarCreador"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView2"
+                android:layout_width="333dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/rainbow_box"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:id="@+id/miembrosTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/adlam_display"
+                        android:gravity="center"
+                        android:paddingHorizontal="10dp"
+                        android:paddingBottom="8dp"
+                        android:text="Miembros"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerAgregarMiembros"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/buttonSiguiente"
+                android:layout_width="137dp"
+                android:layout_height="63dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="#00FFFFFF"
+                android:text="Siguiente"
+                android:textColor="#2880C4"
                 android:textSize="20sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerAgregarMiembros"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <Button
-        android:id="@+id/buttonSiguiente"
-        android:layout_width="137dp"
-        android:layout_height="63dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="#00FFFFFF"
-        android:text="Siguiente"
-        android:textColor="#2880C4"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.core.widget.NestedScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
