@@ -182,7 +182,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 alert.setMessage("Debes tener al menos un miembro").show()
                 return@setOnClickListener
             }
-            if (miembros.none { it.idAnotable != -1 }) {
+            if (creador.none { it.idAnotable != -1 }) {
                 alert.setMessage("Debes agregar un creador").show()
                 return@setOnClickListener
             }

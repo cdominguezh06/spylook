@@ -77,7 +77,7 @@ class NuevaCuentaActivity : AppCompatActivity() {
                 textNombreCuenta.setText(toEdit?.nombre)
                 textLinkCuenta.setText(toEdit?.link)
                 textRedSocialCuenta.setText(toEdit?.redSocial!!)
-                imagen.setImageResource(R.drawable.suceso_icon)
+                imagen.setImageResource(R.drawable.account_icon)
                 imagen.setColorFilter(toEdit?.colorFoto!!, PorterDuff.Mode.MULTIPLY)
                 val contactoDao = AppDatabase
                     .getInstance(this@NuevaCuentaActivity)!!
