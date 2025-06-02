@@ -79,7 +79,7 @@ class DateTextWatcher(private val editText: EditText) : TextWatcher {
                 if(start > lastNumberIndex){
                     editText.setSelection(min(selection.toDouble(), current.length.toDouble()).toInt())
                 }else
-                    editText.setSelection(start+count)
+                    editText.setSelection(min((start+count).toDouble(), current.length.toDouble()).toInt())
             }else{
                 editText.setSelection(start)
             }
