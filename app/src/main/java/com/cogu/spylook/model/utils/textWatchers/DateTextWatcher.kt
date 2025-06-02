@@ -84,8 +84,10 @@ class DateTextWatcher(private val editText: EditText) : TextWatcher {
                 editText.setSelection(start)
             }
 
-            lastNumberIndex = s.toString().lastIndexOf(
-                current.replace("\\D".toRegex(), "")[current.replace("\\D".toRegex(), "").length - 1])
+            try {
+                lastNumberIndex = s.toString().lastIndexOf(
+                    current.replace("\\D".toRegex(), "")[current.replace("\\D".toRegex(), "").length - 1])
+            }catch (e: Exception){}
 
         }
     }
