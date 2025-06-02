@@ -94,7 +94,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
             }
             val card = ContactoCardItem.DEFAULT_FOR_SEARCH
             causante.ifEmpty {causante.add(card)}
-            implicados.ifEmpty {implicados.add(card)}
+            implicados.add(card)
             var adapter = SingleContactCardSearchAdapter(
                 causante,
                 this@NuevoSucesoActivity,
