@@ -1,13 +1,11 @@
 package com.cogu.spylook.view.common
 
-import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.graphics.drawable.Icon
@@ -45,7 +43,6 @@ import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.utils.ApplicationUpdater
 import com.cogu.spylook.model.utils.decorators.RainbowTextViewDecorator
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarContacts
@@ -57,7 +54,6 @@ import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 import androidx.core.graphics.createBitmap
 import com.cogu.spylook.view.contacts.ContactoActivity
-import com.cogu.spylook.view.notification.NotificationHelper
 
 class MainActivity : AppCompatActivity() {
 

@@ -13,14 +13,13 @@ import com.cogu.spylook.adapters.cards.ContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.entity.ContactoEntity
+import com.cogu.spylook.model.entity.GrupoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class MiembrosFragment(private val grupo: Grupo) : Fragment() {
+class MiembrosFragment(private val grupoEntity: GrupoEntity) : Fragment() {
 
     private lateinit var recyclerViewCreador: RecyclerView
     private lateinit var recyclerViewMiembros: RecyclerView
@@ -42,10 +41,10 @@ class MiembrosFragment(private val grupo: Grupo) : Fragment() {
         val grupoDao = AppDatabase.getInstance(requireContext())!!.grupoDAO()
         val contactoDao = AppDatabase.getInstance(requireContext())!!.contactoDAO()
         lifecycleScope.launch {
-            val miembros = grupoDao!!.getRelacionesByGrupo(grupo.idAnotable).map {
+            val miembros = grupoDao!!.getRelacionesByGrupo(grupoEntity.idAnotable).map {
                 contactoDao!!.findContactoById(it.idContacto)
             }
-            val creador = contactoDao!!.findContactoById(grupo.idCreador)
+            val creador = contactoDao!!.findContactoById(grupoEntity.idCreador)
             recyclerViewCreador.layoutManager = LinearLayoutManager(requireContext())
             recyclerViewCreador.adapter = ContactoCardAdapter(mutableListOf(mapper.toCardItem(creador)), requireContext())
             if (recyclerViewCreador.itemDecorationCount == 0) {
@@ -56,7 +55,7 @@ class MiembrosFragment(private val grupo: Grupo) : Fragment() {
         }
     }
 
-    private fun buildCardItemList(miembros: List<Contacto>): MutableList<ContactoCardItem> {
+    private fun buildCardItemList(miembros: List<ContactoEntity>): MutableList<ContactoCardItem> {
         val cardItems = miembros.map { mapper.toCardItem(it) }.toMutableList()
         return cardItems
     }

@@ -22,7 +22,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import com.cogu.spylook.view.widget.CustomProvider
@@ -41,7 +41,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
     private lateinit var nextButton: Button
     private lateinit var imagen : ImageView
     private lateinit var database: AppDatabase
-    var toEdit: Contacto? = null
+    var toEdit: ContactoEntity? = null
     companion object {
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     }
@@ -139,7 +139,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
         }
     }
 
-    private fun createContactFromInput(): Contacto {
+    private fun createContactFromInput(): ContactoEntity {
         val name = nameEditText.text.toString()
         val nick = nickEditText.text.toString()
         val birthday = LocalDate.parse(birthdayEditText.text.toString(), DATE_FORMATTER)
@@ -148,7 +148,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
         val country = countryEditText.text.toString()
         val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
 
-        return Contacto(
+        return ContactoEntity(
             nombre = name,
             alias = nick,
             fechaNacimiento = birthday,

@@ -22,7 +22,7 @@ import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
@@ -33,7 +33,7 @@ import org.mapstruct.factory.Mappers
 open class AmigoCardAdapter(
     internal val cardItemList: MutableList<ContactoCardItem>,
     private val context: Context,
-    private val contacto: Contacto,
+    private val contactoEntity: ContactoEntity,
 ) : RecyclerView.Adapter<AmigoCardAdapter.CardViewHolder?>() {
     private lateinit var onClickFunction: (ContactoCardItem) -> Unit
     private lateinit var mapper: ContactoToCardItem
@@ -91,10 +91,10 @@ open class AmigoCardAdapter(
                     v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                     val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
                     runBlocking {
-                        val amistad = dao.getContactosPorAmigo(contacto.idAnotable).find {
+                        val amistad = dao.getContactosPorAmigo(contactoEntity.idAnotable).find {
                             it.idContacto == cardItem.idAnotable
                         }
-                        val amistadReversa = dao.getAmistadesPorContacto(contacto.idAnotable).find {
+                        val amistadReversa = dao.getAmistadesPorContacto(contactoEntity.idAnotable).find {
                             it.idAmigo == cardItem.idAnotable
                         }
                         if (amistad != null) dao.deleteAmistad(amistad)
@@ -139,15 +139,15 @@ open class AmigoCardAdapter(
                     lista =
                         contactoDAO.getContactos().map { c -> mapper.toCardItem(c) }.toMutableList()
                     val busquedaComoContacto =
-                        contactoDAO.getAmistadesPorContacto(contacto.idAnotable).map {
+                        contactoDAO.getAmistadesPorContacto(contactoEntity.idAnotable).map {
                             contactoDAO.findContactoById(it.idAmigo)
                         }.toMutableList()
                     val busquedaComoAmigo =
-                        contactoDAO.getContactosPorAmigo(contacto.idAnotable).map {
+                        contactoDAO.getContactosPorAmigo(contactoEntity.idAnotable).map {
                             contactoDAO.findContactoById(it.idContacto)
                         }.toMutableList()
                     busquedaComoAmigo.addAll(busquedaComoContacto)
-                    busquedaComoAmigo.add(contacto)
+                    busquedaComoAmigo.add(contactoEntity)
                     val excluded = busquedaComoAmigo.distinct().map {
                         mapper.toCardItem(it)
                     }.toMutableList()
@@ -160,7 +160,7 @@ open class AmigoCardAdapter(
                     cardItemList.removeAt(cardItemList.size - 1)
                     cardItemList.add(cardItem)
                     cardItemList.add(agregar)
-                    val amistad = ContactoAmistadCrossRef(contacto.idAnotable, cardItem.idAnotable)
+                    val amistad = ContactoAmistadCrossRef(contactoEntity.idAnotable, cardItem.idAnotable)
                     runBlocking {
                         AppDatabase.getInstance(context)!!.contactoDAO()!!.insertAmistad(amistad)
                         notifyDataSetChanged()
@@ -182,16 +182,16 @@ open class AmigoCardAdapter(
                         recycler,
                         onClickFunction,
                         context,
-                        contacto.idAnotable,
+                        contactoEntity.idAnotable,
                         onExclude = {
                             runBlocking {
                                 val dao = AppDatabase.getInstance(context)!!.contactoDAO()!!
-                                dao.getAmistadesPorContacto(contacto.idAnotable)
+                                dao.getAmistadesPorContacto(contactoEntity.idAnotable)
                                     .map { dao.findContactoById(it.idAmigo) }
                                     .toMutableList()
                                     .apply {
                                         addAll(
-                                            dao.getContactosPorAmigo(contacto.idAnotable)
+                                            dao.getContactosPorAmigo(contactoEntity.idAnotable)
                                                 .map { dao.findContactoById(it.idContacto) }
                                         )
                                     }

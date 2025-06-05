@@ -19,7 +19,7 @@ import com.cogu.spylook.adapters.slider.ContactSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.view.common.MainActivity
 import com.cogu.spylook.view.notification.NotificationHelper
 import com.google.android.material.tabs.TabLayout
@@ -83,14 +83,14 @@ class ContactoActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupContactDetails(contact: Contacto) {
+    private fun setupContactDetails(contact: ContactoEntity) {
         title.text = contact.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.contact_icon)
         image.setColorFilter(contact.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(contact: Contacto) {
+    private fun setupViewPager(contact: ContactoEntity) {
         viewPager.adapter = ContactSliderAdapter(this, contact, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {

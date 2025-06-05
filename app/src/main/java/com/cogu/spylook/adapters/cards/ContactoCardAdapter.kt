@@ -20,11 +20,7 @@ import com.cogu.spylook.adapters.cards.ContactoCardAdapter.CardViewHolder
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
-import com.cogu.spylook.view.common.MainActivity
 import com.cogu.spylook.view.contacts.ContactoActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 open class ContactoCardAdapter(

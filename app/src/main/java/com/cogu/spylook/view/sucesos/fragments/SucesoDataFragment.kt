@@ -17,11 +17,11 @@ import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.SucesoEntity
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 
-class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fragment() {
+class SucesoDataFragment(private val sucesoEntity: SucesoEntity, val contexto: Context) : Fragment() {
 
     private lateinit var descripcionTextView: TextView
     private lateinit var fechaTextView: TextView
@@ -45,7 +45,7 @@ class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fr
         contactoDAO = AppDatabase.getInstance(contexto)!!.contactoDAO()!!
         recyclerCausante = fragment.findViewById<RecyclerView>(R.id.recyclerCausante)
         val causante = mutableListOf<ContactoCardItem>(
-            mapper.toCardItem(contactoDAO.findContactoById(suceso.idCausante))
+            mapper.toCardItem(contactoDAO.findContactoById(sucesoEntity.idCausante))
         )
         recyclerCausante.layoutManager = LinearLayoutManager(contexto)
         recyclerCausante.adapter = ContactoCardAdapter(causante, contexto)
@@ -53,11 +53,11 @@ class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fr
 
     private fun bindStaticFields(fragment: View) {
         descripcionTextView = fragment.findViewById<TextView>(R.id.descripcionText)
-        descripcionTextView.text = suceso.descripcion
+        descripcionTextView.text = sucesoEntity.descripcion
         descripcionTextView.movementMethod = ScrollingMovementMethod()
         fechaTextView = fragment.findViewById<TextView>(R.id.sucesoFechaText)
-        fechaTextView.text = suceso.fecha
+        fechaTextView.text = sucesoEntity.fecha
         lugarTextView = fragment.findViewById<TextView>(R.id.sucesoLugarText)
-        lugarTextView.text = suceso.lugar
+        lugarTextView.text = sucesoEntity.lugar
     }
 }

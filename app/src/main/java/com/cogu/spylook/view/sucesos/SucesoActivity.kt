@@ -18,9 +18,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.SucesoSliderAdapter
 import com.cogu.spylook.dao.SucesoDAO
 import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.entity.Suceso
-import com.cogu.spylook.view.contacts.ContactoActivity
-import com.cogu.spylook.view.contacts.NuevoContactoActivity
+import com.cogu.spylook.model.entity.SucesoEntity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -61,15 +59,15 @@ class SucesoActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSucesoDetails(suceso: Suceso) {
-        title.text = suceso.nombre
+    private fun setupSucesoDetails(sucesoEntity: SucesoEntity) {
+        title.text = sucesoEntity.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.suceso_icon)
-        image.setColorFilter(suceso.colorFoto, PorterDuff.Mode.MULTIPLY)
+        image.setColorFilter(sucesoEntity.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(suceso: Suceso) {
-        viewPager.adapter = SucesoSliderAdapter(this, suceso, this)
+    private fun setupViewPager(sucesoEntity: SucesoEntity) {
+        viewPager.adapter = SucesoSliderAdapter(this, sucesoEntity, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.TAB_INFO_TITLE)

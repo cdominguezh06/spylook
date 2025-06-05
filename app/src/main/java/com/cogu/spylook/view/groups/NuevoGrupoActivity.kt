@@ -23,9 +23,8 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
-import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.entity.GrupoEntity
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
-import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 import kotlin.collections.ifEmpty
@@ -41,7 +40,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
     private lateinit var imagen : ImageView
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator : RecyclerViewAnimator
-    var toEdit: Grupo? = null
+    var toEdit: GrupoEntity? = null
     var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -187,18 +186,18 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
-            val nuevoGrupo = Grupo(0, nombreGrupo, color, creador.first().idAnotable)
+            val nuevoGrupoEntity = GrupoEntity(0, nombreGrupo, color, creador.first().idAnotable)
             toEdit?.let {
                 AlertDialog.Builder(this@NuevoGrupoActivity)
                     .setTitle("Sobreescribir grupo")
                     .setMessage("¿Desea sobreescribir el grupo actual?")
                     .setPositiveButton("Confirmar") { dialog, _ ->
-                        nuevoGrupo.idAnotable = toEdit?.idAnotable!!
+                        nuevoGrupoEntity.idAnotable = toEdit?.idAnotable!!
                         lifecycleScope.launch {
-                            nuevoGrupo.colorFoto = toEdit?.colorFoto!!
-                            db.grupoDAO()!!.updateGrupoAnotable(nuevoGrupo)
-                            db.grupoDAO()!!.eliminarRelacionesPorGrupo(nuevoGrupo.idAnotable)
-                            insertarRelaciones(nuevoGrupo.idAnotable)
+                            nuevoGrupoEntity.colorFoto = toEdit?.colorFoto!!
+                            db.grupoDAO()!!.updateGrupoAnotable(nuevoGrupoEntity)
+                            db.grupoDAO()!!.eliminarRelacionesPorGrupo(nuevoGrupoEntity.idAnotable)
+                            insertarRelaciones(nuevoGrupoEntity.idAnotable)
                             dialog.dismiss()
                             finish()
                         }
@@ -210,7 +209,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupo).toInt()
+                val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupoEntity).toInt()
                 insertarRelaciones(grupoId)
                 finish()
             }

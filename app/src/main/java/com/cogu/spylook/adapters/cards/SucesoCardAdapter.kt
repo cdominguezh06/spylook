@@ -18,10 +18,8 @@ import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
-import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.cards.SucesoCardItem
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
+import com.cogu.spylook.model.entity.AnotableEntity
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.sucesos.SucesoActivity
@@ -32,7 +30,7 @@ import org.mapstruct.factory.Mappers
 open class SucesoCardAdapter(
     internal val cardItemList: MutableList<SucesoCardItem>,
     private val context: Context,
-    private val anotableOrigen: Anotable
+    private val anotableEntityOrigen: AnotableEntity
 ) : RecyclerView.Adapter<SucesoCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -109,11 +107,11 @@ open class SucesoCardAdapter(
                     val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
                     runBlocking {
                         val suceso = dao.findSucesoById(cardItem.idAnotable)!!
-                        if (anotableOrigen.idAnotable == suceso.idCausante) {
+                        if (anotableEntityOrigen.idAnotable == suceso.idCausante) {
                             AlertDialog.Builder(context)
                                 .setTitle("Si continúas borrarás completamente el suceso")
                                 .setMessage(
-                                    "\"${anotableOrigen.nombre}\" es el causante de este suceso, eliminar " +
+                                    "\"${anotableEntityOrigen.nombre}\" es el causante de este suceso, eliminar " +
                                             "el suceso de la lista implica borrarlo permanentemente"
                                 )
                                 .setPositiveButton("Continuar") { dialog, which ->
@@ -136,7 +134,7 @@ open class SucesoCardAdapter(
                                 }.show()
                         }else{
                             val crossRef = ContactoSucesoCrossRef(
-                                idContacto = anotableOrigen.idAnotable,
+                                idContacto = anotableEntityOrigen.idAnotable,
                                 idSuceso = cardItem.idAnotable
                             )
                             dao.deleteImplicadoSuceso(crossRef)
@@ -165,7 +163,7 @@ open class SucesoCardAdapter(
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, NuevoSucesoActivity::class.java)
-                intent.putExtra("id", anotableOrigen.idAnotable)
+                intent.putExtra("id", anotableEntityOrigen.idAnotable)
                 context.startActivity(intent)
             })
             return
@@ -175,7 +173,7 @@ open class SucesoCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, SucesoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
-                intent.putExtra("idOrigen", anotableOrigen.idAnotable)
+                intent.putExtra("idOrigen", anotableEntityOrigen.idAnotable)
                 context.startActivity(intent)
             })
         }

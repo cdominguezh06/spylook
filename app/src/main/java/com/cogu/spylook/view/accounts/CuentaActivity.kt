@@ -18,9 +18,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.CuentaSliderAdapter
 import com.cogu.spylook.dao.CuentaDao
 import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.entity.Cuenta
-import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
-import com.cogu.spylook.view.sucesos.SucesoActivity
+import com.cogu.spylook.model.entity.CuentaEntity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -62,15 +60,15 @@ class CuentaActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupCuentaDetails(cuenta: Cuenta) {
-        title.text = cuenta.nombre
+    private fun setupCuentaDetails(cuentaEntity: CuentaEntity) {
+        title.text = cuentaEntity.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.account_icon)
-        image.setColorFilter(cuenta.colorFoto, PorterDuff.Mode.MULTIPLY)
+        image.setColorFilter(cuentaEntity.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(cuenta: Cuenta) {
-        viewPager.adapter = CuentaSliderAdapter(this, cuenta, this)
+    private fun setupViewPager(cuentaEntity: CuentaEntity) {
+        viewPager.adapter = CuentaSliderAdapter(this, cuentaEntity, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.TAB_INFO_TITLE)

@@ -15,13 +15,12 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class AmigosFragment(private val contacto: Contacto, private val context: Context?) : Fragment() {
+class AmigosFragment(private val contactoEntity: ContactoEntity, private val context: Context?) : Fragment() {
 
     private val mapper: ContactoToCardItem = Mappers.getMapper(ContactoToCardItem::class.java)
     var amigos = mutableListOf<ContactoCardItem>()
@@ -50,10 +49,10 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
     }
 
     private suspend fun fetchAmigos(contactoDAO: ContactoDAO): MutableList<ContactoCardItem> {
-        val busquedaComoContacto = contactoDAO.getAmistadesPorContacto(contacto.idAnotable).map {
+        val busquedaComoContacto = contactoDAO.getAmistadesPorContacto(contactoEntity.idAnotable).map {
             contactoDAO.findContactoById(it.idAmigo)
         }.toMutableList()
-        val busquedaComoAmigo = contactoDAO.getContactosPorAmigo(contacto.idAnotable).map {
+        val busquedaComoAmigo = contactoDAO.getContactosPorAmigo(contactoEntity.idAnotable).map {
             contactoDAO.findContactoById(it.idContacto)
         }.toMutableList()
         busquedaComoAmigo.addAll(busquedaComoContacto)
@@ -72,7 +71,7 @@ class AmigosFragment(private val contacto: Contacto, private val context: Contex
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = AmigoCardAdapter(amigos.toMutableList(), requireContext(), contacto)
+        recyclerView.adapter = AmigoCardAdapter(amigos.toMutableList(), requireContext(), contactoEntity)
         recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
 

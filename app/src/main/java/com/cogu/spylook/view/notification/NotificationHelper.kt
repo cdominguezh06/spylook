@@ -13,15 +13,14 @@ import android.widget.RemoteViews
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.createBitmap
-import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.view.common.MainActivity
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.view.contacts.ContactoActivity
 
 object NotificationHelper {
     private const val CHANNEL_ID = "notificacion_contacto"
     private const val CHANNEL_NAME = "Notificación de Contacto"
     private const val NOTIFICATION_ID = 10
-    var lastContact : Contacto? = null
+    var lastContact : ContactoEntity? = null
 
     private fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
@@ -35,17 +34,17 @@ object NotificationHelper {
         manager.createNotificationChannel(channel)
     }
 
-    fun showOpenContactNotification(context: Context, contacto: Contacto) {
+    fun showOpenContactNotification(context: Context, contactoEntity: ContactoEntity) {
         createNotificationChannel(context)
         lastContact?.apply {
-          if(lastContact!! == contacto) return@apply
-            lastContact = contacto
+          if(lastContact!! == contactoEntity) return@apply
+            lastContact = contactoEntity
         }
 
         val customLayout = RemoteViews(context.packageName, R.layout.persistent_notification_open_contact)
-        customLayout.setTextViewText(R.id.contactAlias, contacto.alias)
+        customLayout.setTextViewText(R.id.contactAlias, contactoEntity.alias)
         val image = AppCompatResources.getDrawable(context, R.drawable.contact_icon)?.mutate()
-        image?.setTint(contacto.colorFoto)
+        image?.setTint(contactoEntity.colorFoto)
         image?.setTintMode(PorterDuff.Mode.MULTIPLY)
         val bitmap = createBitmap(100, 100)
         val canvas = Canvas(bitmap)
@@ -53,23 +52,23 @@ object NotificationHelper {
         image?.draw(canvas)
         customLayout.setImageViewBitmap(R.id.contactImage, bitmap)
         val smallLayout = RemoteViews(context.packageName, R.layout.persistent_notification_small)
-        smallLayout.setTextViewText(R.id.notification_title, "Contacto activo: ${contacto.alias}")
+        smallLayout.setTextViewText(R.id.notification_title, "Contacto activo: ${contactoEntity.alias}")
 
         val contactoIntent = Intent(context, ContactoActivity::class.java)
             .apply {
-                putExtra("id", contacto.idAnotable)
+                putExtra("id", contactoEntity.idAnotable)
             }
         val pendingIntent = TaskStackBuilder.create(context).run {
             addParentStack(ContactoActivity::class.java)
             addNextIntent(contactoIntent)
-            getPendingIntent(400 + contacto.idAnotable,
+            getPendingIntent(400 + contactoEntity.idAnotable,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.spylookicon_nobg)
-            .setContentTitle("Contacto activo: ${contacto.alias}")
+            .setContentTitle("Contacto activo: ${contactoEntity.alias}")
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCustomContentView(smallLayout)

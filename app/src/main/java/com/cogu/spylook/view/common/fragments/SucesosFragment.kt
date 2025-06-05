@@ -13,12 +13,12 @@ import com.cogu.spylook.adapters.cards.SucesoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.SucesoToCardItem
 import com.cogu.spylook.model.cards.SucesoCardItem
-import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.AnotableEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class SucesosFragment(private val anotable: Anotable, private val context: Context) : Fragment() {
+class SucesosFragment(private val anotableEntity: AnotableEntity, private val context: Context) : Fragment() {
 
     private val mapper: SucesoToCardItem = Mappers.getMapper(SucesoToCardItem::class.java)
     private var sucesos = mutableListOf<SucesoCardItem>()
@@ -46,11 +46,11 @@ class SucesosFragment(private val anotable: Anotable, private val context: Conte
         val sucesoDao = db?.sucesoDAO()!!
         sucesos = mutableListOf()
         sucesos.add(SucesoCardItem.DEFAULT_FOR_ADD)
-        val temp = sucesoDao.findSucesosByCausante(anotable.idAnotable)
+        val temp = sucesoDao.findSucesosByCausante(anotableEntity.idAnotable)
             .map { mapper.toCardItem(it) }
             .toMutableList()
             .apply {
-                addAll(sucesoDao.findSucesosByImplicado(anotable.idAnotable)
+                addAll(sucesoDao.findSucesosByImplicado(anotableEntity.idAnotable)
                     .map { sucesoDao.findSucesoById(it.idSuceso)!! }
                     .map { mapper.toCardItem(it) }) }
             .sortedByDescending { it.idAnotable }
@@ -60,7 +60,7 @@ class SucesosFragment(private val anotable: Anotable, private val context: Conte
 
     private fun initializeRecyclerView(recyclerView: RecyclerView) {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SucesoCardAdapter(sucesos, context, anotable)
+        recyclerView.adapter = SucesoCardAdapter(sucesos, context, anotableEntity)
         recyclerView.addItemDecoration(SpacingItemDecoration(context))
     }
 }

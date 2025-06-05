@@ -16,11 +16,11 @@ import com.cogu.spylook.dao.ContactoDAO
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Cuenta
+import com.cogu.spylook.model.entity.CuentaEntity
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 
-class CuentaDataFragment(private val cuenta: Cuenta, val contexto: Context) : Fragment() {
+class CuentaDataFragment(private val cuentaEntity: CuentaEntity, val contexto: Context) : Fragment() {
 
     private lateinit var linkTextView: TextView
     private lateinit var redSocialTextView: TextView
@@ -43,7 +43,7 @@ class CuentaDataFragment(private val cuenta: Cuenta, val contexto: Context) : Fr
         contactoDAO = AppDatabase.getInstance(contexto)!!.contactoDAO()!!
         recyclerPropietario = fragment.findViewById<RecyclerView>(R.id.recyclerPropietario)
         val propietario = mutableListOf<ContactoCardItem>(
-            mapper.toCardItem(contactoDAO.findContactoById(cuenta.idPropietario))
+            mapper.toCardItem(contactoDAO.findContactoById(cuentaEntity.idPropietario))
         )
         recyclerPropietario.layoutManager = LinearLayoutManager(contexto)
         recyclerPropietario.adapter = ContactoCardAdapter(propietario, contexto)
@@ -51,8 +51,8 @@ class CuentaDataFragment(private val cuenta: Cuenta, val contexto: Context) : Fr
 
     private fun bindStaticFields(fragment: View) {
         linkTextView = fragment.findViewById<TextView>(R.id.linkText)
-        linkTextView.text = cuenta.link
+        linkTextView.text = cuentaEntity.link
         redSocialTextView = fragment.findViewById<TextView>(R.id.redSocialText)
-        redSocialTextView.text = cuenta.redSocial
+        redSocialTextView.text = cuentaEntity.redSocial
     }
 }

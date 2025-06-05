@@ -3,7 +3,6 @@ package com.cogu.spylook.adapters.cards
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
-import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -19,9 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
-import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.ContactoMiniCard
-import com.cogu.spylook.model.cards.CuentaCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.groups.GrupoActivity

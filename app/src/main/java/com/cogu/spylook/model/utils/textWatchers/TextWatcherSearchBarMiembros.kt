@@ -1,6 +1,5 @@
 package com.cogu.spylook.model.utils.textWatchers
 
-import android.app.Dialog
 import android.content.Context
 import android.graphics.LinearGradient
 import android.graphics.PorterDuff
@@ -20,7 +19,7 @@ import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
@@ -35,7 +34,7 @@ class TextWatcherSearchBarMiembros(
     private val onClickFunction: (ContactoCardItem) -> Unit,
     private val context: Context?,
     private val currentMiembroId: Int,
-    private val onExclude: () -> List<Contacto>,
+    private val onExclude: () -> List<ContactoEntity>,
 ) : TextWatcher {
     private val mapper: ContactoToCardItem =
         Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
@@ -54,15 +53,15 @@ class TextWatcherSearchBarMiembros(
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        var contactos = listOf<Contacto>()
+        var contactoEntities = listOf<ContactoEntity>()
         val filter = onExclude.invoke()
         val busqueda = text.getText().toString().lowercase(
             Locale.getDefault()
         ).replace(" ", "")
         runBlocking {
-            contactos =
+            contactoEntities =
                 db.contactoDAO()!!.getContactos();
-            collect = contactos
+            collect = contactoEntities
                 .filter { !filter.contains(it) }
                 .map { contacto -> mapper.toCardItem(contacto) }
                 .filter { it.idAnotable != currentMiembroId }

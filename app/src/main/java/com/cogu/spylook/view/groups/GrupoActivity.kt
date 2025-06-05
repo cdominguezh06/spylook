@@ -17,7 +17,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.GroupSliderAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.dao.GrupoDAO
-import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.entity.GrupoEntity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -76,15 +76,15 @@ class GrupoActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupGroupDetails(grupo : Grupo) {
-        title.text = grupo.nombre
+    private fun setupGroupDetails(grupoEntity : GrupoEntity) {
+        title.text = grupoEntity.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.group_icon)
-        image.setColorFilter(grupo.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
+        image.setColorFilter(grupoEntity.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(grupo: Grupo) {
-        viewPager.adapter = GroupSliderAdapter(this, grupo, this)
+    private fun setupViewPager(grupoEntity: GrupoEntity) {
+        viewPager.adapter = GroupSliderAdapter(this, grupoEntity, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "MIEMBROS"

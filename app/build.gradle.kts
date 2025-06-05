@@ -39,17 +39,17 @@ android {
     }
 }
 dependencies {
-    implementation(libs.legacy.support.v4)
     ksp(libs.room.compiler)
+    implementation(libs.legacy.support.v4)
     kapt(libs.mapstruct.processor)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.core.ktx)
-    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android.v181)
     implementation(libs.recyclerview)
-    implementation(libs.room.runtime)
     implementation(libs.mapstruct)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)

@@ -14,16 +14,13 @@ import com.cogu.spylook.adapters.cards.AnotacionCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
-import com.cogu.spylook.model.entity.Anotacion
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.AnotacionEntity
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
-import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
-import java.time.LocalDateTime
 
-class InformacionFragment(private val contacto: Contacto) : Fragment() {
+class InformacionFragment(private val contactoEntity: ContactoEntity) : Fragment() {
 
     private val ID_RECYCLER_VIEW = R.id.recyclerAnotaciones
     private val camposTextViewIds = mapOf(
@@ -54,12 +51,12 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
         camposTextViewIds.entries.forEach { (field, id) ->
             val textView = fragment.findViewById<TextView>(id)
             textView.text = when (field) {
-                "edad" -> contacto.edad.toString()
-                "nick" -> contacto.alias
-                "fecha" -> contacto.fechaNacimiento.toString()
-                "ciudad" -> contacto.ciudad
-                "estado" -> contacto.estado
-                "pais" -> contacto.pais
+                "edad" -> contactoEntity.edad.toString()
+                "nick" -> contactoEntity.alias
+                "fecha" -> contactoEntity.fechaNacimiento.toString()
+                "ciudad" -> contactoEntity.ciudad
+                "estado" -> contactoEntity.estado
+                "pais" -> contactoEntity.pais
                 else -> ""
             }
         }
@@ -69,23 +66,23 @@ class InformacionFragment(private val contacto: Contacto) : Fragment() {
         recyclerView = fragment.findViewById(ID_RECYCLER_VIEW)
         val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
         lifecycleScope.launch {
-            val anotaciones = db!!.getAnotacionesDeAnotable(contacto.idAnotable)
+            val anotaciones = db!!.getAnotacionesDeAnotable(contactoEntity.idAnotable)
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)
         }
     }
 
-    private fun buildCardItemList(anotaciones: List<Anotacion>): MutableList<AnotacionCardItem> {
+    private fun buildCardItemList(anotaciones: List<AnotacionEntity>): MutableList<AnotacionCardItem> {
         val cardItems = anotaciones.map { mapper.toCardItem(it) }.toMutableList()
         cardItems.add(
-            AnotacionCardItem.getDefaultForNew(contacto.idAnotable)
+            AnotacionCardItem.getDefaultForNew(contactoEntity.idAnotable)
         )
         cardItems.sortBy { it.id }
         return cardItems
     }
 
     private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
-        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.idAnotable)
+        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contactoEntity.idAnotable)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {

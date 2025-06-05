@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "SpyLook"
 include(":app")
+include(":app:domain")
+include(":data")
+include(":domain")

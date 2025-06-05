@@ -13,7 +13,7 @@ import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
-import com.cogu.spylook.model.entity.Anotacion
+import com.cogu.spylook.model.entity.AnotacionEntity
 import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
@@ -135,16 +135,16 @@ class AnotacionCardAdapter(
     }
 
     private suspend fun createAnotacion(view: View, db: AppDatabase) {
-        val anotacion = Anotacion()
-        anotacion.fecha = DateConverters.toDateTimeString(LocalDateTime.now())
-        anotacion.titulo =
+        val anotacionEntity = AnotacionEntity()
+        anotacionEntity.fecha = DateConverters.toDateTimeString(LocalDateTime.now())
+        anotacionEntity.titulo =
             view.findViewById<TextView>(R.id.editTextText).text.toString()
-        anotacion.descripcion =
+        anotacionEntity.descripcion =
             view.findViewById<TextView>(R.id.editTextText2).text.toString()
-        anotacion.idAnotable = anotableId
-        val id = db.anotacionDAO()!!.addAnotacion(anotacion)
-        anotacion.id = id.toInt()
-        val element = mapper.toCardItem(anotacion)
+        anotacionEntity.idAnotable = anotableId
+        val id = db.anotacionDAO()!!.addAnotacion(anotacionEntity)
+        anotacionEntity.id = id.toInt()
+        val element = mapper.toCardItem(anotacionEntity)
         cardItemList.add(element)
         notifyItemInserted(cardItemList.size - 1)
     }

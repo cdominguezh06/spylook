@@ -13,15 +13,15 @@ import com.cogu.spylook.adapters.cards.AnotacionCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.AnotacionToCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.Anotacion
+import com.cogu.spylook.model.entity.AnotableEntity
+import com.cogu.spylook.model.entity.AnotacionEntity
 import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 import java.time.LocalDateTime
 
-class AnotacionesFragment(private val anotable: Anotable, val contexto : Context) : Fragment() {
+class AnotacionesFragment(private val anotableEntity: AnotableEntity, val contexto : Context) : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
@@ -40,13 +40,13 @@ class AnotacionesFragment(private val anotable: Anotable, val contexto : Context
         recyclerView = fragment.findViewById(R.id.recyclerGeneric)
         val db = AppDatabase.Companion.getInstance(requireContext())!!.anotacionDAO()
         runBlocking {
-            val anotaciones = db!!.getAnotacionesDeAnotable(anotable.idAnotable)
+            val anotaciones = db!!.getAnotacionesDeAnotable(anotableEntity.idAnotable)
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)
         }
     }
 
-    private fun buildCardItemList(anotaciones: List<Anotacion>): MutableList<AnotacionCardItem> {
+    private fun buildCardItemList(anotaciones: List<AnotacionEntity>): MutableList<AnotacionCardItem> {
         val cardItems = anotaciones.map { mapper.toCardItem(it) }.toMutableList()
         cardItems.add(
             AnotacionCardItem(
@@ -54,7 +54,7 @@ class AnotacionesFragment(private val anotable: Anotable, val contexto : Context
                 titulo = "Nueva Anotacion",
                 descripcion = "",
                 fecha = DateConverters.toDateTimeString(LocalDateTime.now())!!,
-                idAnotable = anotable.idAnotable
+                idAnotable = anotableEntity.idAnotable
             )
         )
         cardItems.sortBy { it.id }
@@ -62,7 +62,7 @@ class AnotacionesFragment(private val anotable: Anotable, val contexto : Context
     }
 
     private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
-        val adapter = AnotacionCardAdapter(cardItems, contexto, anotable.idAnotable)
+        val adapter = AnotacionCardAdapter(cardItems, contexto, anotableEntity.idAnotable)
         recyclerView.layoutManager = LinearLayoutManager(contexto)
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {

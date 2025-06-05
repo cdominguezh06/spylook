@@ -9,7 +9,6 @@ import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Scroller
@@ -20,12 +19,10 @@ import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.GrupoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
-import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
-import com.cogu.spylook.view.contacts.ContactoActivity
 import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers

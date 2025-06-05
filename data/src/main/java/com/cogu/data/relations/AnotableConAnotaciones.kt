@@ -1,0 +1,19 @@
+package com.cogu.data.relations
+
+import androidx.room.Embedded
+import androidx.room.Relation
+import com.cogu.spylook.model.entity.AnotableEntity
+import com.cogu.spylook.model.entity.AnotacionEntity
+
+class AnotableConAnotaciones {
+    @JvmField
+    @Embedded
+    var anotableEntity: AnotableEntity? = null
+
+    @JvmField
+    @Relation(
+        parentColumn = "idAnotable",
+        entityColumn = "idAnotable"
+    )
+    var anotaciones: MutableList<AnotacionEntity?>? = null
+}

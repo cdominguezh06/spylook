@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.view.common.fragments.CuentasFragment
 import com.cogu.spylook.view.common.fragments.SucesosFragment
 import com.cogu.spylook.view.contacts.fragments.AmigosFragment
@@ -13,7 +13,7 @@ import com.cogu.spylook.view.contacts.fragments.InformacionFragment
 
 class ContactSliderAdapter(
     fragment: FragmentActivity,
-    private val contacto: Contacto,
+    private val contactoEntity: ContactoEntity,
     private val context: Context?
 ) : FragmentStateAdapter(fragment) {
     lateinit var amigos : AmigosFragment
@@ -21,10 +21,10 @@ class ContactSliderAdapter(
     lateinit var sucesos : SucesosFragment
     lateinit var cuentas : CuentasFragment
     init {
-        amigos = AmigosFragment(contacto, context)
-        grupos = ContactGroupsFragment(contacto)
-        sucesos = SucesosFragment(contacto, context!!)
-        cuentas = CuentasFragment(contacto, context)
+        amigos = AmigosFragment(contactoEntity, context)
+        grupos = ContactGroupsFragment(contactoEntity)
+        sucesos = SucesosFragment(contactoEntity, context!!)
+        cuentas = CuentasFragment(contactoEntity, context)
     }
     override fun createFragment(position: Int): Fragment {
         return when (position) {
@@ -32,7 +32,7 @@ class ContactSliderAdapter(
             2 -> grupos
             3 -> sucesos
             4 -> cuentas
-            else -> InformacionFragment(contacto)
+            else -> InformacionFragment(contactoEntity)
         }
     }
 

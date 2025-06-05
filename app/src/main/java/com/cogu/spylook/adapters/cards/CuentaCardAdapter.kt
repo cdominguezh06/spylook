@@ -17,10 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
-import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.CuentaCardItem
-import com.cogu.spylook.model.entity.Anotable
+import com.cogu.spylook.model.entity.AnotableEntity
 import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.accounts.CuentaActivity
@@ -31,7 +30,7 @@ import org.mapstruct.factory.Mappers
 class CuentaCardAdapter(
     internal val cardItemList: MutableList<CuentaCardItem>,
     private val context: Context,
-    private val anotableOrigen: Anotable
+    private val anotableEntityOrigen: AnotableEntity
 ) : RecyclerView.Adapter<CuentaCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private lateinit var usuarios: MutableList<ContactoMiniCard>
@@ -110,7 +109,7 @@ class CuentaCardAdapter(
                     runBlocking {
                         val cuenta = AppDatabase.getInstance(context)!!
                             .cuentaDAO()!!.findCuentaById(cardItem.idAnotable)!!
-                        if (cuenta.idPropietario == anotableOrigen.idAnotable){
+                        if (cuenta.idPropietario == anotableEntityOrigen.idAnotable){
                             AlertDialog.Builder(context)
                                 .setTitle("Eliminar cuenta")
                                 .setMessage("Desea eliminar por completo la cuenta \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
@@ -136,11 +135,11 @@ class CuentaCardAdapter(
                         }else{
                             AlertDialog.Builder(context)
                                 .setTitle("Eliminar relacion")
-                                .setMessage("Desea quitar al usuario \"${anotableOrigen.nombre}\" de la cuenta \"${cardItem.nombre}\"?")
+                                .setMessage("Desea quitar al usuario \"${anotableEntityOrigen.nombre}\" de la cuenta \"${cardItem.nombre}\"?")
                                 .setPositiveButton("Continuar") { dialog, which ->
                                     val dao = AppDatabase.getInstance(context)!!.cuentaDAO()!!
                                     runBlocking {
-                                        val ref = CuentaContactoCrossRef(idCuenta = cardItem.idAnotable, idContacto = anotableOrigen.idAnotable)
+                                        val ref = CuentaContactoCrossRef(idCuenta = cardItem.idAnotable, idContacto = anotableEntityOrigen.idAnotable)
                                         dao.deleteMiembroDeCuenta(ref)
                                         val index = cardItemList.indexOf(cardItem)
                                         recyclerAnimator.deleteItemWithAnimation(
@@ -172,7 +171,7 @@ class CuentaCardAdapter(
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, NuevaCuentaActivity::class.java)
-                intent.putExtra("id", anotableOrigen.idAnotable)
+                intent.putExtra("id", anotableEntityOrigen.idAnotable)
                 context.startActivity(intent)
             })
             return
@@ -182,7 +181,7 @@ class CuentaCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, CuentaActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
-                intent.putExtra("idOrigen", anotableOrigen.idAnotable)
+                intent.putExtra("idOrigen", anotableEntityOrigen.idAnotable)
                 context.startActivity(intent)
             })
         }

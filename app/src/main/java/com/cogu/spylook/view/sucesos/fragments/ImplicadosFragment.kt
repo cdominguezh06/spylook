@@ -13,14 +13,13 @@ import com.cogu.spylook.adapters.cards.ContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.ContactoEntity
+import com.cogu.spylook.model.entity.SucesoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
-class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
+class ImplicadosFragment(private val sucesoEntity: SucesoEntity) : Fragment() {
 
     private lateinit var recycler: RecyclerView
     private val mapper = Mappers.getMapper(ContactoToCardItem::class.java)
@@ -40,7 +39,7 @@ class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
         val sucesoDao = AppDatabase.getInstance(requireContext())!!.sucesoDAO()
         val contactoDao = AppDatabase.getInstance(requireContext())!!.contactoDAO()
         lifecycleScope.launch {
-            val implicados = sucesoDao!!.getRelacionesBySuceso(suceso.idAnotable).map {
+            val implicados = sucesoDao!!.getRelacionesBySuceso(sucesoEntity.idAnotable).map {
                 contactoDao!!.findContactoById(it.idContacto)
             }
             val cardItems = buildCardItemList(implicados)
@@ -51,7 +50,7 @@ class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
         }
     }
 
-    private fun buildCardItemList(miembros: List<Contacto>): MutableList<ContactoCardItem> {
+    private fun buildCardItemList(miembros: List<ContactoEntity>): MutableList<ContactoCardItem> {
         val cardItems = miembros.map { mapper.toCardItem(it) }.toMutableList()
         return cardItems
     }

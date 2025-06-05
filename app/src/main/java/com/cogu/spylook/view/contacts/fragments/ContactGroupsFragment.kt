@@ -9,17 +9,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
-import com.cogu.spylook.adapters.cards.GrupoCardAdapter
 import com.cogu.spylook.adapters.cards.GruposDeContactoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 
-class ContactGroupsFragment(private val contacto: Contacto) : Fragment() {
+class ContactGroupsFragment(private val contactoEntity: ContactoEntity) : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private val mapper = Mappers.getMapper(GrupoToCardItem::class.java)
@@ -42,11 +41,11 @@ class ContactGroupsFragment(private val contacto: Contacto) : Fragment() {
         recyclerView = fragment.findViewById(R.id.recyclerGeneric)
         val db = AppDatabase.getInstance(requireContext())!!.grupoDAO()
         lifecycleScope.launch {
-            grupos = db!!.findGruposByMiembro(contacto.idAnotable).map {
+            grupos = db!!.findGruposByMiembro(contactoEntity.idAnotable).map {
                 mapper.toCardItem(db.findGrupoById(it.idGrupo)!!)
             }.toMutableList()
             grupos.addAll(
-                db.findGruposByCreador(contacto.idAnotable).map {
+                db.findGruposByCreador(contactoEntity.idAnotable).map {
                     mapper.toCardItem(it)
                 }
             )
@@ -56,7 +55,7 @@ class ContactGroupsFragment(private val contacto: Contacto) : Fragment() {
     }
 
     private fun setupRecyclerView(cardItems: MutableList<GrupoCardItem>) {
-        val adapter = GruposDeContactoCardAdapter(cardItems, requireContext(), contacto)
+        val adapter = GruposDeContactoCardAdapter(cardItems, requireContext(), contactoEntity)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {

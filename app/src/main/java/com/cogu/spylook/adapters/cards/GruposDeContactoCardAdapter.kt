@@ -22,12 +22,11 @@ import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.Contacto
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarGruposDeContacto
-import com.cogu.spylook.view.contacts.ContactoActivity
 import com.cogu.spylook.view.contacts.fragments.ContactGroupsFragment
 import com.cogu.spylook.view.groups.GrupoActivity
 import kotlinx.coroutines.runBlocking
@@ -36,7 +35,7 @@ import org.mapstruct.factory.Mappers
 open class GruposDeContactoCardAdapter(
     internal val cardItemList: MutableList<GrupoCardItem>,
     private val context: Context,
-    private val contacto: Contacto
+    private val contactoEntity: ContactoEntity
 ) : RecyclerView.Adapter<GruposDeContactoCardAdapter.CardViewHolder?>() {
     private lateinit var onClickFunction: (GrupoCardItem) -> Unit
     private lateinit var mapper: GrupoToCardItem
@@ -119,11 +118,11 @@ open class GruposDeContactoCardAdapter(
                         val dao = AppDatabase.getInstance(context)!!.grupoDAO()!!
                         runBlocking {
                             val grupo = dao.findGrupoById(cardItem.idAnotable)!!
-                            if (contacto.idAnotable == grupo.idCreador) {
+                            if (contactoEntity.idAnotable == grupo.idCreador) {
                                 AlertDialog.Builder(context)
                                     .setTitle("Si continúas borrarás completamente el grupo")
                                     .setMessage(
-                                        "El contacto \"${contacto.alias}\" es el creador de este grupo, eliminar " +
+                                        "El contacto \"${contactoEntity.alias}\" es el creador de este grupo, eliminar " +
                                                 "el grupo de la lista implica borrarlo permanentemente"
                                     )
                                     .setPositiveButton("Continuar") { dialog, which ->
@@ -146,7 +145,7 @@ open class GruposDeContactoCardAdapter(
                                     }.show()
                             } else {
                                 val crossRef = ContactoGrupoCrossRef(
-                                    idContacto = contacto.idAnotable,
+                                    idContacto = contactoEntity.idAnotable,
                                     idGrupo = cardItem.idAnotable
                                 )
                                 dao.deleteMiembroDeGrupo(crossRef)
@@ -188,11 +187,11 @@ open class GruposDeContactoCardAdapter(
                         .grupoDAO()!!
                     lista = grupoDAO.getGrupos().map { c -> mapper.toCardItem(c) }
                     val busquedaComoMiembro =
-                        grupoDAO.findGruposByMiembro(contacto.idAnotable).map {
+                        grupoDAO.findGruposByMiembro(contactoEntity.idAnotable).map {
                             grupoDAO.findGrupoById(it.idGrupo)!!
                         }.toMutableList()
                     val busquedaComoCreador =
-                        grupoDAO.findGruposByCreador(contacto.idAnotable).map {
+                        grupoDAO.findGruposByCreador(contactoEntity.idAnotable).map {
                             grupoDAO.findGrupoById(it.idAnotable)!!
                         }.toMutableList()
                     busquedaComoCreador.addAll(busquedaComoMiembro)
@@ -208,10 +207,10 @@ open class GruposDeContactoCardAdapter(
                     ContactGroupsFragment.grupos.removeAt(ContactGroupsFragment.grupos.size - 1)
                     ContactGroupsFragment.grupos.add(cardItem)
                     ContactGroupsFragment.grupos.add(agregar)
-                    val amistad = ContactoAmistadCrossRef(contacto.idAnotable, cardItem.idAnotable)
+                    val amistad = ContactoAmistadCrossRef(contactoEntity.idAnotable, cardItem.idAnotable)
                     runBlocking {
                         AppDatabase.getInstance(context)!!.grupoDAO()!!.insertarRelaciones(
-                            listOf(ContactoGrupoCrossRef(contacto.idAnotable, cardItem.idAnotable))
+                            listOf(ContactoGrupoCrossRef(contactoEntity.idAnotable, cardItem.idAnotable))
                         )
                         notifyDataSetChanged()
                         dialog.dismiss()
@@ -233,7 +232,7 @@ open class GruposDeContactoCardAdapter(
                         recycler,
                         onClickFunction,
                         context,
-                        contacto
+                        contactoEntity
                     )
                 )
                 dialog.window?.setLayout(

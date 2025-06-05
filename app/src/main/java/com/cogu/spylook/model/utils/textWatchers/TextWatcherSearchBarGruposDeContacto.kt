@@ -25,8 +25,7 @@ import com.cogu.spylook.adapters.search.BusquedaGrupoCardAdapter
 import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.entity.Grupo
+import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
@@ -40,7 +39,7 @@ class TextWatcherSearchBarGruposDeContacto(
     private val recyclerView: RecyclerView?,
     private val onClickFunction: (GrupoCardItem) -> Unit,
     private val context: Context?,
-    private val contacto: Contacto
+    private val contactoEntity: ContactoEntity
 ) : TextWatcher {
     private val mapper: GrupoToCardItem =
         Mappers.getMapper<GrupoToCardItem>(GrupoToCardItem::class.java)
@@ -65,11 +64,11 @@ class TextWatcherSearchBarGruposDeContacto(
                 .getGrupos()
                 .map { c -> mapper.toCardItem(c) }
                 .toMutableList()
-            val exclude = db.grupoDAO()!!.findGruposByCreador(contacto.idAnotable)
+            val exclude = db.grupoDAO()!!.findGruposByCreador(contactoEntity.idAnotable)
                 .toMutableList()
                 .apply {
                     addAll(
-                        db.grupoDAO()!!.findGruposByMiembro(contacto.idAnotable)
+                        db.grupoDAO()!!.findGruposByMiembro(contactoEntity.idAnotable)
                             .map { db.grupoDAO()!!.findGrupoById(it.idGrupo)!! })
                 }
                 .map { mapper.toCardItem(it) }

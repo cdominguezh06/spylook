@@ -25,7 +25,7 @@ import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.spylook.model.entity.SucesoEntity
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
-    var toEdit: Suceso? = null
+    var toEdit: SucesoEntity? = null
     var causante = mutableListOf<ContactoCardItem>()
     var implicados = mutableListOf<ContactoCardItem>()
     var mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
@@ -212,7 +212,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
             val fecha = textFechaSuceso.text.toString()
             val descripcion = textDescripcionSuceso.text.toString()
             val lugar = textLugarSuceso.text.toString()
-            val suceso = Suceso(
+            val sucesoEntity = SucesoEntity(
                 idAnotable = 0,
                 nombre = nombreSuceso,
                 fecha = fecha,
@@ -226,12 +226,12 @@ class NuevoSucesoActivity : AppCompatActivity() {
                     .setTitle("Sobreescribir suceso")
                     .setMessage("¿Desea sobreescribir el suceso actual?")
                     .setPositiveButton("Confirmar") { dialog, _ ->
-                        suceso.idAnotable = toEdit?.idAnotable!!
+                        sucesoEntity.idAnotable = toEdit?.idAnotable!!
                         lifecycleScope.launch {
-                            suceso.colorFoto = toEdit?.colorFoto!!
-                            db.sucesoDAO()!!.updateSucesoAnotable(suceso)
-                            db.sucesoDAO()!!.eliminarRelacionesPorSuceso(suceso.idAnotable)
-                            insertarRelaciones(suceso.idAnotable)
+                            sucesoEntity.colorFoto = toEdit?.colorFoto!!
+                            db.sucesoDAO()!!.updateSucesoAnotable(sucesoEntity)
+                            db.sucesoDAO()!!.eliminarRelacionesPorSuceso(sucesoEntity.idAnotable)
+                            insertarRelaciones(sucesoEntity.idAnotable)
                             dialog.dismiss()
                             finish()
                         }
@@ -243,7 +243,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(suceso).toInt()
+                val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(sucesoEntity).toInt()
                 insertarRelaciones(sucesoId)
                 finish()
             }
