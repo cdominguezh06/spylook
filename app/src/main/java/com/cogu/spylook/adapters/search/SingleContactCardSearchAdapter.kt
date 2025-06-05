@@ -13,13 +13,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 
 class SingleContactCardSearchAdapter(
     internal val cardItemList: List<ContactoCardItem>,
@@ -27,7 +27,6 @@ class SingleContactCardSearchAdapter(
     private val onClick : (ContactoCardItem, Dialog, SingleContactCardSearchAdapter) -> Unit,
     private val onLongClick : (ContactoCardItem, Context, SingleContactCardSearchAdapter, CardViewHolder) -> Boolean,
 ) : RecyclerView.Adapter<SingleContactCardSearchAdapter.CardViewHolder>() {
-    private lateinit var mapper: ContactoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.contact_card, parent, false)
@@ -35,7 +34,6 @@ class SingleContactCardSearchAdapter(
     }
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.name.isSelected = true
@@ -60,7 +58,7 @@ class SingleContactCardSearchAdapter(
                 var lista = listOf<ContactoCardItem>()
                 runBlocking {
                     lista = AppDatabase.getInstance(context)!!
-                        .contactoDAO()!!.getContactos().map { c -> mapper.toCardItem(c) }
+                        .contactoDAO()!!.getContactos().map { it.toModel().toCardItem() }
                 }
                 recycler.layoutManager = LinearLayoutManager(context)
                 val busquedaContactoCardAdapter =

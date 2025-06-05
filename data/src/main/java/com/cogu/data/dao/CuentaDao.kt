@@ -6,30 +6,30 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.Cuenta
-import com.cogu.spylook.model.entity.CuentaContactoCrossRef
-import com.cogu.spylook.model.relations.CuentaConContactos
+import com.cogu.data.crossrefs.CuentaContactoCrossRef
+import com.cogu.data.entity.AnotableEntity
+import com.cogu.data.entity.CuentaEntity
+import com.cogu.data.relations.CuentaConContactos
 
 @Dao
 interface CuentaDao {
 
     @Insert
-    suspend fun addAnotable(anotable: Anotable): Long
+    suspend fun addAnotable(anotable: AnotableEntity): Long
 
     @Insert
-    suspend fun insert(cuenta: Cuenta)
+    suspend fun insert(cuenta: CuentaEntity)
 
     @Query("SELECT * FROM cuentas WHERE idAnotable = :id")
-    suspend fun findCuentaById(id: Int): Cuenta?
+    suspend fun findCuentaById(id: Int): CuentaEntity?
 
     @Query("SELECT * FROM cuentas WHERE idPropietario = :id")
-    suspend fun findCuentasByPropietario(id: Int): List<Cuenta>
+    suspend fun findCuentasByPropietario(id: Int): List<CuentaEntity>
 
     @Transaction
-    suspend fun addCuentaWithAnotable(cuenta: Cuenta) : Long {
+    suspend fun addCuentaWithAnotable(cuenta: CuentaEntity) : Long {
         val idAnotable = addAnotable(
-            Anotable(
+            AnotableEntity(
                 idAnotable = cuenta.idAnotable,
                 nombre = cuenta.nombre
             )
@@ -40,16 +40,16 @@ interface CuentaDao {
     }
 
     @Transaction
-    suspend fun updateCuentaAnotable(cuenta: Cuenta) {
+    suspend fun updateCuentaAnotable(cuenta: CuentaEntity) {
         updateAnotable(cuenta)
         update(cuenta)
     }
 
     @Update
-    suspend fun updateAnotable(anotable: Anotable)
+    suspend fun updateAnotable(anotable: AnotableEntity)
 
     @Update
-    suspend fun update(cuenta: Cuenta)
+    suspend fun update(cuenta: CuentaEntity)
 
     @Transaction
     @Query("SELECT * FROM cuentas WHERE idAnotable = :idCuenta")

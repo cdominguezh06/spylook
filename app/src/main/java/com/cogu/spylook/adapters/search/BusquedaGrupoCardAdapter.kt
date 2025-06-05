@@ -11,8 +11,8 @@ import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.model.cards.GrupoCardItem
 import kotlinx.coroutines.runBlocking
 

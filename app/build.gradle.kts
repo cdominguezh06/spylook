@@ -1,5 +1,6 @@
 plugins {
     id("com.google.devtools.ksp")
+    kotlin("kapt") version "2.1.20"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
@@ -38,7 +39,7 @@ android {
     }
 }
 dependencies {
-    ksp(libs.mapstruct.processor)
+    kapt(libs.mapstruct.processor)
     ksp(libs.room.compiler)
     ksp(libs.hilt.android.compiler)
     implementation(project(":data"))

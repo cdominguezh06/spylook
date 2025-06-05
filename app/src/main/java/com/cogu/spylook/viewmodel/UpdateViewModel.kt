@@ -26,10 +26,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class UpdateViewModel @Inject constructor(
+class UpdateViewModel constructor(
     application: Application,
     private val checkForUpdatesUseCase: CheckForUpdatesUseCase,
     private val fileDownloader: AndroidFileDownloader

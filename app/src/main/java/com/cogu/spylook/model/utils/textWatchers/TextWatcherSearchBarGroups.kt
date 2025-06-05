@@ -15,10 +15,12 @@ import android.widget.Scroller
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.GrupoCardAdapter
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
@@ -33,8 +35,6 @@ class TextWatcherSearchBarGroups(
     private val recyclerView: RecyclerView?,
     private val context: Context?
 ) : TextWatcher {
-    private val mapper: GrupoToCardItem =
-        Mappers.getMapper<GrupoToCardItem>(GrupoToCardItem::class.java)
     private val db: AppDatabase
     private lateinit var collect: MutableList<GrupoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
@@ -54,7 +54,7 @@ class TextWatcherSearchBarGroups(
         runBlocking {
             collect = db.grupoDAO()!!
                 .getGrupos()
-                .map { c -> mapper.toCardItem(c) }
+                .map { it.toModel().toCardItem() }
                 .toMutableList()
         }
         busqueda.ifEmpty {

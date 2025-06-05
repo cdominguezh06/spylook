@@ -19,13 +19,15 @@ import android.widget.Scroller
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.GrupoCardAdapter
 import com.cogu.spylook.adapters.search.BusquedaGrupoCardAdapter
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.GrupoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
@@ -39,10 +41,8 @@ class TextWatcherSearchBarGruposDeContacto(
     private val recyclerView: RecyclerView?,
     private val onClickFunction: (GrupoCardItem) -> Unit,
     private val context: Context?,
-    private val contactoEntity: ContactoEntity
+    private val contacto: Contacto
 ) : TextWatcher {
-    private val mapper: GrupoToCardItem =
-        Mappers.getMapper<GrupoToCardItem>(GrupoToCardItem::class.java)
     private val db: AppDatabase
     private lateinit var collect: MutableList<GrupoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
@@ -62,16 +62,16 @@ class TextWatcherSearchBarGruposDeContacto(
         runBlocking {
             collect = db.grupoDAO()!!
                 .getGrupos()
-                .map { c -> mapper.toCardItem(c) }
+                .map { it.toModel().toCardItem() }
                 .toMutableList()
-            val exclude = db.grupoDAO()!!.findGruposByCreador(contactoEntity.idAnotable)
+            val exclude = db.grupoDAO()!!.findGruposByCreador(contacto.idAnotable)
                 .toMutableList()
                 .apply {
                     addAll(
-                        db.grupoDAO()!!.findGruposByMiembro(contactoEntity.idAnotable)
+                        db.grupoDAO()!!.findGruposByMiembro(contacto.idAnotable)
                             .map { db.grupoDAO()!!.findGrupoById(it.idGrupo)!! })
                 }
-                .map { mapper.toCardItem(it) }
+                .map { it.toModel().toCardItem() }
             collect = collect.filter { !exclude.contains(it) }.toMutableList()
         }
         busqueda.ifEmpty {

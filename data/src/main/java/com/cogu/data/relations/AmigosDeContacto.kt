@@ -3,8 +3,8 @@ package com.cogu.data.relations
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
-import com.cogu.spylook.model.entity.ContactoEntity
-import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
+import com.cogu.data.crossrefs.ContactoAmistadCrossRef
+import com.cogu.data.entity.ContactoEntity
 
 class AmigosDeContacto {
     @JvmField

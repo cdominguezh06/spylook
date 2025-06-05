@@ -9,18 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Anotacion
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.AnotacionCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.AnotacionToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.AnotacionCardItem
-import com.cogu.spylook.model.entity.AnotacionEntity
-import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 
-class InformacionFragment(private val contactoEntity: ContactoEntity) : Fragment() {
+class InformacionFragment(private val contacto: Contacto) : Fragment() {
 
     private val ID_RECYCLER_VIEW = R.id.recyclerAnotaciones
     private val camposTextViewIds = mapOf(
@@ -33,7 +34,6 @@ class InformacionFragment(private val contactoEntity: ContactoEntity) : Fragment
     )
 
     private lateinit var recyclerView: RecyclerView
-    private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,12 +51,12 @@ class InformacionFragment(private val contactoEntity: ContactoEntity) : Fragment
         camposTextViewIds.entries.forEach { (field, id) ->
             val textView = fragment.findViewById<TextView>(id)
             textView.text = when (field) {
-                "edad" -> contactoEntity.edad.toString()
-                "nick" -> contactoEntity.alias
-                "fecha" -> contactoEntity.fechaNacimiento.toString()
-                "ciudad" -> contactoEntity.ciudad
-                "estado" -> contactoEntity.estado
-                "pais" -> contactoEntity.pais
+                "edad" -> contacto.edad.toString()
+                "nick" -> contacto.alias
+                "fecha" -> contacto.fechaNacimiento.toString()
+                "ciudad" -> contacto.ciudad
+                "estado" -> contacto.estado
+                "pais" -> contacto.pais
                 else -> ""
             }
         }
@@ -66,23 +66,24 @@ class InformacionFragment(private val contactoEntity: ContactoEntity) : Fragment
         recyclerView = fragment.findViewById(ID_RECYCLER_VIEW)
         val db = AppDatabase.getInstance(requireContext())!!.anotacionDAO()
         lifecycleScope.launch {
-            val anotaciones = db!!.getAnotacionesDeAnotable(contactoEntity.idAnotable)
+            val anotaciones = db!!.getAnotacionesDeAnotable(contacto.idAnotable)
+                .map { it.toModel() }
             val cardItems = buildCardItemList(anotaciones)
             setupRecyclerView(cardItems)
         }
     }
 
-    private fun buildCardItemList(anotaciones: List<AnotacionEntity>): MutableList<AnotacionCardItem> {
-        val cardItems = anotaciones.map { mapper.toCardItem(it) }.toMutableList()
+    private fun buildCardItemList(anotaciones: List<Anotacion>): MutableList<AnotacionCardItem> {
+        val cardItems = anotaciones.map { it.toCardItem() }.toMutableList()
         cardItems.add(
-            AnotacionCardItem.getDefaultForNew(contactoEntity.idAnotable)
+            AnotacionCardItem.getDefaultForNew(contacto.idAnotable)
         )
         cardItems.sortBy { it.id }
         return cardItems
     }
 
     private fun setupRecyclerView(cardItems: MutableList<AnotacionCardItem>) {
-        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contactoEntity.idAnotable)
+        val adapter = AnotacionCardAdapter(cardItems, requireContext(), contacto.idAnotable)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {

@@ -1,6 +1,6 @@
 package com.cogu.spylook.model.cards
 
-import com.cogu.spylook.model.utils.converters.DateConverters
+import com.cogu.data.DateConverters
 import java.time.LocalDateTime
 
 class SucesoCardItem(

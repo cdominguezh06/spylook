@@ -14,17 +14,17 @@ import android.widget.Scroller
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 import java.util.Locale
 import kotlin.collections.listOf
 
@@ -34,10 +34,8 @@ class TextWatcherSearchBarMiembros(
     private val onClickFunction: (ContactoCardItem) -> Unit,
     private val context: Context?,
     private val currentMiembroId: Int,
-    private val onExclude: () -> List<ContactoEntity>,
+    private val onExclude: () -> List<Contacto>,
 ) : TextWatcher {
-    private val mapper: ContactoToCardItem =
-        Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private val db: AppDatabase
     private lateinit var baseAdapter: BusquedaContactoCardAdapter
     private lateinit var collect: MutableList<ContactoCardItem>
@@ -53,17 +51,18 @@ class TextWatcherSearchBarMiembros(
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        var contactoEntities = listOf<ContactoEntity>()
+        var contactos = listOf<Contacto>()
         val filter = onExclude.invoke()
         val busqueda = text.getText().toString().lowercase(
             Locale.getDefault()
         ).replace(" ", "")
         runBlocking {
-            contactoEntities =
-                db.contactoDAO()!!.getContactos();
-            collect = contactoEntities
+            contactos =
+                db.contactoDAO()!!.getContactos()
+                    .map { it.toModel() }
+            collect = contactos
                 .filter { !filter.contains(it) }
-                .map { contacto -> mapper.toCardItem(contacto) }
+                .map { it.toCardItem() }
                 .filter { it.idAnotable != currentMiembroId }
                 .toMutableList()
             collect.ifEmpty { collect.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST) }

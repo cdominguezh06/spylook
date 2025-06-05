@@ -11,12 +11,6 @@ import com.cogu.data.entity.AnotableEntity
 import com.cogu.data.entity.GrupoEntity
 import com.cogu.data.relations.ContactosGrupos
 import com.cogu.data.relations.GruposContactos
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
-import com.cogu.spylook.model.entity.Grupo
-import com.cogu.spylook.model.entity.Suceso
-import com.cogu.spylook.model.relations.ContactosGrupos
-import com.cogu.spylook.model.relations.GruposContactos
 
 @Dao
 interface GrupoDAO {

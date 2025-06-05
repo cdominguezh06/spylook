@@ -15,8 +15,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.GrupoCardItem
@@ -87,12 +88,12 @@ open class GrupoCardAdapter(
                         mutableListOf<ContactoMiniCard>()
                             .apply {
                                 val grupo = grupoDao.findGrupoById(cardItem.idAnotable)!!
-                                add(mapper.toMiniCard(contactoDao.findContactoById(grupo.idCreador)))
+                                add(mapper.toMiniCard(contactoDao.findContactoById(grupo.idCreador).toModel()))
                             }.apply {
                                 addAll(
                                     grupoDao
                                         .getRelacionesByGrupo(cardItem.idAnotable)
-                                        .map { mapper.toMiniCard(contactoDao.findContactoById(it.idContacto)) }
+                                        .map { mapper.toMiniCard(contactoDao.findContactoById(it.idContacto).toModel()) }
                                 )
                             }
                     miembrosRecycler.layoutManager = LinearLayoutManager(context)

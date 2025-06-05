@@ -68,7 +68,6 @@ import com.cogu.spylook.viewmodel.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import utils.MarkdownFormatter
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private var lastReleaseTagShown: String? = null
     private val updateViewModel: UpdateViewModel by viewModels()
@@ -318,6 +317,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun loadGroups() {
         grupos = database.grupoDAO()!!.getGrupos()
+            .map { grupoMapper.toCardItem(it.toModel()) }.toMutableList()
         grupos.ifEmpty { grupos.add(GrupoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
     }
 

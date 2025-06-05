@@ -17,26 +17,26 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.crossrefs.ContactoAmistadCrossRef
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toEntity
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.BusquedaContactoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
-import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 
 open class AmigoCardAdapter(
     internal val cardItemList: MutableList<ContactoCardItem>,
     private val context: Context,
-    private val contactoEntity: ContactoEntity,
+    private val contactoEntity: Contacto,
 ) : RecyclerView.Adapter<AmigoCardAdapter.CardViewHolder?>() {
     private lateinit var onClickFunction: (ContactoCardItem) -> Unit
-    private lateinit var mapper: ContactoToCardItem
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
@@ -48,7 +48,6 @@ open class AmigoCardAdapter(
         recyclerAnimator = RecyclerViewAnimator(recyclerView, cardItemList, this)
     }
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.name.isSelected = true
@@ -137,7 +136,7 @@ open class AmigoCardAdapter(
                     val contactoDAO = AppDatabase.getInstance(context)!!
                         .contactoDAO()!!
                     lista =
-                        contactoDAO.getContactos().map { c -> mapper.toCardItem(c) }.toMutableList()
+                        contactoDAO.getContactos().map { c -> c.toModel().toCardItem() }.toMutableList()
                     val busquedaComoContacto =
                         contactoDAO.getAmistadesPorContacto(contactoEntity.idAnotable).map {
                             contactoDAO.findContactoById(it.idAmigo)
@@ -147,10 +146,12 @@ open class AmigoCardAdapter(
                             contactoDAO.findContactoById(it.idContacto)
                         }.toMutableList()
                     busquedaComoAmigo.addAll(busquedaComoContacto)
-                    busquedaComoAmigo.add(contactoEntity)
-                    val excluded = busquedaComoAmigo.distinct().map {
-                        mapper.toCardItem(it)
-                    }.toMutableList()
+                    busquedaComoAmigo.add(contactoEntity.toEntity())
+                    val excluded = busquedaComoAmigo
+                        .distinct()
+                        .map { it.toModel()
+                                .toCardItem() }
+                        .toMutableList()
                     lista = lista.filter { c -> excluded.contains(c) == false }.toMutableList()
                     lista.ifEmpty { lista.add(ContactoCardItem.DEFAULT_FOR_EMPTY_LIST) }
                 }
@@ -195,6 +196,8 @@ open class AmigoCardAdapter(
                                                 .map { dao.findContactoById(it.idContacto) }
                                         )
                                     }
+                                    .map { it.toModel() }
+
                             }
                         }
                     )

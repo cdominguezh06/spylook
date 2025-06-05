@@ -18,17 +18,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.crossrefs.CuentaContactoCrossRef
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toEntity
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Cuenta
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.SingleContactCardSearchAdapter
 import com.cogu.spylook.adapters.search.MultipleContactsCardSearchAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.CuentaEntity
-import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 import kotlin.collections.ifEmpty
 
 class NuevaCuentaActivity : AppCompatActivity() {
@@ -43,10 +44,9 @@ class NuevaCuentaActivity : AppCompatActivity() {
     private lateinit var imagen: ImageView
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
-    var toEdit: CuentaEntity? = null
+    var toEdit: Cuenta? = null
     var propietario = mutableListOf<ContactoCardItem>()
     var usuarios = mutableListOf<ContactoCardItem>()
-    var mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
@@ -69,7 +69,8 @@ class NuevaCuentaActivity : AppCompatActivity() {
         imagen = findViewById<ImageView>(R.id.imagenCuenta)
         lifecycleScope.launch {
             if(intent.getIntExtra("idEdit", -1)!=-1){
-                toEdit = AppDatabase.getInstance(this@NuevaCuentaActivity)!!.cuentaDAO()!!.findCuentaById(intent.getIntExtra("idEdit", -1))
+                toEdit = AppDatabase.getInstance(this@NuevaCuentaActivity)!!.cuentaDAO()!!.findCuentaById(intent.getIntExtra("idEdit", -1))!!
+                    .toModel()
             }
             toEdit?.let {
                 textNombreCuenta.setText(toEdit?.nombre)
@@ -80,12 +81,12 @@ class NuevaCuentaActivity : AppCompatActivity() {
                 val contactoDao = AppDatabase
                     .getInstance(this@NuevaCuentaActivity)!!
                     .contactoDAO()!!
-                val propietarioEdit = mapper.toCardItem(contactoDao.findContactoById(toEdit?.idPropietario!!))
+                val propietarioEdit = contactoDao.findContactoById(toEdit?.idPropietario!!).toModel().toCardItem()
                 val usuariosEdit = AppDatabase.getInstance(this@NuevaCuentaActivity)!!
                     .cuentaDAO()!!
                     .findContactosByCuenta(toEdit?.idAnotable!!)
                     .map {
-                        mapper.toCardItem(contactoDao.findContactoById(it.idContacto))
+                        contactoDao.findContactoById(it.idContacto).toModel().toCardItem()
                     }
                 propietario.add(propietarioEdit)
                 usuarios.addAll(usuariosEdit)
@@ -221,7 +222,7 @@ class NuevaCuentaActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
-            val cuentaEntity = CuentaEntity(
+            val cuenta = Cuenta(
                 idAnotable = 0,
                 nombre = nombreCuenta,
                 link = linkCuenta,
@@ -234,12 +235,12 @@ class NuevaCuentaActivity : AppCompatActivity() {
                     .setTitle("Sobreescribir cuenta")
                     .setMessage("¿Desea sobreescribir la cuenta actual?")
                     .setPositiveButton("Confirmar") { dialog, _ ->
-                        cuentaEntity.idAnotable = toEdit?.idAnotable!!
+                        cuenta.idAnotable = toEdit?.idAnotable!!
                         lifecycleScope.launch {
-                            cuentaEntity.colorFoto = toEdit?.colorFoto!!
-                            db.cuentaDAO()!!.updateCuentaAnotable(cuentaEntity)
-                            db.cuentaDAO()!!.eliminarRelacionesPorCuenta(cuentaEntity.idAnotable)
-                            insertarRelaciones(cuentaEntity.idAnotable)
+                            cuenta.colorFoto = toEdit?.colorFoto!!
+                            db.cuentaDAO()!!.updateCuentaAnotable(cuenta.toEntity())
+                            db.cuentaDAO()!!.eliminarRelacionesPorCuenta(cuenta.idAnotable)
+                            insertarRelaciones(cuenta.idAnotable)
                             dialog.dismiss()
                             finish()
                         }
@@ -251,7 +252,7 @@ class NuevaCuentaActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                val cuentaId = db.cuentaDAO()!!.addCuentaWithAnotable(cuentaEntity).toInt()
+                val cuentaId = db.cuentaDAO()!!.addCuentaWithAnotable(cuenta.toEntity()).toInt()
                 insertarRelaciones(cuentaId)
                 finish()
             }

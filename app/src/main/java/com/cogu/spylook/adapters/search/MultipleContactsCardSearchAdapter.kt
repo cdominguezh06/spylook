@@ -13,22 +13,21 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.utils.textWatchers.TextWatcherSearchBarMiembros
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 
 class MultipleContactsCardSearchAdapter(
     internal val cardItemList: List<ContactoCardItem>,
     private val context: Context,
-    private val onClick : (ContactoCardItem, Dialog, MultipleContactsCardSearchAdapter) -> Unit,
-    private val onLongClick : (ContactoCardItem, Context, MultipleContactsCardSearchAdapter, CardViewHolder) -> Boolean,
-    private val filter : () -> List<ContactoCardItem>
+    private val onClick: (ContactoCardItem, Dialog, MultipleContactsCardSearchAdapter) -> Unit,
+    private val onLongClick: (ContactoCardItem, Context, MultipleContactsCardSearchAdapter, CardViewHolder) -> Boolean,
+    private val filter: () -> List<ContactoCardItem>
 ) : RecyclerView.Adapter<MultipleContactsCardSearchAdapter.CardViewHolder>() {
-    private lateinit var mapper: ContactoToCardItem
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.contact_card, parent, false)
@@ -37,7 +36,6 @@ class MultipleContactsCardSearchAdapter(
 
 
     override fun onBindViewHolder(holder: CardViewHolder, position: Int) {
-        mapper = Mappers.getMapper(ContactoToCardItem::class.java)
         val cardItem = cardItemList[position]
         holder.name.text = cardItem.nombre
         holder.name.isSelected = true
@@ -63,7 +61,7 @@ class MultipleContactsCardSearchAdapter(
                 runBlocking {
                     lista = AppDatabase.getInstance(context)!!
                         .contactoDAO()!!.getContactos()
-                        .map { c -> mapper.toCardItem(c) }
+                        .map { c -> c.toModel().toCardItem() }
                         .filter {
                             !filter().contains(it)
                         }
@@ -94,7 +92,7 @@ class MultipleContactsCardSearchAdapter(
                                     .map { it.copy() }
                                     .toMutableList()
                                     .ifEmpty { return@runBlocking listOf() }
-                                    .map { dao.findContactoById(it.idAnotable) }
+                                    .map { dao.findContactoById(it.idAnotable).toModel() }
                             }
                         }
                     )
@@ -105,10 +103,9 @@ class MultipleContactsCardSearchAdapter(
                 )
             })
 
-            holder.itemView.setOnLongClickListener {
-                    view: View? ->
+            holder.itemView.setOnLongClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-               onLongClick(cardItem, context, this, holder)
+                onLongClick(cardItem, context, this, holder)
             }
         }
     }

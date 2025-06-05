@@ -14,13 +14,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.crossrefs.CuentaContactoCrossRef
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Anotable
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.CuentaCardItem
-import com.cogu.spylook.model.entity.AnotableEntity
-import com.cogu.spylook.model.entity.CuentaContactoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.accounts.CuentaActivity
 import com.cogu.spylook.view.accounts.NuevaCuentaActivity
@@ -30,7 +31,7 @@ import org.mapstruct.factory.Mappers
 class CuentaCardAdapter(
     internal val cardItemList: MutableList<CuentaCardItem>,
     private val context: Context,
-    private val anotableEntityOrigen: AnotableEntity
+    private val anotableOrigen: Anotable
 ) : RecyclerView.Adapter<CuentaCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private lateinit var usuarios: MutableList<ContactoMiniCard>
@@ -73,10 +74,10 @@ class CuentaCardAdapter(
                     mutableListOf<ContactoMiniCard>()
                         .apply {
                             val cuenta = cuentaDAO.findCuentaById(cardItem.idAnotable)!!
-                            add(mapper.toMiniCard(contactoDao.findContactoById(cuenta.idPropietario)))
+                            add(mapper.toMiniCard(contactoDao.findContactoById(cuenta.idPropietario).toModel()))
                             addAll(
                                 cuentaDAO.findContactosByCuenta(cuenta.idAnotable).map {
-                                    mapper.toMiniCard(contactoDao.findContactoById(it.idContacto))
+                                    mapper.toMiniCard(contactoDao.findContactoById(it.idContacto).toModel())
                                 }
                             )
                         }
@@ -109,7 +110,7 @@ class CuentaCardAdapter(
                     runBlocking {
                         val cuenta = AppDatabase.getInstance(context)!!
                             .cuentaDAO()!!.findCuentaById(cardItem.idAnotable)!!
-                        if (cuenta.idPropietario == anotableEntityOrigen.idAnotable){
+                        if (cuenta.idPropietario == anotableOrigen.idAnotable){
                             AlertDialog.Builder(context)
                                 .setTitle("Eliminar cuenta")
                                 .setMessage("Desea eliminar por completo la cuenta \"${cardItem.nombre}\"? \n\nEste proceso no se puede deshacer.")
@@ -135,11 +136,11 @@ class CuentaCardAdapter(
                         }else{
                             AlertDialog.Builder(context)
                                 .setTitle("Eliminar relacion")
-                                .setMessage("Desea quitar al usuario \"${anotableEntityOrigen.nombre}\" de la cuenta \"${cardItem.nombre}\"?")
+                                .setMessage("Desea quitar al usuario \"${anotableOrigen.nombre}\" de la cuenta \"${cardItem.nombre}\"?")
                                 .setPositiveButton("Continuar") { dialog, which ->
                                     val dao = AppDatabase.getInstance(context)!!.cuentaDAO()!!
                                     runBlocking {
-                                        val ref = CuentaContactoCrossRef(idCuenta = cardItem.idAnotable, idContacto = anotableEntityOrigen.idAnotable)
+                                        val ref = CuentaContactoCrossRef(idCuenta = cardItem.idAnotable, idContacto = anotableOrigen.idAnotable)
                                         dao.deleteMiembroDeCuenta(ref)
                                         val index = cardItemList.indexOf(cardItem)
                                         recyclerAnimator.deleteItemWithAnimation(
@@ -171,7 +172,7 @@ class CuentaCardAdapter(
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, NuevaCuentaActivity::class.java)
-                intent.putExtra("id", anotableEntityOrigen.idAnotable)
+                intent.putExtra("id", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
             return
@@ -181,7 +182,7 @@ class CuentaCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, CuentaActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
-                intent.putExtra("idOrigen", anotableEntityOrigen.idAnotable)
+                intent.putExtra("idOrigen", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
         }

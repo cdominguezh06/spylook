@@ -9,14 +9,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.DateConverters
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toEntity
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Anotacion
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.AnotacionToCardItem
+import com.cogu.spylook.mappers.toCardItem
+import com.cogu.spylook.mappers.toModel
 import com.cogu.spylook.model.cards.AnotacionCardItem
-import com.cogu.spylook.model.entity.AnotacionEntity
-import com.cogu.spylook.model.utils.converters.DateConverters
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 import java.time.LocalDateTime
 
 class AnotacionCardAdapter(
@@ -24,7 +26,6 @@ class AnotacionCardAdapter(
     private val context: Context,
     private val anotableId: Int
 ) : RecyclerView.Adapter<AnotacionCardAdapter.CardViewHolder>() {
-    private val mapper = Mappers.getMapper(AnotacionToCardItem::class.java)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.anotacion_card, parent, false)
@@ -94,7 +95,9 @@ class AnotacionCardAdapter(
             val db: AppDatabase = AppDatabase.getInstance(context)!!
             runBlocking {
                 db.anotacionDAO()!!.deleteAnotacion(
-                    mapper.toAnotacion(cardItemList[position])
+                    cardItemList[position]
+                        .toModel()
+                        .toEntity()
                 )
                 cardItemList.removeAt(position)
                 notifyItemRemoved(position)
@@ -135,22 +138,22 @@ class AnotacionCardAdapter(
     }
 
     private suspend fun createAnotacion(view: View, db: AppDatabase) {
-        val anotacionEntity = AnotacionEntity()
-        anotacionEntity.fecha = DateConverters.toDateTimeString(LocalDateTime.now())
-        anotacionEntity.titulo =
+        val anotacion = Anotacion()
+        anotacion.fecha = DateConverters.toDateTimeString(LocalDateTime.now())
+        anotacion.titulo =
             view.findViewById<TextView>(R.id.editTextText).text.toString()
-        anotacionEntity.descripcion =
+        anotacion.descripcion =
             view.findViewById<TextView>(R.id.editTextText2).text.toString()
-        anotacionEntity.idAnotable = anotableId
-        val id = db.anotacionDAO()!!.addAnotacion(anotacionEntity)
-        anotacionEntity.id = id.toInt()
-        val element = mapper.toCardItem(anotacionEntity)
+        anotacion.idAnotable = anotableId
+        val id = db.anotacionDAO()!!.addAnotacion(anotacion.toEntity())
+        anotacion.id = id.toInt()
+        val element = anotacion.toCardItem()
         cardItemList.add(element)
         notifyItemInserted(cardItemList.size - 1)
     }
 
     private suspend fun updateAnotacion(view: View, db: AppDatabase, position: Int) {
-        val editado = mapper.toAnotacion(cardItemList[position])
+        val editado = cardItemList[position].toModel().toEntity()
         editado.fecha = DateConverters.toDateTimeString(LocalDateTime.now())
         editado.titulo =
             view.findViewById<TextView>(R.id.editTextText).text.toString()
@@ -159,7 +162,7 @@ class AnotacionCardAdapter(
         editado.idAnotable = anotableId
         val id = db.anotacionDAO()!!.addAnotacion(editado)
         editado.id = id.toInt()
-        cardItemList[position] = mapper.toCardItem(editado)
+        cardItemList[position] = editado.toModel().toCardItem()
         notifyItemChanged(position)
     }
     class CardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

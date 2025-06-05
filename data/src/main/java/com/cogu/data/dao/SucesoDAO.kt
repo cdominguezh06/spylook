@@ -6,33 +6,32 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
-import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.data.crossrefs.ContactoSucesoCrossRef
+import com.cogu.data.entity.AnotableEntity
+import com.cogu.data.entity.SucesoEntity
 
 @Dao
 interface SucesoDAO {
 
     @Insert
-    suspend fun insert(suceso: Suceso)
+    suspend fun insert(suceso: SucesoEntity)
 
     @Insert
-    suspend fun addAnotable(anotable: Anotable): Long
+    suspend fun addAnotable(anotable: AnotableEntity): Long
 
     @Query("DELETE FROM anotables WHERE idAnotable = :idAnotable")
     suspend fun deleteAnotable(idAnotable: Int)
 
     @Query("SELECT * FROM sucesos WHERE idAnotable = :id")
-    suspend fun findSucesoById(id: Int): Suceso?
+    suspend fun findSucesoById(id: Int): SucesoEntity?
 
     @Update
-    suspend fun update(suceso: Suceso)
+    suspend fun update(suceso: SucesoEntity)
 
     @Transaction
-    suspend fun addSucesoAnotable(suceso: Suceso) : Long {
+    suspend fun addSucesoAnotable(suceso: SucesoEntity) : Long {
         val idAnotable = addAnotable(
-            Anotable(
+            AnotableEntity(
                 idAnotable = suceso.idAnotable,
                 nombre = suceso.nombre
             )
@@ -43,13 +42,13 @@ interface SucesoDAO {
     }
 
     @Transaction
-    suspend fun updateSucesoAnotable(suceso: Suceso) {
+    suspend fun updateSucesoAnotable(suceso: SucesoEntity) {
         updateAnotable(suceso)
         update(suceso)
     }
 
     @Update
-    suspend fun updateAnotable(anotable: Anotable)
+    suspend fun updateAnotable(anotable: AnotableEntity)
 
     @Transaction
     suspend fun deleteSucesoAnotable(idAnotable: Int) {
@@ -74,7 +73,7 @@ interface SucesoDAO {
     suspend fun findSucesosByImplicado(idAnotable : Int) : List<ContactoSucesoCrossRef>
 
     @Query("SELECT * FROM sucesos WHERE idCausante = :idAnotable")
-    suspend fun findSucesosByCausante(idAnotable: Int): List<Suceso>
+    suspend fun findSucesosByCausante(idAnotable: Int): List<SucesoEntity>
     @Transaction
     @Query("SELECT * FROM contacto_suceso_cross_ref WHERE idSuceso = :idAnotable")
     suspend fun getRelacionesBySuceso(idAnotable: Int): List<ContactoSucesoCrossRef>

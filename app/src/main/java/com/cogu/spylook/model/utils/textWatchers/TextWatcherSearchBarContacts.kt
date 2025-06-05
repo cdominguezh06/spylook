@@ -15,17 +15,17 @@ import android.widget.Scroller
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.utils.ForegroundShaderSpan
 import com.cogu.spylook.model.utils.StringWithSpacesIndexRetriever
 import com.cogu.spylook.model.utils.textWatchers.actions.LongTextScrollerAction
 import com.cogu.spylook.view.contacts.ContactoActivity
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 import java.util.Locale
 
 class TextWatcherSearchBarContacts(
@@ -33,8 +33,6 @@ class TextWatcherSearchBarContacts(
     private val recyclerView: RecyclerView?,
     private val context: Context?
 ) : TextWatcher {
-    private val mapper: ContactoToCardItem =
-        Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private val db: AppDatabase
     private lateinit var collect: MutableList<ContactoCardItem>
     private val retriever = StringWithSpacesIndexRetriever()
@@ -55,7 +53,7 @@ override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int
     runBlocking {
         collect = db.contactoDAO()!!
             .getContactos()
-            .map { c -> mapper.toCardItem(c) }
+            .map { it.toModel().toCardItem() }
             .toMutableList()
     }
     busqueda.ifEmpty {

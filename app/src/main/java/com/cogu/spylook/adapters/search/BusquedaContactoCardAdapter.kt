@@ -1,6 +1,5 @@
 package com.cogu.spylook.adapters.search
 
-import android.content.Context
 import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View

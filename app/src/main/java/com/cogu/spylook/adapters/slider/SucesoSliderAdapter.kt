@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.cogu.spylook.model.entity.SucesoEntity
+import com.cogu.domain.model.Suceso
 import com.cogu.spylook.view.common.fragments.AnotacionesFragment
 import com.cogu.spylook.view.sucesos.fragments.ImplicadosFragment
 import com.cogu.spylook.view.sucesos.fragments.SucesoDataFragment
 
 class SucesoSliderAdapter(
     fragment: FragmentActivity,
-    private val sucesoEntity: SucesoEntity,
+    private val sucesoEntity: Suceso,
     private val context: Context?
 ) : FragmentStateAdapter(fragment) {
     lateinit var anotaciones : AnotacionesFragment

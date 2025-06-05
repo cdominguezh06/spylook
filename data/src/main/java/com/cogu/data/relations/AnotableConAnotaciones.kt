@@ -2,8 +2,8 @@ package com.cogu.data.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.cogu.spylook.model.entity.AnotableEntity
-import com.cogu.spylook.model.entity.AnotacionEntity
+import com.cogu.data.entity.AnotableEntity
+import com.cogu.data.entity.AnotacionEntity
 
 class AnotableConAnotaciones {
     @JvmField

@@ -14,11 +14,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.cogu.data.dao.CuentaDao
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Cuenta
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.CuentaSliderAdapter
-import com.cogu.spylook.dao.CuentaDao
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.entity.CuentaEntity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -54,21 +55,21 @@ class CuentaActivity : AppCompatActivity() {
             startActivity(intent)
         }
         lifecycleScope.launch {
-            val cuenta = cuentaDAO.findCuentaById(intent.getIntExtra("id", 0))
-            setupCuentaDetails(cuenta!!)
+            val cuenta = cuentaDAO.findCuentaById(intent.getIntExtra("id", 0))!!.toModel()
+            setupCuentaDetails(cuenta)
             setupViewPager(cuenta)
         }
     }
 
-    private fun setupCuentaDetails(cuentaEntity: CuentaEntity) {
-        title.text = cuentaEntity.nombre
+    private fun setupCuentaDetails(cuenta: Cuenta) {
+        title.text = cuenta.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.account_icon)
-        image.setColorFilter(cuentaEntity.colorFoto, PorterDuff.Mode.MULTIPLY)
+        image.setColorFilter(cuenta.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(cuentaEntity: CuentaEntity) {
-        viewPager.adapter = CuentaSliderAdapter(this, cuentaEntity, this)
+    private fun setupViewPager(cuenta: Cuenta) {
+        viewPager.adapter = CuentaSliderAdapter(this, cuenta, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.TAB_INFO_TITLE)
@@ -88,8 +89,8 @@ class CuentaActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            val cuenta = cuentaDAO.findCuentaById(intent.getIntExtra("id", 0))
-            title.text = cuenta!!.nombre
+            val cuenta = cuentaDAO.findCuentaById(intent.getIntExtra("id", 0))!!.toModel()
+            title.text = cuenta.nombre
             val currentPosition = viewPager.currentItem
             setupViewPager(cuenta)
             viewPager.post {

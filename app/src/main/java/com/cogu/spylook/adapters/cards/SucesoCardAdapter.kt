@@ -14,13 +14,14 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.crossrefs.ContactoSucesoCrossRef
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Anotable
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToMiniCard
 import com.cogu.spylook.model.cards.ContactoMiniCard
 import com.cogu.spylook.model.cards.SucesoCardItem
-import com.cogu.spylook.model.entity.AnotableEntity
-import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.view.sucesos.SucesoActivity
 import com.cogu.spylook.view.sucesos.NuevoSucesoActivity
@@ -30,7 +31,7 @@ import org.mapstruct.factory.Mappers
 open class SucesoCardAdapter(
     internal val cardItemList: MutableList<SucesoCardItem>,
     private val context: Context,
-    private val anotableEntityOrigen: AnotableEntity
+    private val anotableOrigen: Anotable
 ) : RecyclerView.Adapter<SucesoCardAdapter.CardViewHolder?>() {
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardViewHolder {
@@ -70,10 +71,10 @@ open class SucesoCardAdapter(
                     mutableListOf<ContactoMiniCard>()
                         .apply {
                             val suceso = sucesoDao.findSucesoById(cardItem.idAnotable)!!
-                            add(mapper.toMiniCard(contactoDao.findContactoById(suceso.idCausante)))
+                            add(mapper.toMiniCard(contactoDao.findContactoById(suceso.idCausante).toModel()))
                             addAll(
                                 sucesoDao.getRelacionesBySuceso(suceso.idAnotable).map {
-                                    mapper.toMiniCard(contactoDao.findContactoById(it.idContacto))
+                                    mapper.toMiniCard(contactoDao.findContactoById(it.idContacto).toModel())
                                 }
                             )
                         }
@@ -107,11 +108,11 @@ open class SucesoCardAdapter(
                     val dao = AppDatabase.getInstance(context)!!.sucesoDAO()!!
                     runBlocking {
                         val suceso = dao.findSucesoById(cardItem.idAnotable)!!
-                        if (anotableEntityOrigen.idAnotable == suceso.idCausante) {
+                        if (anotableOrigen.idAnotable == suceso.idCausante) {
                             AlertDialog.Builder(context)
                                 .setTitle("Si continúas borrarás completamente el suceso")
                                 .setMessage(
-                                    "\"${anotableEntityOrigen.nombre}\" es el causante de este suceso, eliminar " +
+                                    "\"${anotableOrigen.nombre}\" es el causante de este suceso, eliminar " +
                                             "el suceso de la lista implica borrarlo permanentemente"
                                 )
                                 .setPositiveButton("Continuar") { dialog, which ->
@@ -134,7 +135,7 @@ open class SucesoCardAdapter(
                                 }.show()
                         }else{
                             val crossRef = ContactoSucesoCrossRef(
-                                idContacto = anotableEntityOrigen.idAnotable,
+                                idContacto = anotableOrigen.idAnotable,
                                 idSuceso = cardItem.idAnotable
                             )
                             dao.deleteImplicadoSuceso(crossRef)
@@ -163,7 +164,7 @@ open class SucesoCardAdapter(
             holder.itemView.setOnClickListener(View.OnClickListener { view: View? ->
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, NuevoSucesoActivity::class.java)
-                intent.putExtra("id", anotableEntityOrigen.idAnotable)
+                intent.putExtra("id", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
             return
@@ -173,7 +174,7 @@ open class SucesoCardAdapter(
                 view?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                 val intent = Intent(context, SucesoActivity::class.java)
                 intent.putExtra("id", cardItem.idAnotable)
-                intent.putExtra("idOrigen", anotableEntityOrigen.idAnotable)
+                intent.putExtra("idOrigen", anotableOrigen.idAnotable)
                 context.startActivity(intent)
             })
         }

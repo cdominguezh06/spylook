@@ -2,8 +2,8 @@ package com.cogu.data.relations
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.cogu.spylook.model.entity.ContactoEntity
-import com.cogu.spylook.model.entity.SucesoEntity
+import com.cogu.data.entity.ContactoEntity
+import com.cogu.data.entity.SucesoEntity
 
 class CausanteSuceso {
     @Embedded
