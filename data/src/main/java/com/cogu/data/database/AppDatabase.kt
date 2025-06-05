@@ -5,35 +5,35 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.cogu.spylook.dao.AnotacionDAO
-import com.cogu.spylook.dao.ContactoDAO
-import com.cogu.spylook.dao.CuentaDao
-import com.cogu.spylook.dao.GrupoDAO
-import com.cogu.spylook.dao.SucesoDAO
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.utils.converters.DateConverters
-import com.cogu.spylook.model.entity.Anotacion
-import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
-import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
-import com.cogu.spylook.model.entity.Cuenta
-import com.cogu.spylook.model.entity.CuentaContactoCrossRef
-import com.cogu.spylook.model.entity.Grupo
-import com.cogu.spylook.model.entity.Suceso
+import com.cogu.data.DateConverters
+import com.cogu.data.crossrefs.ContactoAmistadCrossRef
+import com.cogu.data.crossrefs.ContactoGrupoCrossRef
+import com.cogu.data.crossrefs.ContactoSucesoCrossRef
+import com.cogu.data.crossrefs.CuentaContactoCrossRef
+import com.cogu.data.dao.AnotacionDAO
+import com.cogu.data.dao.ContactoDAO
+import com.cogu.data.dao.CuentaDao
+import com.cogu.data.dao.GrupoDAO
+import com.cogu.data.dao.SucesoDAO
+import com.cogu.data.entity.AnotableEntity
+import com.cogu.data.entity.AnotacionEntity
+import com.cogu.data.entity.ContactoEntity
+import com.cogu.data.entity.CuentaEntity
+import com.cogu.data.entity.GrupoEntity
+import com.cogu.data.entity.SucesoEntity
 
 @Database(
     entities = [
-        Contacto::class,
-        Anotacion::class,
-        Grupo::class,
-        Suceso::class,
-        Cuenta::class,
+        ContactoEntity::class,
+        AnotacionEntity::class,
+        GrupoEntity::class,
+        SucesoEntity::class,
+        CuentaEntity::class,
         ContactoSucesoCrossRef::class,
         ContactoGrupoCrossRef::class,
         ContactoAmistadCrossRef::class,
         CuentaContactoCrossRef::class,
-        Anotable::class
+        AnotableEntity::class
     ], version = 11, exportSchema = false
 )
 @TypeConverters(DateConverters::class)

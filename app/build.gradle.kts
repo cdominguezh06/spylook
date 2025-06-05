@@ -1,6 +1,5 @@
 plugins {
     id("com.google.devtools.ksp")
-    kotlin("kapt") version "2.1.20"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
@@ -20,7 +19,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -31,17 +30,24 @@ android {
         buildConfig = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 dependencies {
+    ksp(libs.mapstruct.processor)
     ksp(libs.room.compiler)
+    ksp(libs.hilt.android.compiler)
+    implementation(project(":data"))
+    implementation(project(":domain"))
+    implementation(libs.room.runtime)
     implementation(libs.legacy.support.v4)
-    kapt(libs.mapstruct.processor)
+    implementation(libs.hilt.android)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -51,9 +57,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android.v181)
     implementation(libs.recyclerview)
     implementation(libs.mapstruct)
-    implementation (libs.retrofit)
     implementation (libs.converter.gson)
-    implementation(libs.logging.interceptor)
     implementation (libs.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

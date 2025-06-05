@@ -1,5 +1,6 @@
-package com.cogu.spylook.model.github
+package com.cogu.data.github
 
+import com.cogu.domain.github.GitHubRelease
 import retrofit2.Call
 import retrofit2.http.GET
 

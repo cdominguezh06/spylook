@@ -1,7 +1,7 @@
-package com.cogu.data.mappers
+package com.cogu.spylook.mappers
 
+import com.cogu.domain.model.Cuenta
 import com.cogu.spylook.model.cards.CuentaCardItem
-import com.cogu.spylook.model.entity.CuentaEntity
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 
@@ -9,5 +9,5 @@ import org.mapstruct.Mapping
 interface CuentaToCardItem {
 
     @Mapping(target = "clickable", constant = "true")
-    fun toCardItem(cuentaEntity: CuentaEntity): CuentaCardItem
+    fun toCardItem(cuenta: Cuenta): CuentaCardItem
 }

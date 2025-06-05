@@ -6,6 +6,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.cogu.data.crossrefs.ContactoGrupoCrossRef
+import com.cogu.data.entity.AnotableEntity
+import com.cogu.data.entity.GrupoEntity
+import com.cogu.data.relations.ContactosGrupos
+import com.cogu.data.relations.GruposContactos
 import com.cogu.spylook.model.entity.Anotable
 import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
 import com.cogu.spylook.model.entity.Grupo
@@ -16,18 +21,18 @@ import com.cogu.spylook.model.relations.GruposContactos
 @Dao
 interface GrupoDAO {
     @Insert
-    suspend fun addAnotable(anotable: Anotable): Long
+    suspend fun addAnotable(anotable: AnotableEntity): Long
 
     @Insert
-    suspend fun addGrupo(grupo: Grupo) : Long
+    suspend fun addGrupo(grupo: GrupoEntity) : Long
 
     @Query("DELETE FROM anotables WHERE idAnotable = :idAnotable")
     suspend fun deleteAnotable(idAnotable: Int)
 
     @Transaction
-    suspend fun addGrupoWithAnotable(grupo: Grupo) : Long {
+    suspend fun addGrupoWithAnotable(grupo: GrupoEntity) : Long {
         val idAnotable = addAnotable(
-            Anotable(
+            AnotableEntity(
                 idAnotable = grupo.idAnotable,
                 nombre = grupo.nombre
             )
@@ -37,15 +42,15 @@ interface GrupoDAO {
     }
 
     @Transaction
-    suspend fun updateGrupoAnotable(grupo: Grupo) {
+    suspend fun updateGrupoAnotable(grupo: GrupoEntity) {
         updateAnotable(grupo)
         updateGrupo(grupo)
     }
 
     @Update
-    suspend fun updateAnotable(anotable: Anotable)
+    suspend fun updateAnotable(anotable: AnotableEntity)
     @Update
-    suspend fun updateGrupo(grupo: Grupo)
+    suspend fun updateGrupo(grupo: GrupoEntity)
 
     @Transaction
     suspend fun deleteGrupoAnotable(idAnotable: Int) {
@@ -57,10 +62,10 @@ interface GrupoDAO {
     suspend fun delete(idAnotable: Int)
 
     @Query("SELECT * FROM grupos WHERE idAnotable = :id")
-    suspend fun findGrupoById(id: Int): Grupo?
+    suspend fun findGrupoById(id: Int): GrupoEntity?
 
     @Query("SELECT * FROM grupos")
-    suspend fun getGrupos(): List<Grupo>
+    suspend fun getGrupos(): List<GrupoEntity>
 
     /**
      * Relación entre grupos y contactos
@@ -91,7 +96,7 @@ interface GrupoDAO {
     suspend fun findGruposByMiembro(idMiembro : Int) : List<ContactoGrupoCrossRef>
 
     @Query("SELECT * FROM grupos WHERE idCreador = :idAnotable")
-    suspend fun findGruposByCreador(idAnotable: Int): List<Grupo>
+    suspend fun findGruposByCreador(idAnotable: Int): List<GrupoEntity>
     @Transaction
     @Query("SELECT * FROM contacto_grupo_cross_ref WHERE idGrupo = :idGrupo")
     suspend fun getRelacionesByGrupo(idGrupo: Int): List<ContactoGrupoCrossRef>

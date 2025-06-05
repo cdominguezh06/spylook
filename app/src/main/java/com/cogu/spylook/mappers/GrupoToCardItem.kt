@@ -1,13 +1,12 @@
-package com.cogu.data.mappers
+package com.cogu.spylook.mappers
 
+import com.cogu.domain.model.Grupo
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.GrupoEntity
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 
 @Mapper
 interface GrupoToCardItem {
     @Mapping(target = "clickable", constant = "true")
-    fun toCardItem(grupoEntity: GrupoEntity): GrupoCardItem
-    fun toGrupo(grupoCardItem: GrupoCardItem): GrupoEntity
+    fun toCardItem(grupo: Grupo): GrupoCardItem
 }

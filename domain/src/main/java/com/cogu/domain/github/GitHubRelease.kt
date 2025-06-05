@@ -1,7 +1,7 @@
-package com.cogu.spylook.model.github
+package com.cogu.domain.github
 
 data class GitHubRelease(
-    val tag_name : String,
+    val tagName : String,
     val body : String,
     val assets: List<ReleaseAsset>
 )

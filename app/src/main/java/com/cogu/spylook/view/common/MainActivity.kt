@@ -1,18 +1,24 @@
 package com.cogu.spylook.view.common
 
 import android.app.ActivityOptions
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.transition.Slide
+import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -25,6 +31,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
@@ -37,10 +44,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter
 import com.cogu.spylook.adapters.cards.GrupoCardAdapter
-import com.cogu.spylook.controller.GithubController
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
-import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
 import com.cogu.spylook.model.utils.decorators.RainbowTextViewDecorator
@@ -53,17 +56,28 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.mapstruct.factory.Mappers
 import androidx.core.graphics.createBitmap
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.GrupoToCardItem
+import com.cogu.domain.github.GitHubRelease
 import com.cogu.spylook.view.contacts.ContactoActivity
+import com.cogu.spylook.viewmodel.UpdateViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import utils.MarkdownFormatter
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
+    private var lastReleaseTagShown: String? = null
+    private val updateViewModel: UpdateViewModel by viewModels()
     private val transitionEffect = Slide()
     private lateinit var adapter: RecyclerView.Adapter<*>
     private lateinit var recyclerView: RecyclerView
     private val contactoMapper: ContactoToCardItem =
         Mappers.getMapper(ContactoToCardItem::class.java)
     private val grupoMapper = Mappers.getMapper(GrupoToCardItem::class.java)
-    private lateinit var githubController: GithubController
     private lateinit var searchEditText: EditText
     private lateinit var database: AppDatabase
     private var contactos = mutableListOf<ContactoCardItem>()
@@ -107,18 +121,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
         this.enableEdgeToEdge()
-
-        githubController = GithubController.Companion.getInstance()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                updateViewModel.releaseState.collect { release ->
+                    if (release != null
+                        && updateViewModel.isUpdateAvailable(release.tagName)
+                        && lastReleaseTagShown != release.tagName
+                    ) {
+                        showUpdateDialog(release)
+                        lastReleaseTagShown = release.tagName
+                    }
+                }
+            }
+        }
         unknownAppsPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (this@MainActivity.packageManager.canRequestPackageInstalls()) {
-                githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
+                updateViewModel.checkForUpdates()
             } else {
                 Toast.makeText(this@MainActivity, "Permiso denegado.", Toast.LENGTH_SHORT).show()
             }
         }
-        githubController.checkForUpdates(this, unknownAppsPermissionLauncher)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -152,6 +176,46 @@ class MainActivity : AppCompatActivity() {
             applyRainbowDecorators()
         }
         lifecycleScope.launch(block = toExecute)
+    }
+
+    private fun showUpdateDialog(release: GitHubRelease) {
+        val markdownBody = release.body
+        val styledMarkdown: Spannable = MarkdownFormatter(markdownBody).let { clean ->
+            SpannableStringBuilder(MarkdownFormatter(clean)).apply {
+                val warningIndex = clean.indexOf("⚠️")
+                if (warningIndex != -1) {
+                    setSpan(
+                        ForegroundColorSpan(Color.RED),
+                        warningIndex,
+                        warningIndex + 2,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+            }
+        }
+
+        val builder = AlertDialog.Builder(this)
+            .setTitle("Nueva actualización disponible (${release.tagName})")
+            .setView(TextView(this).apply {
+                textSize = 16f
+                setPadding(32, 32, 32, 32)
+                setText(styledMarkdown, TextView.BufferType.SPANNABLE)
+            })
+
+        val downloadUrl =
+            release.assets.firstOrNull { it.name.endsWith(".apk") }?.browserDownloadUrl
+        builder.setPositiveButton("Descargar") { _, _ ->
+            if (downloadUrl != null) {
+                Log.d("UpdateViewModel", "Descargando desde URL: $downloadUrl")
+                updateViewModel.downloadFile(
+                    downloadUrl,
+                    "spylook-${release.tagName}.apk",
+                )
+            }
+        }
+
+        builder.setNegativeButton("Cancelar", null)
+        builder.show()
     }
 
     private fun setupWindowTransitions() {
@@ -248,13 +312,12 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun loadContacts() {
         contactos = database.contactoDAO()!!.getContactos()
-            .map { contactoMapper.toCardItem(it) }.toMutableList()
+            .map { contactoMapper.toCardItem(it.toModel()) }.toMutableList()
         contactos.ifEmpty { contactos.add(ContactoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
     }
 
     private suspend fun loadGroups() {
         grupos = database.grupoDAO()!!.getGrupos()
-            .map { grupoMapper.toCardItem(it) }.toMutableList()
         grupos.ifEmpty { grupos.add(GrupoCardItem.Companion.DEFAULT_FOR_EMPTY_LIST) }
     }
 

@@ -1,6 +1,5 @@
-package com.cogu.spylook.model.utils
+package com.cogu.spylook.model.github
 
-import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
@@ -8,7 +7,6 @@ import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 

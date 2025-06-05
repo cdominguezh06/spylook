@@ -1,12 +1,12 @@
-package com.cogu.data.mappers
+package com.cogu.spylook.mappers
 
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 
 @Mapper
 interface ContactoToCardItem {
     @Mapping(target = "clickable", constant = "true")
-    fun toCardItem(contactoEntity: ContactoEntity): ContactoCardItem
+    fun toCardItem(contacto: Contacto): ContactoCardItem
 }

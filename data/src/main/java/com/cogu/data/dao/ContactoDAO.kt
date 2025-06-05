@@ -1,30 +1,28 @@
 package com.cogu.data.dao
 
 import androidx.room.*
-import com.cogu.spylook.model.entity.Anotable
-import com.cogu.spylook.model.entity.Contacto
-import com.cogu.spylook.model.entity.ContactoAmistadCrossRef
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
-import com.cogu.spylook.model.relations.AmigosDeContacto
-import com.cogu.spylook.model.relations.ContactoConCuentas
-import com.cogu.spylook.model.relations.CreadorGrupo
+import com.cogu.data.crossrefs.ContactoAmistadCrossRef
+import com.cogu.data.entity.AnotableEntity
+import com.cogu.data.entity.ContactoEntity
+import com.cogu.data.relations.ContactoConCuentas
+import com.cogu.data.relations.CreadorGrupo
 
 @Dao
 interface ContactoDAO {
 
     @Insert
-    suspend fun addAnotable(anotable: Anotable): Long
+    suspend fun addAnotable(anotable: AnotableEntity): Long
 
     @Update
-    suspend fun updateAnotable(anotable: Anotable)
+    suspend fun updateAnotable(anotable: AnotableEntity)
 
     @Insert
-    suspend fun addContacto(contacto: Contacto)
+    suspend fun addContacto(contacto: ContactoEntity)
 
     @Transaction
-    suspend fun addContactoWithAnotable(contacto: Contacto) {
+    suspend fun addContactoWithAnotable(contacto: ContactoEntity) {
         val idAnotable = addAnotable(
-            Anotable(
+            AnotableEntity(
                 idAnotable = contacto.idAnotable,
                 nombre = contacto.nombre
             )
@@ -35,9 +33,9 @@ interface ContactoDAO {
 
 
     @Transaction
-    suspend fun updateContactoWithAnotable(contacto: Contacto) {
+    suspend fun updateContactoWithAnotable(contacto: ContactoEntity) {
         updateAnotable(
-            Anotable(
+            AnotableEntity(
                 idAnotable = contacto.idAnotable,
                 nombre = contacto.nombre
             )
@@ -46,10 +44,10 @@ interface ContactoDAO {
     }
 
     @Update
-    suspend fun updateContacto(contacto: Contacto)
+    suspend fun updateContacto(contacto: ContactoEntity)
 
     @Delete
-    suspend fun deleteContacto(contacto: Contacto)
+    suspend fun deleteContacto(contacto: ContactoEntity)
 
     @Query("DELETE FROM contactos WHERE idAnotable = :id")
     suspend fun deleteContactosById(id: Int)
@@ -64,16 +62,16 @@ interface ContactoDAO {
     }
 
     @Query("SELECT * FROM contactos WHERE idAnotable = :id")
-    suspend fun findContactoById(id: Int): Contacto
+    suspend fun findContactoById(id: Int): ContactoEntity
 
     @Query("SELECT * FROM anotables WHERE idAnotable = :id")
-    suspend fun findAnotableById(id: Int): Anotable
+    suspend fun findAnotableById(id: Int): AnotableEntity
 
     @Query("SELECT * FROM contactos WHERE nombre = :nombre")
-    suspend fun findContactoByName(nombre: String): Contacto?
+    suspend fun findContactoByName(nombre: String): ContactoEntity?
 
     @Query("SELECT * FROM contactos")
-    suspend fun getContactos(): List<Contacto>
+    suspend fun getContactos(): List<ContactoEntity>
 
     @Transaction
     @Query("SELECT * FROM contactos")
