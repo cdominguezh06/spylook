@@ -8,19 +8,18 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Anotable
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.SucesoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.SucesoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.SucesoCardItem
-import com.cogu.spylook.model.entity.AnotableEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.runBlocking
-import org.mapstruct.factory.Mappers
 
-class SucesosFragment(private val anotableEntity: AnotableEntity, private val context: Context) : Fragment() {
+class SucesosFragment(private val anotable: Anotable, private val context: Context) : Fragment() {
 
-    private val mapper: SucesoToCardItem = Mappers.getMapper(SucesoToCardItem::class.java)
     private var sucesos = mutableListOf<SucesoCardItem>()
 
     override fun onCreateView(
@@ -46,13 +45,13 @@ class SucesosFragment(private val anotableEntity: AnotableEntity, private val co
         val sucesoDao = db?.sucesoDAO()!!
         sucesos = mutableListOf()
         sucesos.add(SucesoCardItem.DEFAULT_FOR_ADD)
-        val temp = sucesoDao.findSucesosByCausante(anotableEntity.idAnotable)
-            .map { mapper.toCardItem(it) }
+        val temp = sucesoDao.findSucesosByCausante(anotable.idAnotable)
+            .map { it.toModel().toCardItem() }
             .toMutableList()
             .apply {
-                addAll(sucesoDao.findSucesosByImplicado(anotableEntity.idAnotable)
+                addAll(sucesoDao.findSucesosByImplicado(anotable.idAnotable)
                     .map { sucesoDao.findSucesoById(it.idSuceso)!! }
-                    .map { mapper.toCardItem(it) }) }
+                    .map { it.toModel().toCardItem() }) }
             .sortedByDescending { it.idAnotable }
         sucesos.apply { addAll(temp) }
             .toMutableList()
@@ -60,7 +59,7 @@ class SucesosFragment(private val anotableEntity: AnotableEntity, private val co
 
     private fun initializeRecyclerView(recyclerView: RecyclerView) {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SucesoCardAdapter(sucesos, context, anotableEntity)
+        recyclerView.adapter = SucesoCardAdapter(sucesos, context, anotable)
         recyclerView.addItemDecoration(SpacingItemDecoration(context))
     }
 }

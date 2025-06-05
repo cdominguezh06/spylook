@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import com.cogu.domain.github.FileDownloader
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class AndroidFileDownloader(
-    private val context: Context,
-    private val launcher: ActivityResultLauncher<Intent>
+class AndroidFileDownloader @Inject constructor(
+    @ApplicationContext private val context: Context,
 ) : FileDownloader{
+    lateinit var launcher: ActivityResultLauncher<Intent>
+
     override fun downloadAndInstallFile(
         url: String,
         fileName: String,

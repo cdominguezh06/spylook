@@ -13,11 +13,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.cogu.data.dao.GrupoDAO
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Grupo
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.GroupSliderAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.dao.GrupoDAO
-import com.cogu.spylook.model.entity.GrupoEntity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -70,20 +71,20 @@ class GrupoActivity : AppCompatActivity() {
             startActivity(intent)
         }
         lifecycleScope.launch {
-            val grupo = grupoDAO.findGrupoById(intent.getIntExtra("id", 0))!!
+            val grupo = grupoDAO.findGrupoById(intent.getIntExtra("id", 0))!!.toModel()
             setupGroupDetails(grupo)
             setupViewPager(grupo)
         }
     }
 
-    private fun setupGroupDetails(grupoEntity : GrupoEntity) {
+    private fun setupGroupDetails(grupoEntity : Grupo) {
         title.text = grupoEntity.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.group_icon)
         image.setColorFilter(grupoEntity.colorFoto, android.graphics.PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(grupoEntity: GrupoEntity) {
+    private fun setupViewPager(grupoEntity: Grupo) {
         viewPager.adapter = GroupSliderAdapter(this, grupoEntity, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
@@ -97,9 +98,8 @@ class GrupoActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            val grupo = grupoDAO.findGrupoById(intent.getIntExtra("id", 0))
-            title.text = grupo!!.nombre
-
+            val grupo = grupoDAO.findGrupoById(intent.getIntExtra("id", 0))!!.toModel()
+            title.text = grupo.nombre
             val currentPosition = viewPager.currentItem
             setupViewPager(grupo)
             viewPager.post {

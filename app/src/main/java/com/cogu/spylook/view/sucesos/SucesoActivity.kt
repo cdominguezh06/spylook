@@ -14,11 +14,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.cogu.data.dao.SucesoDAO
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Suceso
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.SucesoSliderAdapter
-import com.cogu.spylook.dao.SucesoDAO
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.entity.SucesoEntity
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -53,20 +54,20 @@ class SucesoActivity : AppCompatActivity() {
             startActivity(intent)
         }
         lifecycleScope.launch {
-            val suceso = sucesoDAO.findSucesoById(intent.getIntExtra("id", 0))
-            setupSucesoDetails(suceso!!)
+            val suceso = sucesoDAO.findSucesoById(intent.getIntExtra("id", 0))!!.toModel()
+            setupSucesoDetails(suceso)
             setupViewPager(suceso)
         }
     }
 
-    private fun setupSucesoDetails(sucesoEntity: SucesoEntity) {
+    private fun setupSucesoDetails(sucesoEntity: Suceso) {
         title.text = sucesoEntity.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.suceso_icon)
         image.setColorFilter(sucesoEntity.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(sucesoEntity: SucesoEntity) {
+    private fun setupViewPager(sucesoEntity: Suceso) {
         viewPager.adapter = SucesoSliderAdapter(this, sucesoEntity, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
@@ -87,8 +88,8 @@ class SucesoActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            val suceso = sucesoDAO.findSucesoById(intent.getIntExtra("id", 0))
-            title.text = suceso!!.nombre
+            val suceso = sucesoDAO.findSucesoById(intent.getIntExtra("id", 0))!!.toModel()
+            title.text = suceso.nombre
             val currentPosition = viewPager.currentItem
             setupViewPager(suceso)
             viewPager.post {

@@ -9,20 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.dao.ContactoDAO
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.AmigoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.dao.ContactoDAO
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
-class AmigosFragment(private val contactoEntity: ContactoEntity, private val context: Context?) : Fragment() {
+class AmigosFragment(private val contacto: Contacto, private val context: Context?) : Fragment() {
 
-    private val mapper: ContactoToCardItem = Mappers.getMapper(ContactoToCardItem::class.java)
     var amigos = mutableListOf<ContactoCardItem>()
 
     override fun onCreateView(
@@ -49,15 +48,15 @@ class AmigosFragment(private val contactoEntity: ContactoEntity, private val con
     }
 
     private suspend fun fetchAmigos(contactoDAO: ContactoDAO): MutableList<ContactoCardItem> {
-        val busquedaComoContacto = contactoDAO.getAmistadesPorContacto(contactoEntity.idAnotable).map {
+        val busquedaComoContacto = contactoDAO.getAmistadesPorContacto(contacto.idAnotable).map {
             contactoDAO.findContactoById(it.idAmigo)
         }.toMutableList()
-        val busquedaComoAmigo = contactoDAO.getContactosPorAmigo(contactoEntity.idAnotable).map {
+        val busquedaComoAmigo = contactoDAO.getContactosPorAmigo(contacto.idAnotable).map {
             contactoDAO.findContactoById(it.idContacto)
         }.toMutableList()
         busquedaComoAmigo.addAll(busquedaComoContacto)
         val amigos = busquedaComoAmigo.distinct().map {
-            mapper.toCardItem(it)
+            it.toModel().toCardItem()
         }.toMutableList()
         amigos.add(ContactoCardItem(
             idAnotable = -1,
@@ -71,7 +70,7 @@ class AmigosFragment(private val contactoEntity: ContactoEntity, private val con
 
     private fun initializeRecyclerView(recyclerView: RecyclerView, amigos: List<ContactoCardItem>) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = AmigoCardAdapter(amigos.toMutableList(), requireContext(), contactoEntity)
+        recyclerView.adapter = AmigoCardAdapter(amigos.toMutableList(), requireContext(), contacto)
         recyclerView.addItemDecoration(SpacingItemDecoration(requireContext()))
     }
 

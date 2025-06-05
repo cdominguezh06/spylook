@@ -9,16 +9,17 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.createBitmap
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
 import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
 import kotlinx.coroutines.runBlocking
 import org.mapstruct.factory.Mappers
 
 class ContactWidgetFactory(private val context: Context, private val intent: Intent) : RemoteViewsService.RemoteViewsFactory {
 
-    private val mapper : ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private val contactList = mutableListOf<ContactoCardItem>()
     private var appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -34,7 +35,7 @@ class ContactWidgetFactory(private val context: Context, private val intent: Int
                 addAll(AppDatabase.getInstance(context)!!
                     .contactoDAO()!!
                     .getContactos()
-                    .map {mapper.toCardItem(it)})
+                    .map {it.toModel().toCardItem()})
             }
         }
     }

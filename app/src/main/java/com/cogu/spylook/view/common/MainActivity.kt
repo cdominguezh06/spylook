@@ -63,15 +63,22 @@ import com.cogu.data.mappers.toModel
 import com.cogu.spylook.mappers.ContactoToCardItem
 import com.cogu.spylook.mappers.GrupoToCardItem
 import com.cogu.domain.github.GitHubRelease
+import com.cogu.spylook.model.github.AndroidFileDownloader
 import com.cogu.spylook.view.contacts.ContactoActivity
 import com.cogu.spylook.viewmodel.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
 import utils.MarkdownFormatter
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private var lastReleaseTagShown: String? = null
     private val updateViewModel: UpdateViewModel by viewModels()
     private val transitionEffect = Slide()
+
+    @Inject
+    lateinit var fileDownloader: AndroidFileDownloader
     private lateinit var adapter: RecyclerView.Adapter<*>
     private lateinit var recyclerView: RecyclerView
     private val contactoMapper: ContactoToCardItem =
@@ -120,38 +127,49 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setupWindowTransitions()
         this.enableEdgeToEdge()
+        unknownAppsPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            updateViewModel.onInstallPermissionResult(
+                this@MainActivity.packageManager.canRequestPackageInstalls()
+            )
+        }
+        fileDownloader.launcher = unknownAppsPermissionLauncher
+
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                updateViewModel.releaseState.collect { release ->
-                    if (release != null
-                        && updateViewModel.isUpdateAvailable(release.tagName)
-                        && lastReleaseTagShown != release.tagName
-                    ) {
-                        showUpdateDialog(release)
-                        lastReleaseTagShown = release.tagName
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    updateViewModel.releaseState
+                        .filterNotNull()
+                        .collect { release ->
+                            if(lastReleaseTagShown != release.tag_name)
+                                showUpdateDialog(release)
+                            lastReleaseTagShown = release.tag_name
+                        }
+                }
+
+                launch {
+                    updateViewModel.installPermissionGranted.collect {
+                        lastReleaseTagShown = ""
+                        updateViewModel.checkForUpdates()
                     }
                 }
             }
         }
-        unknownAppsPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (this@MainActivity.packageManager.canRequestPackageInstalls()) {
-                updateViewModel.checkForUpdates()
-            } else {
-                Toast.makeText(this@MainActivity, "Permiso denegado.", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                updateViewModel.downloadEvent.filterNotNull().collect { data ->
+                    Log.d("MainActivity", "Evento de descarga recibido: $data")
+                    fileDownloader.downloadAndInstallFile(
+                        url = data.url,
+                        fileName = data.filename,
+                        onSuccess = { },
+                        onError = { }
+                    )
+                }
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.POST_NOTIFICATIONS
-                )
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 100)
-            }
-        }
+        checkPermissions()
         setContentView(R.layout.activity_main)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         applyWindowInsets()
@@ -175,6 +193,20 @@ class MainActivity : AppCompatActivity() {
             applyRainbowDecorators()
         }
         lifecycleScope.launch(block = toExecute)
+        updateViewModel.checkForUpdates()
+    }
+
+    private fun checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 100)
+            }
+        }
     }
 
     private fun showUpdateDialog(release: GitHubRelease) {
@@ -194,7 +226,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val builder = AlertDialog.Builder(this)
-            .setTitle("Nueva actualización disponible (${release.tagName})")
+            .setTitle("Nueva actualización disponible (${release.tag_name})")
             .setView(TextView(this).apply {
                 textSize = 16f
                 setPadding(32, 32, 32, 32)
@@ -202,13 +234,13 @@ class MainActivity : AppCompatActivity() {
             })
 
         val downloadUrl =
-            release.assets.firstOrNull { it.name.endsWith(".apk") }?.browserDownloadUrl
+            release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
         builder.setPositiveButton("Descargar") { _, _ ->
             if (downloadUrl != null) {
                 Log.d("UpdateViewModel", "Descargando desde URL: $downloadUrl")
-                updateViewModel.downloadFile(
+                updateViewModel.onDownloadClicked(
                     downloadUrl,
-                    "spylook-${release.tagName}.apk",
+                    "spylook-${release.tag_name}.apk",
                 )
             }
         }
@@ -326,6 +358,11 @@ class MainActivity : AppCompatActivity() {
         searchEditText.clearFocus()
         searchEditText.text.clear()
         lifecycleScope.launch(block = toExecute)
+        if (packageManager.canRequestPackageInstalls()) {
+            lastReleaseTagShown = ""
+            updateViewModel.checkForUpdates()
+        }
+
     }
 
 }

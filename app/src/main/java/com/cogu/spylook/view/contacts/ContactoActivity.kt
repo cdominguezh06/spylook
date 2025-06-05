@@ -14,18 +14,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.cogu.data.dao.ContactoDAO
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.slider.ContactSliderAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.dao.ContactoDAO
-import com.cogu.spylook.mappers.ContactoToCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.view.common.MainActivity
 import com.cogu.spylook.view.notification.NotificationHelper
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
 class ContactoActivity : AppCompatActivity() {
 
@@ -75,22 +75,22 @@ class ContactoActivity : AppCompatActivity() {
             startActivity(intent)
         }
         lifecycleScope.launch {
-            val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
-            MainActivity.addRecentContact(Mappers.getMapper(ContactoToCardItem::class.java).toCardItem(contact), this@ContactoActivity)
+            val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0)).toModel()
+            MainActivity.addRecentContact(contact.toCardItem(), this@ContactoActivity)
             setupContactDetails(contact)
             setupViewPager(contact)
             NotificationHelper.lastContact = contact
         }
     }
 
-    private fun setupContactDetails(contact: ContactoEntity) {
+    private fun setupContactDetails(contact: Contacto) {
         title.text = contact.nombre
         val image: ImageView = findViewById(R.id.imageView3)
         image.setImageResource(R.drawable.contact_icon)
         image.setColorFilter(contact.colorFoto, PorterDuff.Mode.MULTIPLY)
     }
 
-    private fun setupViewPager(contact: ContactoEntity) {
+    private fun setupViewPager(contact: Contacto) {
         viewPager.adapter = ContactSliderAdapter(this, contact, this)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
@@ -108,6 +108,7 @@ class ContactoActivity : AppCompatActivity() {
         super.onResume()
         lifecycleScope.launch {
             val contact = contactoDAO.findContactoById(intent.getIntExtra("id", 0))
+                .toModel()
             title.text = contact.nombre
             val currentPosition = viewPager.currentItem
             setupViewPager(contact)

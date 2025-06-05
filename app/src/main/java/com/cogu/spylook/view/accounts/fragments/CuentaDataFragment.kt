@@ -10,22 +10,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.dao.ContactoDAO
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Cuenta
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter
-import com.cogu.spylook.dao.ContactoDAO
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.CuentaEntity
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
-class CuentaDataFragment(private val cuentaEntity: CuentaEntity, val contexto: Context) : Fragment() {
+class CuentaDataFragment(private val cuentaEntity: Cuenta, val contexto: Context) : Fragment() {
 
     private lateinit var linkTextView: TextView
     private lateinit var redSocialTextView: TextView
     private lateinit var recyclerPropietario : RecyclerView
-    private var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private lateinit var contactoDAO : ContactoDAO
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +42,7 @@ class CuentaDataFragment(private val cuentaEntity: CuentaEntity, val contexto: C
         contactoDAO = AppDatabase.getInstance(contexto)!!.contactoDAO()!!
         recyclerPropietario = fragment.findViewById<RecyclerView>(R.id.recyclerPropietario)
         val propietario = mutableListOf<ContactoCardItem>(
-            mapper.toCardItem(contactoDAO.findContactoById(cuentaEntity.idPropietario))
+            contactoDAO.findContactoById(cuentaEntity.idPropietario).toModel().toCardItem()
         )
         recyclerPropietario.layoutManager = LinearLayoutManager(contexto)
         recyclerPropietario.adapter = ContactoCardAdapter(propietario, contexto)

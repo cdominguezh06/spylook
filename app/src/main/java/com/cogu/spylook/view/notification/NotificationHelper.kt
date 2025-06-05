@@ -13,14 +13,14 @@ import android.widget.RemoteViews
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.createBitmap
-import com.cogu.spylook.model.entity.ContactoEntity
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.view.contacts.ContactoActivity
 
 object NotificationHelper {
     private const val CHANNEL_ID = "notificacion_contacto"
     private const val CHANNEL_NAME = "Notificación de Contacto"
     private const val NOTIFICATION_ID = 10
-    var lastContact : ContactoEntity? = null
+    var lastContact : Contacto? = null
 
     private fun createNotificationChannel(context: Context) {
         val channel = NotificationChannel(
@@ -34,7 +34,7 @@ object NotificationHelper {
         manager.createNotificationChannel(channel)
     }
 
-    fun showOpenContactNotification(context: Context, contactoEntity: ContactoEntity) {
+    fun showOpenContactNotification(context: Context, contactoEntity: Contacto) {
         createNotificationChannel(context)
         lastContact?.apply {
           if(lastContact!! == contactoEntity) return@apply

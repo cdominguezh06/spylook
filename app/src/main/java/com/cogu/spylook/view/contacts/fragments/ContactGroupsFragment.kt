@@ -8,20 +8,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.GruposDeContactoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.GrupoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.GrupoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
-class ContactGroupsFragment(private val contactoEntity: ContactoEntity) : Fragment() {
+class ContactGroupsFragment(private val contacto: Contacto) : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private val mapper = Mappers.getMapper(GrupoToCardItem::class.java)
 
     companion object{
         var grupos = mutableListOf<GrupoCardItem>()
@@ -41,12 +40,12 @@ class ContactGroupsFragment(private val contactoEntity: ContactoEntity) : Fragme
         recyclerView = fragment.findViewById(R.id.recyclerGeneric)
         val db = AppDatabase.getInstance(requireContext())!!.grupoDAO()
         lifecycleScope.launch {
-            grupos = db!!.findGruposByMiembro(contactoEntity.idAnotable).map {
-                mapper.toCardItem(db.findGrupoById(it.idGrupo)!!)
+            grupos = db!!.findGruposByMiembro(contacto.idAnotable).map {
+                db.findGrupoById(it.idGrupo)!!.toModel().toCardItem()
             }.toMutableList()
             grupos.addAll(
-                db.findGruposByCreador(contactoEntity.idAnotable).map {
-                    mapper.toCardItem(it)
+                db.findGruposByCreador(contacto.idAnotable).map {
+                    it.toModel().toCardItem()
                 }
             )
             grupos.add(GrupoCardItem.ADD_TO_GROUP)
@@ -55,7 +54,7 @@ class ContactGroupsFragment(private val contactoEntity: ContactoEntity) : Fragme
     }
 
     private fun setupRecyclerView(cardItems: MutableList<GrupoCardItem>) {
-        val adapter = GruposDeContactoCardAdapter(cardItems, requireContext(), contactoEntity)
+        val adapter = GruposDeContactoCardAdapter(cardItems, requireContext(), contacto)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         if (recyclerView.itemDecorationCount == 0) {

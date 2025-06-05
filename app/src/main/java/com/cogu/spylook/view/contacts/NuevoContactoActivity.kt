@@ -20,10 +20,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.cogu.data.DateConverters
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toEntity
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
 import com.cogu.spylook.R
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.model.entity.ContactoEntity
-import com.cogu.spylook.model.utils.converters.DateConverters
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import com.cogu.spylook.view.widget.CustomProvider
 import kotlinx.coroutines.launch
@@ -41,7 +43,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
     private lateinit var nextButton: Button
     private lateinit var imagen : ImageView
     private lateinit var database: AppDatabase
-    var toEdit: ContactoEntity? = null
+    var toEdit: Contacto? = null
     companion object {
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     }
@@ -77,6 +79,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
         lifecycleScope.launch {
             if(intent.getIntExtra("idEdit", -1)!=-1){
                 toEdit = AppDatabase.getInstance(this@NuevoContactoActivity)!!.contactoDAO()!!.findContactoById(intent.getIntExtra("idEdit", -1))
+                    .toModel()
             }
             toEdit?.let {
                 nameEditText.setText(toEdit?.nombre)
@@ -112,7 +115,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
                         contacto.colorFoto = it.colorFoto
                         lifecycleScope.launch {
                             contacto.idAnotable = toEdit!!.idAnotable
-                            database.contactoDAO()!!.updateContactoWithAnotable(contacto)
+                            database.contactoDAO()!!.updateContactoWithAnotable(contacto.toEntity())
                             dialog.dismiss()
                             finish()
                         }
@@ -132,14 +135,14 @@ class NuevoContactoActivity() : AppCompatActivity() {
                         .show()
                     return@launch
                 }
-                database.contactoDAO()!!.addContactoWithAnotable(contact)
+                database.contactoDAO()!!.addContactoWithAnotable(contact.toEntity())
                 notifyWidgetUpdate()
                 finish()
             }
         }
     }
 
-    private fun createContactFromInput(): ContactoEntity {
+    private fun createContactFromInput(): Contacto {
         val name = nameEditText.text.toString()
         val nick = nickEditText.text.toString()
         val birthday = LocalDate.parse(birthdayEditText.text.toString(), DATE_FORMATTER)
@@ -148,7 +151,7 @@ class NuevoContactoActivity() : AppCompatActivity() {
         val country = countryEditText.text.toString()
         val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
 
-        return ContactoEntity(
+        return Contacto(
             nombre = name,
             alias = nick,
             fechaNacimiento = birthday,

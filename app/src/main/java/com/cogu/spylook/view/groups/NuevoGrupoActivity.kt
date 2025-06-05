@@ -16,17 +16,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.crossrefs.ContactoGrupoCrossRef
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toEntity
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Grupo
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.SingleContactCardSearchAdapter
 import com.cogu.spylook.adapters.search.MultipleContactsCardSearchAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoGrupoCrossRef
-import com.cogu.spylook.model.entity.GrupoEntity
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 import kotlin.collections.ifEmpty
 
 class NuevoGrupoActivity : AppCompatActivity() {
@@ -37,11 +38,10 @@ class NuevoGrupoActivity : AppCompatActivity() {
     private lateinit var recyclerMiembrosGrupo: RecyclerView
     private lateinit var textNombreGrupo: EditText
     private lateinit var boton: Button
-    private lateinit var imagen : ImageView
+    private lateinit var imagen: ImageView
     private lateinit var db: AppDatabase
-    private lateinit var recyclerAnimator : RecyclerViewAnimator
-    var toEdit: GrupoEntity? = null
-    var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
+    private lateinit var recyclerAnimator: RecyclerViewAnimator
+    var toEdit: Grupo? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -58,7 +58,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
         lifecycleScope.launch {
             if (intent.getIntExtra("idEdit", -1) != -1) {
                 toEdit = AppDatabase.getInstance(this@NuevoGrupoActivity)!!.grupoDAO()!!
-                    .findGrupoById(intent.getIntExtra("idEdit", -1))
+                    .findGrupoById(intent.getIntExtra("idEdit", -1))!!.toModel()
             }
             toEdit?.let {
                 textNombreGrupo.setText(toEdit?.nombre)
@@ -67,10 +67,10 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 val contactoDao = AppDatabase.getInstance(this@NuevoGrupoActivity)!!
                     .contactoDAO()!!
                 val creadorEdit =
-                    mapper.toCardItem(contactoDao.findContactoById(toEdit?.idCreador!!))
+                    contactoDao.findContactoById(toEdit?.idCreador!!).toModel().toCardItem()
                 val miembrosEdit = AppDatabase.getInstance(this@NuevoGrupoActivity)!!
                     .grupoDAO()!!.getRelacionesByGrupo(toEdit?.idAnotable!!).map {
-                        mapper.toCardItem(contactoDao.findContactoById(it.idContacto))
+                        contactoDao.findContactoById(it.idContacto).toModel().toCardItem()
                     }
                 creador.add(creadorEdit)
                 miembros.addAll(miembrosEdit)
@@ -114,7 +114,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
             )
             recyclerCreadorGrupo.layoutManager = LinearLayoutManager(this@NuevoGrupoActivity)
             recyclerCreadorGrupo.adapter = adapter
-            recyclerAnimator = RecyclerViewAnimator(recyclerCreadorGrupo, creador,adapter )
+            recyclerAnimator = RecyclerViewAnimator(recyclerCreadorGrupo, creador, adapter)
             recyclerMiembrosGrupo.layoutManager = LinearLayoutManager(this@NuevoGrupoActivity)
             var adapterMiembros = MultipleContactsCardSearchAdapter(
                 miembros,
@@ -125,7 +125,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
                         addAll(creador.filter { it.idAnotable != -1 })
                         addAll(miembros.filter { it.idAnotable != -1 })
                     }
-                } ,
+                },
                 onClick = { cardItem, dialog, adapter ->
                     val buscarCard =
                         miembros[miembros.size - 1]
@@ -135,7 +135,7 @@ class NuevoGrupoActivity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
                     dialog.dismiss()
                 },
-                onLongClick = {cardItem, context, adapter, holder ->
+                onLongClick = { cardItem, context, adapter, holder ->
                     if (cardItem.idAnotable == -1) false
                     AlertDialog.Builder(context)
                         .setTitle("Retirar miembro")
@@ -186,18 +186,18 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val color = Color.rgb((0..255).random(), (0..255).random(), (0..255).random())
-            val nuevoGrupoEntity = GrupoEntity(0, nombreGrupo, color, creador.first().idAnotable)
+            val nuevoGrupo = Grupo(0, nombreGrupo, color, creador.first().idAnotable)
             toEdit?.let {
                 AlertDialog.Builder(this@NuevoGrupoActivity)
                     .setTitle("Sobreescribir grupo")
                     .setMessage("¿Desea sobreescribir el grupo actual?")
                     .setPositiveButton("Confirmar") { dialog, _ ->
-                        nuevoGrupoEntity.idAnotable = toEdit?.idAnotable!!
+                        nuevoGrupo.idAnotable = toEdit?.idAnotable!!
                         lifecycleScope.launch {
-                            nuevoGrupoEntity.colorFoto = toEdit?.colorFoto!!
-                            db.grupoDAO()!!.updateGrupoAnotable(nuevoGrupoEntity)
-                            db.grupoDAO()!!.eliminarRelacionesPorGrupo(nuevoGrupoEntity.idAnotable)
-                            insertarRelaciones(nuevoGrupoEntity.idAnotable)
+                            nuevoGrupo.colorFoto = toEdit?.colorFoto!!
+                            db.grupoDAO()!!.updateGrupoAnotable(nuevoGrupo.toEntity())
+                            db.grupoDAO()!!.eliminarRelacionesPorGrupo(nuevoGrupo.idAnotable)
+                            insertarRelaciones(nuevoGrupo.idAnotable)
                             dialog.dismiss()
                             finish()
                         }
@@ -209,14 +209,15 @@ class NuevoGrupoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupoEntity).toInt()
+                val grupoId = db.grupoDAO()!!.addGrupoWithAnotable(nuevoGrupo.toEntity()).toInt()
                 insertarRelaciones(grupoId)
                 finish()
             }
 
         }
     }
-    suspend fun insertarRelaciones(grupoId: Int){
+
+    suspend fun insertarRelaciones(grupoId: Int) {
         val relaciones = miembros
             .filter { it.idAnotable != -1 }
             .map { miembro ->

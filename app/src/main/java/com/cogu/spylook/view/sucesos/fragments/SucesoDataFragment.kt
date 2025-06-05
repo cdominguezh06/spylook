@@ -11,23 +11,22 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.dao.ContactoDAO
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Suceso
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter
-import com.cogu.spylook.dao.ContactoDAO
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.SucesoEntity
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
-class SucesoDataFragment(private val sucesoEntity: SucesoEntity, val contexto: Context) : Fragment() {
+class SucesoDataFragment(private val suceso: Suceso, val contexto: Context) : Fragment() {
 
     private lateinit var descripcionTextView: TextView
     private lateinit var fechaTextView: TextView
     private lateinit var lugarTextView: TextView
     private lateinit var recyclerCausante : RecyclerView
-    private var mapper = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     private lateinit var contactoDAO : ContactoDAO
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +44,7 @@ class SucesoDataFragment(private val sucesoEntity: SucesoEntity, val contexto: C
         contactoDAO = AppDatabase.getInstance(contexto)!!.contactoDAO()!!
         recyclerCausante = fragment.findViewById<RecyclerView>(R.id.recyclerCausante)
         val causante = mutableListOf<ContactoCardItem>(
-            mapper.toCardItem(contactoDAO.findContactoById(sucesoEntity.idCausante))
+            contactoDAO.findContactoById(suceso.idCausante).toModel().toCardItem()
         )
         recyclerCausante.layoutManager = LinearLayoutManager(contexto)
         recyclerCausante.adapter = ContactoCardAdapter(causante, contexto)
@@ -53,11 +52,11 @@ class SucesoDataFragment(private val sucesoEntity: SucesoEntity, val contexto: C
 
     private fun bindStaticFields(fragment: View) {
         descripcionTextView = fragment.findViewById<TextView>(R.id.descripcionText)
-        descripcionTextView.text = sucesoEntity.descripcion
+        descripcionTextView.text = suceso.descripcion
         descripcionTextView.movementMethod = ScrollingMovementMethod()
         fechaTextView = fragment.findViewById<TextView>(R.id.sucesoFechaText)
-        fechaTextView.text = sucesoEntity.fecha
+        fechaTextView.text = suceso.fecha
         lugarTextView = fragment.findViewById<TextView>(R.id.sucesoLugarText)
-        lugarTextView.text = sucesoEntity.lugar
+        lugarTextView.text = suceso.lugar
     }
 }

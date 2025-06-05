@@ -9,7 +9,7 @@ class CheckForUpdatesUseCase(private val repo : GitHubRepository) {
 
     operator fun invoke(owner: String, repoName: String, currentVersion: String): Flow<GitHubRelease?> {
         return repo.getLatestRelease(owner, repoName).map { release ->
-            if (isUpdateAvailable(release.tagName, currentVersion)) release else null
+            if (isUpdateAvailable(release.tag_name, currentVersion)) release else null
         }
     }
 

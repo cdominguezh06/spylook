@@ -18,18 +18,19 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.crossrefs.ContactoSucesoCrossRef
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toEntity
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Suceso
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.search.SingleContactCardSearchAdapter
 import com.cogu.spylook.adapters.search.MultipleContactsCardSearchAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoSucesoCrossRef
-import com.cogu.spylook.model.entity.SucesoEntity
 import com.cogu.spylook.model.utils.animations.RecyclerViewAnimator
 import com.cogu.spylook.model.utils.textWatchers.DateTextWatcher
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
 class NuevoSucesoActivity : AppCompatActivity() {
 
@@ -44,10 +45,9 @@ class NuevoSucesoActivity : AppCompatActivity() {
     private lateinit var db: AppDatabase
     private lateinit var recyclerAnimator: RecyclerViewAnimator
     private var anotableOrigen: Int = -1
-    var toEdit: SucesoEntity? = null
+    var toEdit: Suceso? = null
     var causante = mutableListOf<ContactoCardItem>()
     var implicados = mutableListOf<ContactoCardItem>()
-    var mapper: ContactoToCardItem = Mappers.getMapper<ContactoToCardItem>(ContactoToCardItem::class.java)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
@@ -73,7 +73,8 @@ class NuevoSucesoActivity : AppCompatActivity() {
         imagen = findViewById<ImageView>(R.id.imageView3)
         lifecycleScope.launch {
             if(intent.getIntExtra("idEdit", -1)!=-1){
-                toEdit = AppDatabase.getInstance(this@NuevoSucesoActivity)!!.sucesoDAO()!!.findSucesoById(intent.getIntExtra("idEdit", -1))
+                toEdit = AppDatabase.getInstance(this@NuevoSucesoActivity)!!.sucesoDAO()!!.findSucesoById(intent.getIntExtra("idEdit", -1))!!
+                    .toModel()
             }
             toEdit?.let {
                 textNombreSuceso.setText(toEdit?.nombre)
@@ -84,10 +85,10 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 imagen.setColorFilter(toEdit?.colorFoto!!, PorterDuff.Mode.MULTIPLY)
                 val contactoDao = AppDatabase.getInstance(this@NuevoSucesoActivity)!!
                     .contactoDAO()!!
-                val causanteEdit = mapper.toCardItem(contactoDao.findContactoById(toEdit?.idCausante!!))
+                val causanteEdit = contactoDao.findContactoById(toEdit?.idCausante!!).toModel().toCardItem()
                 val implicadosEdit = AppDatabase.getInstance(this@NuevoSucesoActivity)!!
                     .sucesoDAO()!!.getRelacionesBySuceso(toEdit?.idAnotable!!).map {
-                        mapper.toCardItem(contactoDao.findContactoById(it.idContacto))
+                        contactoDao.findContactoById(it.idContacto).toModel().toCardItem()
                     }
                 causante.add(causanteEdit)
                 implicados.addAll(implicadosEdit)
@@ -212,7 +213,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
             val fecha = textFechaSuceso.text.toString()
             val descripcion = textDescripcionSuceso.text.toString()
             val lugar = textLugarSuceso.text.toString()
-            val sucesoEntity = SucesoEntity(
+            val suceso = Suceso(
                 idAnotable = 0,
                 nombre = nombreSuceso,
                 fecha = fecha,
@@ -226,12 +227,12 @@ class NuevoSucesoActivity : AppCompatActivity() {
                     .setTitle("Sobreescribir suceso")
                     .setMessage("¿Desea sobreescribir el suceso actual?")
                     .setPositiveButton("Confirmar") { dialog, _ ->
-                        sucesoEntity.idAnotable = toEdit?.idAnotable!!
+                        suceso.idAnotable = toEdit?.idAnotable!!
                         lifecycleScope.launch {
-                            sucesoEntity.colorFoto = toEdit?.colorFoto!!
-                            db.sucesoDAO()!!.updateSucesoAnotable(sucesoEntity)
-                            db.sucesoDAO()!!.eliminarRelacionesPorSuceso(sucesoEntity.idAnotable)
-                            insertarRelaciones(sucesoEntity.idAnotable)
+                            suceso.colorFoto = toEdit?.colorFoto!!
+                            db.sucesoDAO()!!.updateSucesoAnotable(suceso.toEntity())
+                            db.sucesoDAO()!!.eliminarRelacionesPorSuceso(suceso.idAnotable)
+                            insertarRelaciones(suceso.idAnotable)
                             dialog.dismiss()
                             finish()
                         }
@@ -243,7 +244,7 @@ class NuevoSucesoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(sucesoEntity).toInt()
+                val sucesoId = db.sucesoDAO()!!.addSucesoAnotable(suceso.toEntity()).toInt()
                 insertarRelaciones(sucesoId)
                 finish()
             }

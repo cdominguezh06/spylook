@@ -8,21 +8,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cogu.data.database.AppDatabase
+import com.cogu.data.mappers.toModel
+import com.cogu.domain.model.Contacto
+import com.cogu.domain.model.Suceso
 import com.cogu.spylook.R
 import com.cogu.spylook.adapters.cards.ContactoCardAdapter
-import com.cogu.spylook.database.AppDatabase
-import com.cogu.spylook.mappers.ContactoToCardItem
+import com.cogu.spylook.mappers.toCardItem
 import com.cogu.spylook.model.cards.ContactoCardItem
-import com.cogu.spylook.model.entity.ContactoEntity
-import com.cogu.spylook.model.entity.SucesoEntity
 import com.cogu.spylook.model.utils.decorators.SpacingItemDecoration
 import kotlinx.coroutines.launch
-import org.mapstruct.factory.Mappers
 
-class ImplicadosFragment(private val sucesoEntity: SucesoEntity) : Fragment() {
+class ImplicadosFragment(private val suceso: Suceso) : Fragment() {
 
     private lateinit var recycler: RecyclerView
-    private val mapper = Mappers.getMapper(ContactoToCardItem::class.java)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,8 +38,8 @@ class ImplicadosFragment(private val sucesoEntity: SucesoEntity) : Fragment() {
         val sucesoDao = AppDatabase.getInstance(requireContext())!!.sucesoDAO()
         val contactoDao = AppDatabase.getInstance(requireContext())!!.contactoDAO()
         lifecycleScope.launch {
-            val implicados = sucesoDao!!.getRelacionesBySuceso(sucesoEntity.idAnotable).map {
-                contactoDao!!.findContactoById(it.idContacto)
+            val implicados = sucesoDao!!.getRelacionesBySuceso(suceso.idAnotable).map {
+                contactoDao!!.findContactoById(it.idContacto).toModel()
             }
             val cardItems = buildCardItemList(implicados)
             cardItems.ifEmpty {
@@ -50,8 +49,8 @@ class ImplicadosFragment(private val sucesoEntity: SucesoEntity) : Fragment() {
         }
     }
 
-    private fun buildCardItemList(miembros: List<ContactoEntity>): MutableList<ContactoCardItem> {
-        val cardItems = miembros.map { mapper.toCardItem(it) }.toMutableList()
+    private fun buildCardItemList(miembros: List<Contacto>): MutableList<ContactoCardItem> {
+        val cardItems = miembros.map { it.toCardItem() }.toMutableList()
         return cardItems
     }
 

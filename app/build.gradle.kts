@@ -1,5 +1,6 @@
 plugins {
     id("com.google.devtools.ksp")
+    id("dagger.hilt.android.plugin")
     kotlin("kapt") version "2.1.20"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
