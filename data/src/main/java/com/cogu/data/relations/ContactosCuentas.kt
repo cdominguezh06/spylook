@@ -7,17 +7,17 @@ import com.cogu.data.crossrefs.CuentaContactoCrossRef
 import com.cogu.data.entity.ContactoEntity
 import com.cogu.data.entity.CuentaEntity
 
-data class CuentaConContactos(
+data class ContactosCuentas(
     @Embedded
-    val cuentaEntity: CuentaEntity,
+    val contactoEntity: ContactoEntity,
     @Relation(
         parentColumn = "idAnotable",
         entityColumn = "idAnotable",
         associateBy = Junction(
             value = CuentaContactoCrossRef::class,
-            parentColumn = "idCuenta",
-            entityColumn = "idContacto"
+            parentColumn = "idContacto",
+            entityColumn = "idCuenta"
         )
     )
-    val contactoEntities: List<ContactoEntity>
+    val cuentaEntities: List<CuentaEntity>
 )

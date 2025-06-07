@@ -68,6 +68,7 @@ class UpdateViewModel @Inject constructor(
 
     private val _releaseState = MutableStateFlow<GitHubRelease?>(null)
     val releaseState: StateFlow<GitHubRelease?> = _releaseState
+        .onStart { checkForUpdates() }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     fun checkForUpdates() {

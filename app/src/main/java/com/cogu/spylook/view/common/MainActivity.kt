@@ -193,7 +193,6 @@ class MainActivity : AppCompatActivity() {
             applyRainbowDecorators()
         }
         lifecycleScope.launch(block = toExecute)
-        updateViewModel.checkForUpdates()
     }
 
     private fun checkPermissions() {

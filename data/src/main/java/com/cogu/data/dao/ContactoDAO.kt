@@ -4,7 +4,7 @@ import androidx.room.*
 import com.cogu.data.crossrefs.ContactoAmistadCrossRef
 import com.cogu.data.entity.AnotableEntity
 import com.cogu.data.entity.ContactoEntity
-import com.cogu.data.relations.ContactoConCuentas
+import com.cogu.data.relations.ContactosCuentas
 import com.cogu.data.relations.CreadorGrupo
 
 @Dao
@@ -77,6 +77,10 @@ interface ContactoDAO {
     @Query("SELECT * FROM contactos")
     suspend fun getCreadoresDeGrupos(): List<CreadorGrupo>
 
+    @Transaction
+    @Query("SELECT * FROM contactos WHERE idAnotable = :idAnotable")
+    suspend fun getCreadorDeGrupo(idAnotable: Int): CreadorGrupo?
+
     @Insert
     suspend fun insertAmistad(crossRef: ContactoAmistadCrossRef)
 
@@ -92,6 +96,6 @@ interface ContactoDAO {
     suspend fun getContactosPorAmigo(idAmigo: Int): List<ContactoAmistadCrossRef>
     @Transaction
     @Query("SELECT * FROM contactos WHERE idAnotable = :idContacto")
-    fun obtenerContactoConCuentas(idContacto: Int): List<ContactoConCuentas>
+    fun obtenerContactoConCuentas(idContacto: Int): List<ContactosCuentas>
 
 }

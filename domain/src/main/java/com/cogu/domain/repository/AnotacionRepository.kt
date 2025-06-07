@@ -8,5 +8,4 @@ interface AnotacionRepository {
     suspend fun deleteAnotacion(anotacion: Anotacion)
     fun findAnotacionById(id: Int): Flow<Anotacion>
     fun getAnotacionesDeAnotable(idAnotable: Int): Flow<List<Anotacion>>
-    fun getAnotaciones(): Flow<List<Anotacion>>
 }

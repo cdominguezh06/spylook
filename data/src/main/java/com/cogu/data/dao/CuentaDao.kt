@@ -9,7 +9,7 @@ import androidx.room.Update
 import com.cogu.data.crossrefs.CuentaContactoCrossRef
 import com.cogu.data.entity.AnotableEntity
 import com.cogu.data.entity.CuentaEntity
-import com.cogu.data.relations.CuentaConContactos
+import com.cogu.data.relations.CuentasContactos
 
 @Dao
 interface CuentaDao {
@@ -53,11 +53,11 @@ interface CuentaDao {
 
     @Transaction
     @Query("SELECT * FROM cuentas WHERE idAnotable = :idCuenta")
-    fun obtenerCuentaConContactos(idCuenta: Int): List<CuentaConContactos>
+    fun obtenerCuentaConContactos(idCuenta: Int): List<CuentasContactos>
 
     @Transaction
     @Query("SELECT * FROM cuentas WHERE link = :link")
-    fun obtenerCuentaConContactosPorLink(link: String): List<CuentaConContactos>
+    fun obtenerCuentaConContactosPorLink(link: String): List<CuentasContactos>
 
     @Transaction
     suspend fun deleteCuentaAnotable(suceso: Int) {

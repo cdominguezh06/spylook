@@ -5,7 +5,7 @@ import androidx.room.Relation
 import com.cogu.data.entity.AnotableEntity
 import com.cogu.data.entity.AnotacionEntity
 
-class AnotableConAnotaciones {
+class AnotablesAnotaciones {
     @JvmField
     @Embedded
     var anotableEntity: AnotableEntity? = null

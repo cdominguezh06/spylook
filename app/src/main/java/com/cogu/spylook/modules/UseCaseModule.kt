@@ -1,4 +1,4 @@
-package com.cogu.spylook.usecase
+package com.cogu.spylook.modules
 
 import com.cogu.domain.repository.GitHubRepository
 import com.cogu.domain.usecase.github.CheckForUpdatesUseCase
